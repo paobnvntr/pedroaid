@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('email');
             $table->string('appointment_date');
             $table->string('appointment_time');
-            $table->string('date_finished')->nullable();
             $table->string('appointment_status')->default('Pending');
+            $table->timestamp('date_finished')->nullable();
             $table->timestamps();
         });
     }
