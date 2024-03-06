@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+pawwy{$2a$10$MbpRb83zB0uD.SDB9C6fGu/SNORzFmK4LpLES5332vSEYFvpmM/Iq}

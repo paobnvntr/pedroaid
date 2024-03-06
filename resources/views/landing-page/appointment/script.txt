@@ -1,0 +1,212 @@
+            <!-- <div class="form-group">
+                <label for="selectedDate">Select Date (Tuesday & Thursday Only): </label>
+                <input type="date" id="selectedDate" name="selectedDate" value="{{ old('selectedDate') }}"
+                class="form-control form-control-user @error('selectedDate')is-invalid @enderror col-sm-3 mb-3 mb-sm-0">
+                @error('selectedDate')
+                <span class="invalid-feedback">{{ $message }}</span>
+                @enderror
+            </div> -->
+            
+            <div class="card shadow mb-2" id="appointmentTimeslot"  style="display: none;">
+                <div class="card-header py-3 d-flex align-items-center justify-content-between">
+                    <h4 class="m-0 font-weight-bold text-primary">Available Timeslots</h4>
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <tr>
+                                <td class="align-middle">13:00 - 13:10 <button type="button" name="13:00" class="timeslot btn btn-primary p-2 ml-4" data-bs-time="13:00">Book Now</button></td>
+                                <td class="align-middle">13:10 - 13:20 <button type="button" name="13:10" class="timeslot btn btn-primary p-2 ml-4" data-bs-time="13:10">Book Now</button></td>
+                                <td class="align-middle">13:20 - 13:30 <button type="button" name="13:20" class="timeslot btn btn-primary p-2 ml-4" data-bs-time="13:20">Book Now</button></td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle">13:30 - 13:40 <button type="button" name="13:30" class="timeslot btn btn-primary p-2 ml-4" data-bs-time="13:30">Book Now</button></td>
+                                <td class="align-middle">13:40 - 13:50 <button type="button" name="13:40" class="timeslot btn btn-primary p-2 ml-4" data-bs-time="13:40">Book Now</button></td>
+                                <td class="align-middle">13:50 - 14:00 <button type="button" name="13:50" class="timeslot btn btn-primary p-2 ml-4" data-bs-time="13:50">Book Now</button></td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle">14:00 - 14:10 <button type="button" name="14:00" class="timeslot btn btn-primary p-2 ml-4" data-bs-time="14:00">Book Now</button></td>
+                                <td class="align-middle">14:10 - 14:20 <button type="button" name="14:10" class="timeslot btn btn-primary p-2 ml-4" data-bs-time="14:10">Book Now</button></td>
+                                <td class="align-middle">14:20 - 14:30 <button type="button" name="14:20" class="timeslot btn btn-primary p-2 ml-4" data-bs-time="14:20">Book Now</button></td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle">14:30 - 14:40 <button type="button" name="14:30" class="timeslot btn btn-primary p-2 ml-4" data-bs-time="14:30">Book Now</button></td>
+                                <td class="align-middle">14:40 - 14:50 <button type="button" name="14:40" class="timeslot btn btn-primary p-2 ml-4" data-bs-time="14:40">Book Now</button></td>
+                                <td class="align-middle">14:50 - 15:00 <button type="button" name="14:50" class="timeslot btn btn-primary p-2 ml-4" data-bs-time="14:50">Book Now</button></td>
+                            </tr>
+                        </table>
+
+                        <!-- Modal -->
+                        @include('landing-page.appointment.clientDetailsForm')
+                                        
+                    </div>
+                </div>
+            </div>
+
+<script>
+        const selectedDateInput = document.getElementById("selectedDate");
+        const timeslotsTable = document.getElementById("appointmentTimeslot");
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const currentDate = `${year}-${month}-${day}`;
+
+        // Set the minimum date as today
+        selectedDateInput.setAttribute('min', currentDate);
+
+        selectedDateInput.addEventListener("input", async () => {
+            const errorElements = document.querySelectorAll('.invalid-feedback');
+            errorElements.forEach(errorElement => {
+                errorElement.remove();
+            });
+
+            selectedDateInput.classList.remove("is-invalid");
+
+            const selectedDate = new Date(selectedDateInput.value);
+            
+            // Check if selected date is a holiday
+            const year = new Date().getFullYear();
+            const holidays = [
+                `${year}-01-01`,
+                `${year}-02-25`,
+                `${year}-04-09`,
+                `${year}-04-15`,
+                `${year}-04-21`,
+                `${year}-05-01`,
+                `${year}-06-12`,
+                `${year}-08-30`,
+                `${year}-11-01`,
+                `${year}-11-30`,
+                `${year}-12-25`,
+                `${year}-12-30`
+            ];
+            const isHoliday = holidays.includes(selectedDateInput.value);
+
+            if (selectedDate.getDay() !== 2 && selectedDate.getDay() !== 4 || isHoliday) {
+                // If the selected date is not Tuesday (2) or Thursday (4) or is a holiday, clear the input field and hide the timeslotsTable.
+                selectedDateInput.value = "";
+                timeslotsTable.style.display = "none";
+
+                const error = document.createElement('div');
+                error.classList.add('invalid-feedback');
+                error.textContent = "Please select a valid date (Tuesday or Thursday, excluding holidays).";
+                selectedDateInput.classList.add('is-invalid');
+                selectedDateInput.parentNode.insertBefore(error, selectedDateInput.nextSibling);
+                
+            } else {
+                timeslotsTable.style.display = "block";
+                
+                // Add your code to check and update timeslot availability here
+                const timeslots = document.querySelectorAll(".timeslot");
+                
+                timeslots.forEach(async timeslotButton => {
+                    const timeslot = timeslotButton.getAttribute("name");
+                    
+                    try {
+                        const response = await fetch('{{ route('appointmentCheckAvailability') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}', // Add CSRF token
+                            },
+                            body: JSON.stringify({ selectedDate: selectedDateInput.value, timeslot }),
+                        });
+
+                        const data = await response.json();
+
+                        if (data.message === 'Timeslot is available') {
+                            // Timeslot is available
+                            timeslotButton.disabled = false;
+                            timeslotButton.textContent = 'Book Now';
+                            timeslotButton.classList.remove('btn-danger');
+                            timeslotButton.classList.add('btn-primary');
+                        } else if (data.message === 'Timeslot is already booked') {
+                            // Timeslot is already booked
+                            timeslotButton.disabled = true;
+                            timeslotButton.textContent = 'Booked';
+                            timeslotButton.classList.remove('btn-primary');
+                            timeslotButton.classList.add('btn-danger');
+                        } else {
+                            // Other errors
+                            timeslotButton.disabled = true;
+                            timeslotButton.textContent = 'Error';
+                        }
+                    } catch (error) {
+                        console.error('An error occurred:', error);
+                    }
+
+                    timeslotButton.addEventListener('click', () => {
+                        document.getElementById('clientDetailsForm').style.display = 'block';
+                    });
+                });
+            }
+        });
+        
+
+        $(document).ready(function() {
+            $('.timeslot').click(function() {
+                var time = $(this).data('bs-time');
+                $('#appointment_time').val(time).attr('readonly', true);
+            });
+        });
+
+        selectedDateInput.addEventListener("input", async () => {
+            const selectedDate = new Date(selectedDateInput.value);
+            const appointmentDate = document.getElementById("appointment_date");
+            appointmentDate.value = selectedDateInput.value;
+            appointmentDate.readOnly = true;
+        });
+
+        const createAppointmentBtn = document.getElementById("createAppointmentBtn");
+
+        createAppointmentBtn.addEventListener("click", async () => {
+            const appointmentForm = document.getElementById("appointmentForm");
+            const formData = new FormData(appointmentForm);
+
+            try {
+                const response = await fetch('{{ route('appointmentValidateForm') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}', // Add CSRF token
+                    },
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (data.message === 'Validation failed') {
+                    timeslotsTable.style.display = "block";
+                    document.getElementById('clientDetailsForm').style.display = 'block';
+
+                    const errorElements = document.querySelectorAll('.invalid-feedback');
+                    errorElements.forEach(errorElement => {
+                        errorElement.remove();
+                    });
+
+                    const inputElements = document.querySelectorAll('.is-invalid');
+                    inputElements.forEach(inputElement => {
+                        inputElement.classList.remove('is-invalid');
+                    });
+
+                    for (const [key, value] of Object.entries(data.errors)) {
+                        const input = document.querySelector(`[name="${key}"]`);
+                        const error = document.createElement('div');
+                        error.classList.add('invalid-feedback');
+                        error.textContent = value;
+                        input.classList.add('is-invalid');
+                        input.parentNode.insertBefore(error, input.nextSibling);
+                    }
+                } else if (data.message === 'Validation passed') {
+                    appointmentForm.submit();
+                } else {
+                    console.log('Other errors');
+                }
+
+            } catch (error) {
+                console.error('An error occurred:', error);
+            }
+        });
+    
+    </script>
