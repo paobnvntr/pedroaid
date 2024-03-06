@@ -172,7 +172,7 @@ function handleCommitteeSearch() {
 							<hr>
 							<p class="description">${ord.description}</p>
 							<div class="text-center text-lg-start d-flex align-items-center justify-content-center">
-								<a href="${ord.ordinance_file}" target="_blank" class="btn-view scrollto d-inline-flex align-items-center justify-content-center align-self-center">
+								<a href="{{ asset($ord->ordinance_file) }}" target="_blank" class="btn-view scrollto d-inline-flex align-items-center justify-content-center align-self-center">
 									<span>Read More</span>
 									<i class="bi bi-arrow-right"></i>
 								</a>
