@@ -39,6 +39,7 @@
                         <option value="Extra Judicial" {{ old('document_type', $documentRequest->document_type) == 'Extra Judicial' ? 'selected' : '' }}>Extra Judicial</option>
                         <option value="Deed of Sale" {{ old('document_type', $documentRequest->document_type) == 'Deed of Sale' ? 'selected' : '' }}>Deed of Sale</option>
                         <option value="Deed of Donation" {{ old('document_type', $documentRequest->document_type) == 'Deed of Donation' ? 'selected' : '' }}>Deed of Donation</option>
+                        <option value="Other Document" {{ old('document_type', $documentRequest->document_type) == 'Other Document' ? 'selected' : '' }}>Other Document</option>
                     </select>
                 </div>
 
@@ -260,6 +261,176 @@
         });
     }
 
+    function useSameAddress() {
+        const useSameAddressCheckbox = document.getElementById('use_same_address');
+        const sanPedroCityRadio = document.getElementById('san-pedro-city');
+        const otherCityRadio = document.getElementById('other-city');
+        const barangay = document.getElementById('barangay');
+        const street = document.getElementById('street');
+        const otherCity = document.getElementById('other-city-input');
+        const otherBarangay = document.getElementById('other-barangay');
+        const otherStreet = document.getElementById('other-street');
+
+        useSameAddressCheckbox.addEventListener('change', () => {
+            const documentSanPedroCityRadio = document.getElementById('document-san-pedro-city');
+            const documentOtherCityRadio = document.getElementById('document-other-city');
+
+            const documentBarangayGroup = document.getElementById('document-barangay-group');
+            const documentStreetGroup = document.getElementById('document-street-group');
+            const documentBarangay = document.getElementById('document-barangay');
+            const documentStreet = document.getElementById('document-street');
+
+            const documentOtherAddressGroup = document.getElementById('document-other-address-group');
+            const documentOtherCity = document.getElementById('document-other-city-input');
+            const documentOtherBarangay = document.getElementById('document-other-barangay');
+            const documentOtherStreet = document.getElementById('document-other-street');
+
+            if (useSameAddressCheckbox.checked) {
+                if (sanPedroCityRadio.checked) {
+                    documentSanPedroCityRadio.checked = true;
+                    documentBarangayGroup.classList.remove('d-none');
+                    documentStreetGroup.classList.remove('d-none');
+                    documentBarangay.value = barangay.value;
+                    documentStreet.value = street.value;
+                    documentOtherCityRadio.checked = false;
+                    documentOtherCity.value = '';
+                    documentOtherBarangay.value = '';
+                    documentOtherStreet.value = '';
+                } else if (otherCityRadio.checked) {
+                    documentOtherCityRadio.checked = true;
+                    documentOtherAddressGroup.classList.remove('d-none');
+                    documentOtherCity.value = otherCity.value;
+                    documentOtherBarangay.value = otherBarangay.value;
+                    documentOtherStreet.value = otherStreet.value;
+                    documentSanPedroCityRadio.checked = false;
+                    documentBarangay.value = '';
+                    documentStreet.value = '';
+                }
+            } else {
+                const originalDocumentCity = "{{ $document_city }}";
+                const originalDocumentBarangay = "{{ $document_final_barangay }}";
+                const originalDocumentStreet = "{{ $document_street }}";
+                const originalDocumentOtherCity = "{{ $document_other_city }}";
+                const originalDocumentOtherBarangay = "{{ $document_other_barangay }}";
+                const originalDocumentOtherStreet = "{{ $document_other_street }}";
+
+                if (originalDocumentCity === 'San Pedro City') {
+
+                    documentSanPedroCityRadio.checked = true;
+                    documentBarangayGroup.classList.remove('d-none');
+                    documentStreetGroup.classList.remove('d-none');
+                    documentBarangay.value = originalDocumentBarangay;
+                    documentStreet.value = originalDocumentStreet;
+
+                    documentOtherCityRadio.checked = false;
+                    documentOtherAddressGroup.classList.add('d-none');
+                    documentOtherCity.value = '';
+                    documentOtherBarangay.value = '';
+                    documentOtherStreet.value = '';
+                    
+                } else {
+
+                    documentOtherCityRadio.checked = true;
+                    documentOtherAddressGroup.classList.remove('d-none');
+                    documentOtherCity.value = originalDocumentOtherCity;
+                    documentOtherBarangay.value = originalDocumentOtherBarangay;
+                    documentOtherStreet.value = originalDocumentOtherStreet;
+
+                    documentSanPedroCityRadio.checked = false;
+                    documentBarangayGroup.classList.add('d-none');
+                    documentStreetGroup.classList.add('d-none');
+                    documentBarangay.value = '';
+                    documentStreet.value = '';
+                }
+            }
+        });
+    }
+
+    function useSameAddress2() {
+        const useSameAddressCheckbox = document.getElementById('use_same_address_2');
+        const sanPedroCityRadio = document.getElementById('san-pedro-city');
+        const otherCityRadio = document.getElementById('other-city');
+        const barangay = document.getElementById('barangay');
+        const street = document.getElementById('street');
+        const otherCity = document.getElementById('other-city-input');
+        const otherBarangay = document.getElementById('other-barangay');
+        const otherStreet = document.getElementById('other-street');
+
+        useSameAddressCheckbox.addEventListener('change', () => {
+            const documentSanPedroCityRadio = document.getElementById('document-san-pedro-city-2');
+            const documentOtherCityRadio = document.getElementById('document-other-city-2');
+
+            const documentBarangayGroup = document.getElementById('document-barangay-group-2');
+            const documentStreetGroup = document.getElementById('document-street-group-2');
+            const documentBarangay = document.getElementById('document-barangay-2');
+            const documentStreet = document.getElementById('document-street-2');
+
+            const documentOtherAddressGroup = document.getElementById('document-other-address-group-2');
+            const documentOtherCity = document.getElementById('document-other-city-input-2');
+            const documentOtherBarangay = document.getElementById('document-other-barangay-2');
+            const documentOtherStreet = document.getElementById('document-other-street-2');
+
+            if (useSameAddressCheckbox.checked) {
+                if (sanPedroCityRadio.checked) {
+                    documentSanPedroCityRadio.checked = true;
+                    documentBarangayGroup.classList.remove('d-none');
+                    documentStreetGroup.classList.remove('d-none');
+                    documentBarangay.value = barangay.value;
+                    documentStreet.value = street.value;
+                    documentOtherCityRadio.checked = false;
+                    documentOtherCity.value = '';
+                    documentOtherBarangay.value = '';
+                    documentOtherStreet.value = '';
+                } else if (otherCityRadio.checked) {
+                    documentOtherCityRadio.checked = true;
+                    documentOtherAddressGroup.classList.remove('d-none');
+                    documentOtherCity.value = otherCity.value;
+                    documentOtherBarangay.value = otherBarangay.value;
+                    documentOtherStreet.value = otherStreet.value;
+                    documentSanPedroCityRadio.checked = false;
+                    documentBarangay.value = '';
+                    documentStreet.value = '';
+                }
+            } else {
+                const originalDocumentCity = "{{ $document_city_2 }}";
+                const originalDocumentBarangay = "{{ $document_final_barangay_2 }}";
+                const originalDocumentStreet = "{{ $document_street_2 }}";
+                const originalDocumentOtherCity = "{{ $document_other_city_2 }}";
+                const originalDocumentOtherBarangay = "{{ $document_other_barangay_2 }}";
+                const originalDocumentOtherStreet = "{{ $document_other_street_2 }}";
+
+                if (originalDocumentCity === 'San Pedro City') {
+
+                    documentSanPedroCityRadio.checked = true;
+                    documentBarangayGroup.classList.remove('d-none');
+                    documentStreetGroup.classList.remove('d-none');
+                    documentBarangay.value = originalDocumentBarangay;
+                    documentStreet.value = originalDocumentStreet;
+
+                    documentOtherCityRadio.checked = false;
+                    documentOtherAddressGroup.classList.add('d-none');
+                    documentOtherCity.value = '';
+                    documentOtherBarangay.value = '';
+                    documentOtherStreet.value = '';
+                    
+                } else {
+
+                    documentOtherCityRadio.checked = true;
+                    documentOtherAddressGroup.classList.remove('d-none');
+                    documentOtherCity.value = originalDocumentOtherCity;
+                    documentOtherBarangay.value = originalDocumentOtherBarangay;
+                    documentOtherStreet.value = originalDocumentOtherStreet;
+
+                    documentSanPedroCityRadio.checked = false;
+                    documentBarangayGroup.classList.add('d-none');
+                    documentStreetGroup.classList.add('d-none');
+                    documentBarangay.value = '';
+                    documentStreet.value = '';
+                }
+            }
+        });
+    }
+
     const additionalInfo = document.getElementById("additional-info");
 
     function generateAdditionalInfo(originalDocumentType) {
@@ -272,6 +443,8 @@
 
             additionalInfoAddress();
 
+            useSameAddress();
+
         } else if (originalDocumentType === 'Affidavit of Guardianship') {
             additionalInfo.innerHTML = `
                 @include('document-request.additionalEditInfo.affidavitOfGuardianship')
@@ -280,6 +453,9 @@
             additionalInfoAddress();
             additionalInfoAddress2();
 
+            useSameAddress();
+            useSameAddress2();
+
         } else if (originalDocumentType === 'Affidavit of No income') {
             additionalInfo.innerHTML = `
                 @include('document-request.additionalEditInfo.affidavitOfNoIncome')
@@ -287,12 +463,16 @@
 
             additionalInfoAddress();
 
+            useSameAddress();
+
         } else if (originalDocumentType === 'Affidavit of No fix income') {
             additionalInfo.innerHTML = `
                 @include('document-request.additionalEditInfo.affidavitOfNoFixIncome')
             `;
 
             additionalInfoAddress();
+
+            useSameAddress();
 
         } else if (originalDocumentType === 'Extra Judicial') {
             additionalInfo.innerHTML = `
@@ -310,6 +490,14 @@
             additionalInfoAddress();
             additionalInfoAddress2();
 
+            useSameAddress();
+            useSameAddress2();
+
+        } else if (originalDocumentType === 'Other Document') {
+            additionalInfo.innerHTML = `
+                @include('document-request.additionalEditInfo.otherDocument')
+            `;
+        
         } else {
             additionalInfo.innerHTML = '';
         }
@@ -361,6 +549,7 @@
             if(originalDocumentType === 'Affidavit of Loss') {
                 const documentName = document.getElementById('document_name');
                 const documentAge = document.getElementById('document_age');
+                const useSameAddress = document.getElementById('use_same_address');
                 const documentSanPedroCityRadio = document.getElementById('document-san-pedro-city');
                 const documentOtherCityRadio = document.getElementById('document-other-city');
 
@@ -380,6 +569,7 @@
 
                 documentName.disabled = false;
                 documentAge.disabled = false;
+                useSameAddress.disabled = false;
                 documentSanPedroCityRadio.disabled = false;
                 documentOtherCityRadio.disabled = false;
                 validIDFront.disabled = false;
@@ -393,11 +583,10 @@
                     documentOtherAddressGroup.classList.remove('d-none');
                 }
 
-                
-
             } else if(originalDocumentType === 'Affidavit of Guardianship') {
                 const guardianName = document.getElementById('guardian_name');
                 const guardianAge = document.getElementById('guardian_age');
+                const useSameAddress = document.getElementById('use_same_address');
                 const guardianSanPedroCityRadio = document.getElementById('document-san-pedro-city');
                 const guardianOtherCityRadio = document.getElementById('document-other-city');
 
@@ -417,6 +606,7 @@
 
                 const minorName = document.getElementById('minor_name');
                 const minorAge = document.getElementById('minor_age');
+                const useSameAddress2 = document.getElementById('use_same_address_2');
                 const minorSanPedroCityRadio = document.getElementById('document-san-pedro-city-2');
                 const minorOtherCityRadio = document.getElementById('document-other-city-2');
 
@@ -434,6 +624,7 @@
 
                 guardianName.disabled = false;
                 guardianAge.disabled = false;
+                useSameAddress.disabled = false;
                 guardianSanPedroCityRadio.disabled = false;
                 guardianOtherCityRadio.disabled = false;
                 guardianOccupation.disabled = false;
@@ -442,6 +633,7 @@
 
                 minorName.disabled = false;
                 minorAge.disabled = false;
+                useSameAddress2.disabled = false;
                 minorSanPedroCityRadio.disabled = false;
                 minorOtherCityRadio.disabled = false;
                 minorRelationship.disabled = false;
@@ -463,6 +655,7 @@
             } else if(originalDocumentType === 'Affidavit of No income') {
                 const documentName = document.getElementById('document_name');
                 const documentAge = document.getElementById('document_age');
+                const useSameAddress = document.getElementById('use_same_address');
                 const documentSanPedroCityRadio = document.getElementById('document-san-pedro-city');
                 const documentOtherCityRadio = document.getElementById('document-other-city');
 
@@ -488,6 +681,7 @@
 
                 documentName.disabled = false;
                 documentAge.disabled = false;
+                useSameAddress.disabled = false;
                 documentSanPedroCityRadio.disabled = false;
                 documentOtherCityRadio.disabled = false;
                 certificateOfIndigency.disabled = false;
@@ -509,6 +703,7 @@
             } else if(originalDocumentType === 'Affidavit of No fix income') {
                 const documentName = document.getElementById('document_name');
                 const documentAge = document.getElementById('document_age');
+                const useSameAddress = document.getElementById('use_same_address');
                 const documentSanPedroCityRadio = document.getElementById('document-san-pedro-city');
                 const documentOtherCityRadio = document.getElementById('document-other-city');
 
@@ -527,6 +722,7 @@
 
                 documentName.disabled = false;
                 documentAge.disabled = false;
+                useSameAddress.disabled = false;
                 documentSanPedroCityRadio.disabled = false;
                 documentOtherCityRadio.disabled = false;
                 sourceOfIncome.disabled = false;
@@ -564,6 +760,7 @@
             } else if(originalDocumentType === 'Deed of Donation') {
                 const donorName = document.getElementById('donor_name');
                 const donorAge = document.getElementById('donor_age');
+                const useSameAddress = document.getElementById('use_same_address');
                 const donorSanPedroCityRadio = document.getElementById('document-san-pedro-city');
                 const donorOtherCityRadio = document.getElementById('document-other-city');
 
@@ -579,6 +776,7 @@
 
                 const doneeName = document.getElementById('donee_name');
                 const doneeAge = document.getElementById('donee_age');
+                const useSameAddress2 = document.getElementById('use_same_address_2');
                 const doneeSanPedroCityRadio = document.getElementById('document-san-pedro-city-2');
                 const doneeOtherCityRadio = document.getElementById('document-other-city-2');
 
@@ -594,11 +792,13 @@
 
                 donorName.disabled = false;
                 donorAge.disabled = false;
+                useSameAddress.disabled = false;
                 donorSanPedroCityRadio.disabled = false;
                 donorOtherCityRadio.disabled = false;
 
                 doneeName.disabled = false;
                 doneeAge.disabled = false;
+                useSameAddress2.disabled = false;
                 doneeSanPedroCityRadio.disabled = false;
                 doneeOtherCityRadio.disabled = false;
 
@@ -616,6 +816,13 @@
                     doneeOtherAddressGroup.classList.remove('d-none');
                 }
 
+            } else if(originalDocumentType === 'Other Document') {
+                const validIDFront = document.getElementById('valid-id-front');
+                const validIDBack = document.getElementById('valid-id-back');
+
+                validIDFront.disabled = false;
+                validIDBack.disabled = false;
+            
             } else {
                 additionalInfo.innerHTML = '';
             }
@@ -667,6 +874,11 @@
                     additionalInfoAddress();
                     additionalInfoAddress2();
 
+                } else if(documentType.value === 'Other Document') {
+                    additionalInfo.innerHTML = `
+                        @include('document-request.additionalInfo.otherDocument')
+                    `;
+                
                 } else {
                     additionalInfo.innerHTML = '';
                 }
@@ -1291,6 +1503,28 @@
                     inputElement.classList.remove('is-invalid');
                 });
 
+            } else if(originalDocumentType === 'Other Document') {
+                generateAdditionalInfo(originalDocumentType);
+
+                const validIDFront = document.getElementById('valid-id-front');
+                const validIDBack = document.getElementById('valid-id-back');
+
+                validIDFront.disabled = true;
+                validIDBack.disabled = true;
+
+                validIDFront.value = "";
+                validIDBack.value = "";
+
+                const errorElements = document.querySelectorAll('.invalid-feedback');
+                errorElements.forEach(errorElement => {
+                    errorElement.remove();
+                });
+
+                const inputElements = document.querySelectorAll('.is-invalid');
+                inputElements.forEach(inputElement => {
+                    inputElement.classList.remove('is-invalid');
+                });
+            
             } else {
                 additionalInfo.innerHTML = '';
             }

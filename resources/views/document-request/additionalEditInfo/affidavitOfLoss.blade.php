@@ -17,7 +17,12 @@
 </div>
 
 <div class="form-group">
-    <label for="document_address">Address:</label>
+    <label for="document_address">Address:
+        <label for="use_same_address">
+            <input type="checkbox" id="use_same_address" name="use_same_address" class="same-address" disabled>
+            Use same address on client details
+        </label>
+    </label>
     <div class="form-check @error('document_city')is-invalid @enderror">
         <input class="form-check-input" type="radio" name="document_city" id="document-san-pedro-city" value="San Pedro City" {{ old('document_city', $document_city) == 'San Pedro City' ? 'checked' : '' }} disabled>
         <label class="form-check-label" for="document-san-pedro-city">

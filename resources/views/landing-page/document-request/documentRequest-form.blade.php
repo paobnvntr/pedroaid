@@ -51,6 +51,7 @@
                         <option value="Extra Judicial" {{ old('document_type') == 'Extra Judicial' ? 'selected' : '' }}>Extra Judicial</option>
                         <option value="Deed of Sale" {{ old('document_type') == 'Deed of Sale' ? 'selected' : '' }}>Deed of Sale</option>
                         <option value="Deed of Donation" {{ old('document_type') == 'Deed of Donation' ? 'selected' : '' }}>Deed of Donation</option>
+                        <option value="Other Document" {{ old('document_type') == 'Other Document' ? 'selected' : '' }}>Other Document</option>
                     </select>
                 </div>
 
@@ -129,7 +130,7 @@
                     <div class="form-group {{ old('city') == 'other-city' ? '' : 'd-none' }}" id="other-address-group">
                         <div class="form-group row">
                             <div class="col-sm-6 mb-3 mb-sm-0">
-                                <input name="other_city" id="other-city" type="text"
+                                <input name="other_city" id="other-city-input" type="text"
                                     class="form-control form-control-user @error('other_city')is-invalid @enderror"
                                     placeholder="City (e.g. Biñan City)" value="{{ old('other_city') }}">
                                 @error('other_city')
@@ -265,6 +266,126 @@
         });
     }
 
+    function useSameAddress() {
+        const useSameAddressCheckbox = document.getElementById('use_same_address');
+        const sanPedroCityRadio = document.getElementById('san-pedro-city');
+        const otherCityRadio = document.getElementById('other-city');
+        const barangay = document.getElementById('barangay');
+        const street = document.getElementById('street');
+        const otherCity = document.getElementById('other-city-input');
+        const otherBarangay = document.getElementById('other-barangay');
+        const otherStreet = document.getElementById('other-street');
+
+        useSameAddressCheckbox.addEventListener('change', () => {
+            const documentSanPedroCityRadio = document.getElementById('document-san-pedro-city');
+            const documentOtherCityRadio = document.getElementById('document-other-city');
+
+            const documentBarangayGroup = document.getElementById('document-barangay-group');
+            const documentStreetGroup = document.getElementById('document-street-group');
+            const documentBarangay = document.getElementById('document_barangay');
+            const documentStreet = document.getElementById('document_street');
+
+            const documentOtherAddressGroup = document.getElementById('document-other-address-group');
+            const documentOtherCity = document.getElementById('document-other-city-input');
+            const documentOtherBarangay = document.getElementById('document-other-barangay');
+            const documentOtherStreet = document.getElementById('document-other-street');
+
+            if (useSameAddressCheckbox.checked) {
+                if (sanPedroCityRadio.checked) {
+                    documentSanPedroCityRadio.checked = true;
+                    documentBarangayGroup.classList.remove('d-none');
+                    documentStreetGroup.classList.remove('d-none');
+                    documentBarangay.value = barangay.value;
+                    documentStreet.value = street.value;
+                    documentOtherCityRadio.checked = false;
+                    documentOtherCity.value = '';
+                    documentOtherBarangay.value = '';
+                    documentOtherStreet.value = '';
+                } else if (otherCityRadio.checked) {
+                    documentOtherCityRadio.checked = true;
+                    documentOtherAddressGroup.classList.remove('d-none');
+                    documentOtherCity.value = otherCity.value;
+                    documentOtherBarangay.value = otherBarangay.value;
+                    documentOtherStreet.value = otherStreet.value;
+                    documentSanPedroCityRadio.checked = false;
+                    documentBarangay.value = '';
+                    documentStreet.value = '';
+                }
+            } else {
+                documentSanPedroCityRadio.checked = false;
+                documentBarangayGroup.classList.add('d-none');
+                documentStreetGroup.classList.add('d-none');
+                documentBarangay.value = '';
+                documentStreet.value = '';
+                documentOtherCityRadio.checked = false;
+                documentOtherAddressGroup.classList.add('d-none');
+                documentOtherCity.value = '';
+                documentOtherBarangay.value = '';
+                documentOtherStreet.value = '';
+            }
+        });
+    }
+
+    function useSameAddress2() {
+        const useSameAddressCheckbox = document.getElementById('use_same_address_2');
+        const sanPedroCityRadio = document.getElementById('san-pedro-city');
+        const otherCityRadio = document.getElementById('other-city');
+        const barangay = document.getElementById('barangay');
+        const street = document.getElementById('street');
+        const otherCity = document.getElementById('other-city-input');
+        const otherBarangay = document.getElementById('other-barangay');
+        const otherStreet = document.getElementById('other-street');
+
+        useSameAddressCheckbox.addEventListener('change', () => {
+            const documentSanPedroCityRadio = document.getElementById('document-san-pedro-city-2');
+            const documentOtherCityRadio = document.getElementById('document-other-city-2');
+
+            const documentBarangayGroup = document.getElementById('document-barangay-group-2');
+            const documentStreetGroup = document.getElementById('document-street-group-2');
+            const documentBarangay = document.getElementById('document_barangay_2');
+            const documentStreet = document.getElementById('document_street_2');
+
+            const documentOtherAddressGroup = document.getElementById('document-other-address-group-2');
+            const documentOtherCity = document.getElementById('document-other-city-input-2');
+            const documentOtherBarangay = document.getElementById('document-other-barangay-2');
+            const documentOtherStreet = document.getElementById('document-other-street-2');
+
+            if (useSameAddressCheckbox.checked) {
+                if (sanPedroCityRadio.checked) {
+                    documentSanPedroCityRadio.checked = true;
+                    documentBarangayGroup.classList.remove('d-none');
+                    documentStreetGroup.classList.remove('d-none');
+                    documentBarangay.value = barangay.value;
+                    documentStreet.value = street.value;
+                    documentOtherCityRadio.checked = false;
+                    documentOtherCity.value = '';
+                    documentOtherBarangay.value = '';
+                    documentOtherStreet.value = '';
+                } else if (otherCityRadio.checked) {
+                    documentOtherCityRadio.checked = true;
+                    documentOtherAddressGroup.classList.remove('d-none');
+                    documentOtherCity.value = otherCity.value;
+                    documentOtherBarangay.value = otherBarangay.value;
+                    documentOtherStreet.value = otherStreet.value;
+                    documentSanPedroCityRadio.checked = false;
+                    documentBarangay.value = '';
+                    documentStreet.value = '';
+                }
+            } else {
+                documentSanPedroCityRadio.checked = false;
+                documentBarangayGroup.classList.add('d-none');
+                documentStreetGroup.classList.add('d-none');
+                documentBarangay.value = '';
+                documentStreet.value = '';
+                documentOtherCityRadio.checked = false;
+                documentOtherAddressGroup.classList.add('d-none');
+                documentOtherCity.value = '';
+                documentOtherBarangay.value = '';
+                documentOtherStreet.value = '';
+            }
+        });
+    }
+
     documentType.addEventListener('change', () => {
         if(documentType.value === 'Affidavit of Loss') {
             additionalInfo.innerHTML = `
@@ -272,6 +393,7 @@
             `;
 
             additionalInfoAddress();
+            useSameAddress();
 
         } else if(documentType.value === 'Affidavit of Guardianship') {
             additionalInfo.innerHTML = `
@@ -281,6 +403,9 @@
             additionalInfoAddress();
             additionalInfoAddress2();
 
+            useSameAddress();
+            useSameAddress2();
+
         } else if(documentType.value === 'Affidavit of No income') {
             additionalInfo.innerHTML = `
                 @include('landing-page.document-request.affidavitOfNoIncome')
@@ -288,12 +413,16 @@
 
             additionalInfoAddress();
 
+            useSameAddress();
+
         } else if(documentType.value === 'Affidavit of No fix income') {
             additionalInfo.innerHTML = `
                 @include('landing-page.document-request.affidavitOfNoFixIncome')
             `;
 
             additionalInfoAddress();
+
+            useSameAddress();
 
         } else if(documentType.value === 'Extra Judicial') {
             additionalInfo.innerHTML = `
@@ -311,6 +440,14 @@
             additionalInfoAddress();
             additionalInfoAddress2();
 
+            useSameAddress();
+            useSameAddress2();
+
+        } else if(documentType.value === 'Other Document') {
+            additionalInfo.innerHTML = `
+                @include('landing-page.document-request.otherDocument')
+            `;
+        
         } else {
             additionalInfo.innerHTML = '';
         }

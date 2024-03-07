@@ -11,6 +11,7 @@ use App\Models\DeedOfDonation;
 use App\Models\DeedOfSale;
 use App\Models\ExtraJudicial;
 use App\Models\Ordinances;
+use App\Models\OtherDocument;
 use App\Models\User;
 use App\Notifications\NewAppointment;
 use App\Notifications\NewAppointmentMessage;
@@ -356,8 +357,8 @@ class LandingPageController extends Controller
             'document_other_barangay_2' => 'required_if:document_city_2,Other City',
             'document_other_street_2' => 'required_if:document_city_2,Other City',
 
-            'valid_id_front' => 'required_if:document_type,Affidavit of Loss|image|mimes:jpg,jpeg,png',
-            'valid_id_back' => 'required_if:document_type,Affidavit of Loss|image|mimes:jpg,jpeg,png',
+            'valid_id_front' => 'required_if:document_type,Affidavit of Loss,Other Document|image|mimes:jpg,jpeg,png',
+            'valid_id_back' => 'required_if:document_type,Affidavit of Loss,Other Document|image|mimes:jpg,jpeg,png',
             'cedula' => 'required_if:document_type,Affidavit of Loss|mimes:pdf',
 
             'guardian_name' => 'required_if:document_type,Affidavit of Guardianship',
@@ -394,6 +395,7 @@ class LandingPageController extends Controller
             'donor_age' => 'required_if:document_type,Deed of Donation',
             'donee_name' => 'required_if:document_type,Deed of Donation',
             'donee_age' => 'required_if:document_type,Deed of Donation',
+
         ],
         [
             'barangay.required_if' => 'The barangay field is required.',
@@ -732,6 +734,45 @@ class LandingPageController extends Controller
             } else {
                 return $this->failedResponse();
             }
+        } else if ($request->document_type == 'Other Document') {
+            $validIdFrontFilePath = $this->uploadValidIdFrontOther($request);
+            $validIdBackFilePath = $this->uploadValidIdBackOther($request);
+
+            $createOtherDocument = $this->createOtherDocument($validIdFrontFilePath, $validIdBackFilePath, $documentRequestID);
+
+            if ($createDocumentRequest && $createOtherDocument) {
+                $mailData = $this->prepareMailData($request, $documentRequestID);
+                $mailSubject = $this->prepareMailSubject($documentRequestID, $request);
+    
+                $this->sendMail($request->email, $mailData, $mailSubject);
+
+                $staff = User::where('transaction_level', 'Document Request')->get();
+                $admins = User::where('level', 'Admin')->get();
+                $superAdmins = User::where('level', 'Super Admin')->get();
+                
+                $notificationData = [
+                    'documentRequest_id' => $documentRequestID,
+                    'name' => $request->name,
+                ];
+
+                foreach ($staff as $user) {
+                    $user->notify(new NewDocumentRequest($notificationData));
+                }
+
+                foreach ($admins as $admin) {
+                    $admin->notify(new NewDocumentRequest($notificationData));
+                }
+
+                foreach ($superAdmins as $superAdmin) {
+                    $superAdmin->notify(new NewDocumentRequest($notificationData));
+                }
+    
+                return $this->successResponse();
+            } else {
+                return $this->failedResponse();
+            }
+        } else {
+            return $this->failedResponse();
         }
     }
     
@@ -774,6 +815,26 @@ class LandingPageController extends Controller
         $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
         $filePath = 'uploads/document-request/affidavitOfLoss/' . $fileName;
         $file->move('uploads/document-request/affidavitOfLoss/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadValidIdFrontOther(Request $request) {
+        $file = $request->file('valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/otherDocument/' . $fileName;
+        $file->move('uploads/document-request/otherDocument/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadValidIdBackOther(Request $request) {
+        $file = $request->file('valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/otherDocument/' . $fileName;
+        $file->move('uploads/document-request/otherDocument/', $fileName);
     
         return $filePath;
     }
@@ -1002,6 +1063,18 @@ class LandingPageController extends Controller
         ];
     
         return DeedOfDonation::create($data);
+    }
+
+    private function createOtherDocument($validIdFrontFilePath, $validIdBackFilePath, $documentRequestID) {
+        $data = [
+            'documentRequest_id' => $documentRequestID,
+            'valid_id_front' => $validIdFrontFilePath,
+            'valid_id_back' => $validIdBackFilePath,
+            'created_at' => Carbon::now('Asia/Manila'),
+            'updated_at' => Carbon::now('Asia/Manila'),
+        ];
+    
+        return OtherDocument::create($data);
     }
     
     private function prepareMailData(Request $request, $documentRequestID) {

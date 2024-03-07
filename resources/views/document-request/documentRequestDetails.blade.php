@@ -112,6 +112,11 @@
                         <p><strong>Donee's Age:</strong> {{ $additional_info->donee_age }}</p>
                         <p><strong>Donee's Address:</strong> {{ $additional_info->donee_address }}</p>
 
+                    @elseif($documentRequest->document_type == 'Other Document')
+
+                        <p><strong>Valid ID (Front):</strong> <a href="{{ asset($additional_info->valid_id_front) }}" target="_blank">Valid ID (Front)</a></p>
+                        <p><strong>Valid ID (Back):</strong> <a href="{{ asset($additional_info->valid_id_back) }}" target="_blank">Valid ID (Back)</a></p>
+
                     @else
                     
                     @endif

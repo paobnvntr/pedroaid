@@ -17,7 +17,12 @@
 </div>
 
 <div class="form-group">
-    <label for="guardian_address">Guardian's Address:</label>
+    <label for="guardian_address">Guardian's Address:
+        <label for="use_same_address">
+            <input type="checkbox" id="use_same_address" name="use_same_address" class="same-address">
+            Use same address on client details
+        </label>
+    </label>
     <div class="form-check @error('document_city')is-invalid @enderror">
         <input class="form-check-input" type="radio" name="document_city" id="document-san-pedro-city" value="San Pedro City" {{ old('document_city') == 'document-san-pedro-city' ? 'checked' : '' }}>
         <label class="form-check-label" for="document-san-pedro-city">
@@ -82,7 +87,7 @@
     <div class="form-group {{ old('document_city') == 'document-other-city' ? '' : 'd-none' }}" id="document-other-address-group">
         <div class="form-group row">
             <div class="col-sm-6 mb-3 mb-sm-0">
-                <input name="document_other_city" id="document-other-city" type="text"
+                <input name="document_other_city" id="document-other-city-input" type="text"
                     class="form-control form-control-user @error('document_other_city')is-invalid @enderror"
                     placeholder="City (e.g. Biñan City)" value="{{ old('document_other_city') }}">
                 @error('document_other_city')
@@ -159,7 +164,12 @@
 </div>
 
 <div class="form-group">
-    <label for="minor_address">Minor's Address:</label>
+    <label for="minor_address">Minor's Address:
+        <label for="use_same_address_2">
+            <input type="checkbox" id="use_same_address_2" name="use_same_address_2" class="same-address">
+            Use same address on client details
+        </label>
+    </label>
     <div class="form-check @error('document_city_2')is-invalid @enderror">
         <input class="form-check-input" type="radio" name="document_city_2" id="document-san-pedro-city-2" value="San Pedro City" {{ old('document_city_2') == 'document-san-pedro-city-2' ? 'checked' : '' }}>
         <label class="form-check-label" for="document-san-pedro-city-2">
@@ -224,7 +234,7 @@
     <div class="form-group {{ old('document_city_2') == 'document-other-city-2' ? '' : 'd-none' }}" id="document-other-address-group-2">
         <div class="form-group row">
             <div class="col-sm-6 mb-3 mb-sm-0">
-                <input name="document_other_city_2" id="document-other-city-2" type="text"
+                <input name="document_other_city_2" id="document-other-city-input-2" type="text"
                     class="form-control form-control-user @error('document_other_city_2')is-invalid @enderror"
                     placeholder="City (e.g. Biñan City)" value="{{ old('document_other_city_2') }}">
                 @error('document_other_city_2')

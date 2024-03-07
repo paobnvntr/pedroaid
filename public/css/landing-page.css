@@ -3397,3 +3397,7 @@
     flex: 1 0 calc(33.333% - 20px); /* Adjust as needed */
     margin-right: 20px; /* Adjust as needed */
   }
+
+  .same-address {
+    margin-left: 2rem;
+  }

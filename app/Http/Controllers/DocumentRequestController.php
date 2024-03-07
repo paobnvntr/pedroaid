@@ -11,6 +11,7 @@ use App\Models\DeedOfSale;
 use App\Models\DocumentRequest;
 use App\Models\DocumentRequestMessage;
 use App\Models\ExtraJudicial;
+use App\Models\OtherDocument;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
@@ -110,8 +111,8 @@ class DocumentRequestController extends Controller
             'document_other_barangay_2' => 'required_if:document_city_2,Other City',
             'document_other_street_2' => 'required_if:document_city_2,Other City',
 
-            'valid_id_front' => 'required_if:document_type,Affidavit of Loss|image|mimes:jpg,jpeg,png',
-            'valid_id_back' => 'required_if:document_type,Affidavit of Loss|image|mimes:jpg,jpeg,png',
+            'valid_id_front' => 'required_if:document_type,Affidavit of Loss,Other Document|image|mimes:jpg,jpeg,png',
+            'valid_id_back' => 'required_if:document_type,Affidavit of Loss,Other Document|image|mimes:jpg,jpeg,png',
             'cedula' => 'required_if:document_type,Affidavit of Loss|mimes:pdf',
 
             'guardian_name' => 'required_if:document_type,Affidavit of Guardianship',
@@ -347,6 +348,23 @@ class DocumentRequestController extends Controller
             } else {
                 return $this->failedRedirect();
             }
+        } else if ($request->document_type == 'Other Document') {
+            $validIdFrontFilePath = $this->uploadValidIdFrontOther($request);
+            $validIdBackFilePath = $this->uploadValidIdBackOther($request);
+            
+            $createOtherDocument = $this->createOtherDocument($validIdFrontFilePath, $validIdBackFilePath, $documentRequestID);
+    
+            if ($createDocumentRequest && $createOtherDocument) {
+                $this->logSuccess($user, $documentRequestID);
+                $mailData = $this->prepareMailData($request, $documentRequestID);
+                $mailSubject = $this->prepareMailSubject($documentRequestID, $request);
+    
+                $this->sendMail($request->email, $mailData, $mailSubject);
+    
+                return $this->successRedirect();
+            } else {
+                return $this->failedRedirect();
+            }
         }
     }
     
@@ -389,6 +407,26 @@ class DocumentRequestController extends Controller
         $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
         $filePath = 'uploads/document-request/affidavitOfLoss/' . $fileName;
         $file->move('uploads/document-request/affidavitOfLoss/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadValidIdFrontOther(Request $request) {
+        $file = $request->file('valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/otherDocument/' . $fileName;
+        $file->move('uploads/document-request/otherDocument/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadValidIdBackOther(Request $request) {
+        $file = $request->file('valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/otherDocument/' . $fileName;
+        $file->move('uploads/document-request/otherDocument/', $fileName);
     
         return $filePath;
     }
@@ -618,6 +656,18 @@ class DocumentRequestController extends Controller
     
         return DeedOfDonation::create($data);
     }
+
+    private function createOtherDocument($validIdFrontFilePath, $validIdBackFilePath, $documentRequestID) {
+        $data = [
+            'documentRequest_id' => $documentRequestID,
+            'valid_id_front' => $validIdFrontFilePath,
+            'valid_id_back' => $validIdBackFilePath,
+            'created_at' => Carbon::now('Asia/Manila'),
+            'updated_at' => Carbon::now('Asia/Manila'),
+        ];
+    
+        return OtherDocument::create($data);
+    }
     
     private function logSuccess($user, $documentRequestID) {
         Logs::create([
@@ -676,6 +726,8 @@ class DocumentRequestController extends Controller
             $additional_info = DeedOfSale::where('documentRequest_id', $documentRequest_id)->get()->first();
         } else if ($documentRequest->document_type == 'Deed of Donation') {
             $additional_info = DeedOfDonation::where('documentRequest_id', $documentRequest_id)->get()->first();
+        } else if ($documentRequest->document_type == 'Other Document') {
+            $additional_info = OtherDocument::where('documentRequest_id', $documentRequest_id)->get()->first();
         }
 
         $feedback = Feedback::where('transaction_id', $documentRequest_id)->where('transaction_type', 'Document Request')->get();
@@ -1119,6 +1171,8 @@ class DocumentRequestController extends Controller
                 $document_other_street_2 = $document_address2[0];
                 $document_other_street_2 = trim($document_other_street_2);
             }
+        } else if ($documentRequest->document_type == 'Other Document') {
+            $additional_info = OtherDocument::where('documentRequest_id', $id)->get()->first();
         }
 
         return view('document-request.editDocumentRequest', compact('documentRequest', 'city', 'final_barangay', 'street', 'other_city', 'other_barangay', 'other_street', 'additional_info', 'document_city', 'document_final_barangay', 'document_street', 'document_other_city', 'document_other_barangay', 'document_other_street', 'document_city_2', 'document_final_barangay_2', 'document_street_2', 'document_other_city_2', 'document_other_barangay_2', 'document_other_street_2'));
@@ -1286,8 +1340,8 @@ class DocumentRequestController extends Controller
             'document_other_barangay_2' => 'required_if:document_city_2,Other City',
             'document_other_street_2' => 'required_if:document_city_2,Other City',
 
-            'valid_id_front' => 'required_if:document_type,Affidavit of Loss|image|mimes:jpg,jpeg,png',
-            'valid_id_back' => 'required_if:document_type,Affidavit of Loss|image|mimes:jpg,jpeg,png',
+            'valid_id_front' => 'required_if:document_type,Affidavit of Loss,Other Document|image|mimes:jpg,jpeg,png',
+            'valid_id_back' => 'required_if:document_type,Affidavit of Loss,Other Document|image|mimes:jpg,jpeg,png',
             'cedula' => 'required_if:document_type,Affidavit of Loss|mimes:pdf',
 
             'guardian_name' => 'required_if:document_type,Affidavit of Guardianship',
@@ -1571,6 +1625,28 @@ class DocumentRequestController extends Controller
                         }
                     }
 
+                } else if($request->document_type == 'Other Document') {
+                    
+                    if($this->shouldUpdateOtherDocument($request, $id)) {
+                        $updateOtherDocumentDetails = $this->updateOtherDocument($request, $id);
+
+                        if($updateDocumentRequestDetails && $updateOtherDocumentDetails) {
+                            $this->logDocumentRequestEditSuccess($user, $id);
+
+                            return $this->successEditRedirect($id);
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+                    } else {
+                        if($updateDocumentRequestDetails) {
+                            $this->logDocumentRequestEditSuccess($user, $id);
+
+                            return $this->successEditRedirect($id);
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+                    }
+                
                 } else {
                     return $this->failedEditRedirect($id);
                 }
@@ -1680,6 +1756,24 @@ class DocumentRequestController extends Controller
                     } else if($documentRequest->document_type == 'Deed of Donation') {
             
                         DeedOfDonation::where('documentRequest_id', $id)->delete();
+            
+                    } else if($documentRequest->document_type == 'Other Document') {
+
+                        $additionalInfoDetails = OtherDocument::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        OtherDocument::where('documentRequest_id', $id)->delete();
             
                     }
 
@@ -1804,6 +1898,24 @@ class DocumentRequestController extends Controller
             
                         DeedOfDonation::where('documentRequest_id', $id)->delete();
             
+                    } else if($documentRequest->document_type == 'Other Document') {
+                        
+                        $additionalInfoDetails = OtherDocument::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        OtherDocument::where('documentRequest_id', $id)->delete();
+            
                     }
 
                     $documentAddress = $this->generateEditDocumentAddress($request);
@@ -1926,6 +2038,24 @@ class DocumentRequestController extends Controller
             
                         DeedOfDonation::where('documentRequest_id', $id)->delete();
             
+                    } else if($documentRequest->document_type == 'Other Document') {
+                        
+                        $additionalInfoDetails = OtherDocument::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        OtherDocument::where('documentRequest_id', $id)->delete();
+            
                     }
 
                     $documentAddress = $this->generateEditDocumentAddress($request);
@@ -2047,6 +2177,24 @@ class DocumentRequestController extends Controller
             
                         DeedOfDonation::where('documentRequest_id', $id)->delete();
             
+                    } else if($documentRequest->document_type == 'Other Document') {
+                        
+                        $additionalInfoDetails = OtherDocument::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        OtherDocument::where('documentRequest_id', $id)->delete();
+            
                     }
 
                     $documentAddress = $this->generateEditDocumentAddress($request);
@@ -2167,6 +2315,24 @@ class DocumentRequestController extends Controller
                     } else if($documentRequest->document_type == 'Deed of Donation') {
             
                         DeedOfDonation::where('documentRequest_id', $id)->delete();
+            
+                    } else if($documentRequest->document_type == 'Other Document') {
+                        
+                        $additionalInfoDetails = OtherDocument::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        OtherDocument::where('documentRequest_id', $id)->delete();
             
                     }
 
@@ -2293,6 +2459,24 @@ class DocumentRequestController extends Controller
             
                         DeedOfDonation::where('documentRequest_id', $id)->delete();
             
+                    } else if($documentRequest->document_type == 'Other Document') {
+                        
+                        $additionalInfoDetails = OtherDocument::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        OtherDocument::where('documentRequest_id', $id)->delete();
+            
                     }
 
                     $createDeedOfSale = $this->createDeedOfSale($request, $id);
@@ -2411,6 +2595,24 @@ class DocumentRequestController extends Controller
             
                         DeedOfDonation::where('documentRequest_id', $id)->delete();
             
+                    } else if($documentRequest->document_type == 'Other Document') {
+                        
+                        $additionalInfoDetails = OtherDocument::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        OtherDocument::where('documentRequest_id', $id)->delete();
+            
                     }
 
                     $documentAddress = $this->generateEditDocumentAddress($request);
@@ -2426,6 +2628,145 @@ class DocumentRequestController extends Controller
                         return $this->failedEditRedirect($id);
                     }
 
+                } else if($request->document_type == 'Other Document') {
+                    
+                    if($documentRequest->document_type == 'Affidavit of Loss') {
+
+                        $additionalInfoDetails = AffidavitOfLoss::where('documentRequest_id', $id)->first();
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->cedula))) {
+                            unlink(public_path($additionalInfoDetails->cedula));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        AffidavitOfLoss::where('documentRequest_id', $id)->delete();
+            
+                    } else if($documentRequest->document_type == 'Affidavit of Guardianship') {
+            
+                        $additionalInfoDetails = AffidavitOfGuardianship::where('documentRequest_id', $id)->first();
+            
+                        if (file_exists(public_path($additionalInfoDetails->guardian_brgy_clearance))) {
+                            unlink(public_path($additionalInfoDetails->guardian_brgy_clearance));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        AffidavitOfGuardianship::where('documentRequest_id', $id)->delete();
+            
+                    } else if($documentRequest->document_type == 'Affidavit of No income') {
+            
+                        $additionalInfoDetails = AffidavitOfNoIncome::where('documentRequest_id', $id)->first();
+            
+                        if (file_exists(public_path($additionalInfoDetails->certificate_of_indigency))) {
+                            unlink(public_path($additionalInfoDetails->certificate_of_indigency));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        AffidavitOfNoIncome::where('documentRequest_id', $id)->delete();
+            
+                    } else if($documentRequest->document_type == 'Affidavit of No fix income') {
+            
+                        $additionalInfoDetails = AffidavitOfNoFixIncome::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->indigency))) {
+                            unlink(public_path($additionalInfoDetails->indigency));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        AffidavitOfNoFixIncome::where('documentRequest_id', $id)->delete();
+
+                    } else if($documentRequest->document_type == 'Extra Judicial') {
+
+                        $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->death_cert))) {
+                            unlink(public_path($additionalInfoDetails->death_cert));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->heirship))) {
+                            unlink(public_path($additionalInfoDetails->heirship));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->inv_estate))) {
+                            unlink(public_path($additionalInfoDetails->inv_estate));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->tax_clearance))) {
+                            unlink(public_path($additionalInfoDetails->tax_clearance));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->deed_extrajudicial))) {
+                            unlink(public_path($additionalInfoDetails->deed_extrajudicial));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        ExtraJudicial::where('documentRequest_id', $id)->delete();
+
+                    } else if($documentRequest->document_type == 'Deed of Sale') {
+
+                        DeedOfSale::where('documentRequest_id', $id)->delete();
+
+                    } else if($documentRequest->document_type == 'Deed of Donation') {
+
+                        DeedOfDonation::where('documentRequest_id', $id)->delete();
+
+                    } else if($documentRequest->document_type == 'Other Document') {
+                        
+                        $additionalInfoDetails = OtherDocument::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        OtherDocument::where('documentRequest_id', $id)->delete();
+
+                    }
+
+                    $validIdFrontFilePath = $this->uploadEditValidIdFrontOther($request);
+                    $validIdBackFilePath = $this->uploadEditValidIdBackOther($request);
+
+                    $createOtherDocument = $this->createOtherDocument($validIdFrontFilePath, $validIdBackFilePath, $id);
+
+                    if($updateDocumentRequestDetails && $createOtherDocument) {
+                        $this->logDocumentRequestEditSuccess($user, $id);
+    
+                        return $this->successEditRedirect($id);
+                    } else {
+                        return $this->failedEditRedirect($id);
+                    }
+                
                 } else {
                     return $this->failedEditRedirect($id);
                 } 
@@ -2512,6 +2853,17 @@ class DocumentRequestController extends Controller
                 return $this->failedEditRedirect($id);
             }
 
+        } else if ($request->document_type == 'Other Document' && $this->shouldUpdateOtherDocument($request, $id)) {
+            $updateOtherDocumentDetails = $this->updateOtherDocument($request, $id);
+
+            if($updateOtherDocumentDetails) {
+                $this->logDocumentRequestEditSuccess($user, $id);
+
+                return $this->successEditRedirect($id);
+            } else {
+                return $this->failedEditRedirect($id);
+            }
+        
         } else {
             return redirect()->route('document-request.editDocumentRequest', $id)
                 ->with('failed', 'Update Some Fields!');
@@ -2639,6 +2991,12 @@ class DocumentRequestController extends Controller
             $this->shouldUpdateDocument2Address($request, $deedOfDonationInfo->donee_address);
     }
 
+    private function shouldUpdateOtherDocument(Request $request, $id) {
+
+        return $request->valid_id_front != null ||
+            $request->valid_id_back != null;
+    }
+
     private function shouldUpdateDocumentAddress(Request $request, $address) {
         $address = explode(', ', $address);
         $city = $address[2];
@@ -2744,6 +3102,26 @@ class DocumentRequestController extends Controller
         $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
         $filePath = 'uploads/document-request/affidavitOfLoss/' . $fileName;
         $file->move('uploads/document-request/affidavitOfLoss/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditValidIdFrontOther(Request $request) {
+        $file = $request->file('valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/otherDocument/' . $fileName;
+        $file->move('uploads/document-request/otherDocument/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditValidIdBackOther(Request $request) {
+        $file = $request->file('valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/otherDocument/' . $fileName;
+        $file->move('uploads/document-request/otherDocument/', $fileName);
     
         return $filePath;
     }
@@ -3066,6 +3444,36 @@ class DocumentRequestController extends Controller
         return DeedOfDonation::where('documentRequest_id', $documentRequestID)->update($data);
     }
 
+    private function updateOtherDocument(Request $request, $documentRequestID) {
+        $documentRequest = OtherDocument::where('documentRequest_id', $documentRequestID)->first();
+
+        $data = [
+            'updated_at' => Carbon::now('Asia/Manila'),
+        ];
+
+        if ($request->hasFile('valid_id_front')) {
+            $filePath = $documentRequest->valid_id_front;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $validIDFrontFilePath = $this->uploadEditValidIdFrontOther($request);
+            $data['valid_id_front'] = $validIDFrontFilePath;
+        }
+    
+        if ($request->hasFile('valid_id_back')) {
+            $filePath = $documentRequest->valid_id_back;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $validIDBackFilePath = $this->uploadEditValidIdBackOther($request);
+            $data['valid_id_back'] = $validIDBackFilePath;
+        }
+    
+        return OtherDocument::where('documentRequest_id', $documentRequestID)->update($data);
+    }
+
     private function logDocumentRequestEditSuccess($user, $documentRequestID) {
         Logs::create([
             'type' => 'Edit Document Request',
@@ -3104,8 +3512,75 @@ class DocumentRequestController extends Controller
     
             $this->createDeleteDocumentRequestLog($user, $documentRequest);
     
-            if ($documentRequest->additional_file != null) {
-                $this->deleteAdditionalFile($documentRequest->additional_file);
+            if ($documentRequest->document_type == 'Affidavit of Loss') {
+                $additionalInfo = AffidavitOfLoss::where('documentRequest_id', $id)->get()->first();
+
+                if (file_exists(public_path($additionalInfo->valid_id_front))) {
+                    unlink(public_path($additionalInfo->valid_id_front));
+                }
+
+                if (file_exists(public_path($additionalInfo->valid_id_back))) {
+                    unlink(public_path($additionalInfo->valid_id_back));
+                }
+
+                if (file_exists(public_path($additionalInfo->cedula))) {
+                    unlink(public_path($additionalInfo->cedula));
+                }
+
+            } else if ($documentRequest->document_type == 'Affidavit of Guardianship') {
+                $additionalInfo = AffidavitOfGuardianship::where('documentRequest_id', $id)->get()->first();
+
+                if (file_exists(public_path($additionalInfo->guardian_brgy_clearance))) {
+                    unlink(public_path($additionalInfo->guardian_brgy_clearance));
+                }
+
+            } else if ($documentRequest->document_type == 'Affidavit of No Income') {
+                $additionalInfo = AffidavitOfNoIncome::where('documentRequest_id', $id)->get()->first();
+
+                if (file_exists(public_path($additionalInfo->certificate_of_indigency))) {
+                    unlink(public_path($additionalInfo->certificate_of_indigency));
+                }
+
+            } else if ($documentRequest->document_type == 'Affidavit of No Fix Income') {
+                $additionalInfo = AffidavitOfNoFixIncome::where('documentRequest_id', $id)->get()->first();
+
+                if (file_exists(public_path($additionalInfo->indigency))) {
+                    unlink(public_path($additionalInfo->indigency));
+                }
+
+            } else if ($documentRequest->document_type == 'Extra Judicial') {
+                $additionalInfo = ExtraJudicial::where('documentRequest_id', $id)->get()->first();
+
+                if (file_exists(public_path($additionalInfo->death_cert))) {
+                    unlink(public_path($additionalInfo->death_cert));
+                }
+
+                if (file_exists(public_path($additionalInfo->heirship))) {
+                    unlink(public_path($additionalInfo->heirship));
+                }
+
+                if (file_exists(public_path($additionalInfo->inv_estate))) {
+                    unlink(public_path($additionalInfo->inv_estate));
+                }
+
+                if (file_exists(public_path($additionalInfo->tax_clearance))) {
+                    unlink(public_path($additionalInfo->tax_clearance));
+                }
+
+                if (file_exists(public_path($additionalInfo->deed_extrajudicial))) {
+                    unlink(public_path($additionalInfo->deed_extrajudicial));
+                }
+
+            } else if ($documentRequest->document_type == 'Other Document') {
+                $additionalInfo = OtherDocument::where('documentRequest_id', $id)->get()->first();
+
+                if (file_exists(public_path($additionalInfo->valid_id_front))) {
+                    unlink(public_path($additionalInfo->valid_id_front));
+                }
+
+                if (file_exists(public_path($additionalInfo->valid_id_back))) {
+                    unlink(public_path($additionalInfo->valid_id_back));
+                }
             }
     
             $route = $this->getRouteByDocumentRequestStatus($documentRequest->documentRequest_status);
@@ -3116,15 +3591,19 @@ class DocumentRequestController extends Controller
                 Feedback::where('transaction_id', $id)->where('transaction_type', 'Document Request')->delete();
             }
 
-            DB::table('notifications')
-            ->where('data->documentRequest_id', $id)
-            ->where('type', 'App\Notifications\NewDocumentRequest')
-            ->delete();
+            if(DB::table('notifications')->where('data->documentRequest_id', $id)->where('type', 'App\Notifications\NewDocumentRequest')->get()->count() > 0) {
+                DB::table('notifications')
+                ->where('data->documentRequest_id', $id)
+                ->where('type', 'App\Notifications\NewDocumentRequest')
+                ->delete();
+            }
 
-            DB::table('notifications')
-            ->where('data->documentRequest_id', $id)
-            ->where('type', 'App\Notifications\NewDocumentRequestMessage')
-            ->delete();
+            if(DB::table('notifications')->where('data->documentRequest_id', $id)->where('type', 'App\Notifications\NewDocumentRequestMessage')->get()->count() > 0) {
+                DB::table('notifications')
+                ->where('data->documentRequest_id', $id)
+                ->where('type', 'App\Notifications\NewDocumentRequestMessage')
+                ->delete();
+            }
     
             DB::commit();
     
@@ -3149,12 +3628,6 @@ class DocumentRequestController extends Controller
         ];
     
         Logs::create($logData);
-    }
-    
-    // Function to delete additional file
-    private function deleteAdditionalFile($filePath)
-    {
-        unlink(public_path($filePath));
     }
     
     // Function to get route based on document request status

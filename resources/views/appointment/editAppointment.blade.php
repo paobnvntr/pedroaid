@@ -186,18 +186,18 @@
                                 <label for="timeslot">Appointment Time:</label>
                                 <select class="form-control timeslot @error('timeslot') is-invalid @enderror" name="timeslot" id="timeslot">
                                     <option value="">Select Timeslot</option>
-                                    <option class="timeslot-option" value="14:00" {{ old('appointment_time') == '14:00' ? 'selected' : '' }}>14:00 - 14:10</option>
-                                    <option class="timeslot-option" value="14:10" {{ old('appointment_time') == '14:10' ? 'selected' : '' }}>14:10 - 14:20</option>
-                                    <option class="timeslot-option" value="14:20" {{ old('appointment_time') == '14:20' ? 'selected' : '' }}>14:20 - 14:30</option>
-                                    <option class="timeslot-option" value="14:30" {{ old('appointment_time') == '14:30' ? 'selected' : '' }}>14:30 - 14:40</option>
-                                    <option class="timeslot-option" value="14:40" {{ old('appointment_time') == '14:40' ? 'selected' : '' }}>14:40 - 14:50</option>
-                                    <option class="timeslot-option" value="14:50" {{ old('appointment_time') == '14:50' ? 'selected' : '' }}>14:50 - 15:00</option>
-                                    <option class="timeslot-option" value="15:00" {{ old('appointment_time') == '15:00' ? 'selected' : '' }}>15:00 - 15:10</option>
-                                    <option class="timeslot-option" value="15:10" {{ old('appointment_time') == '15:10' ? 'selected' : '' }}>15:10 - 15:20</option>
-                                    <option class="timeslot-option" value="15:20" {{ old('appointment_time') == '15:20' ? 'selected' : '' }}>15:20 - 15:30</option>
-                                    <option class="timeslot-option" value="15:30" {{ old('appointment_time') == '15:30' ? 'selected' : '' }}>15:30 - 15:40</option>
-                                    <option class="timeslot-option" value="15:40" {{ old('appointment_time') == '15:40' ? 'selected' : '' }}>15:40 - 15:50</option>
-                                    <option class="timeslot-option" value="15:50" {{ old('appointment_time') == '15:50' ? 'selected' : '' }}>15:50 - 15:00</option>
+                                    <option class="timeslot-option" value="14:00" {{ old('appointment_time') == '14:00' ? 'selected' : '' }}>2:00 PM - 2:10 PM</option>
+                                    <option class="timeslot-option" value="14:10" {{ old('appointment_time') == '14:10' ? 'selected' : '' }}>2:10 PM - 2:20 PM</option>
+                                    <option class="timeslot-option" value="14:20" {{ old('appointment_time') == '14:20' ? 'selected' : '' }}>2:20 PM - 2:30 PM</option>
+                                    <option class="timeslot-option" value="14:30" {{ old('appointment_time') == '14:30' ? 'selected' : '' }}>2:30 PM - 2:40 PM</option>
+                                    <option class="timeslot-option" value="14:40" {{ old('appointment_time') == '14:40' ? 'selected' : '' }}>2:40 PM - 2:50 PM</option>
+                                    <option class="timeslot-option" value="14:50" {{ old('appointment_time') == '14:50' ? 'selected' : '' }}>2:50 PM - 3:00 PM</option>
+                                    <option class="timeslot-option" value="15:00" {{ old('appointment_time') == '15:00' ? 'selected' : '' }}>3:00 PM - 3:10 PM</option>
+                                    <option class="timeslot-option" value="15:10" {{ old('appointment_time') == '15:10' ? 'selected' : '' }}>3:10 PM - 3:20 PM</option>
+                                    <option class="timeslot-option" value="15:20" {{ old('appointment_time') == '15:20' ? 'selected' : '' }}>3:20 PM - 3:30 PM</option>
+                                    <option class="timeslot-option" value="15:30" {{ old('appointment_time') == '15:30' ? 'selected' : '' }}>3:30 PM - 3:40 PM</option>
+                                    <option class="timeslot-option" value="15:40" {{ old('appointment_time') == '15:40' ? 'selected' : '' }}>3:40 PM - 3:50 PM</option>
+                                    <option class="timeslot-option" value="15:50" {{ old('appointment_time') == '15:50' ? 'selected' : '' }}>3:50 PM - 4:00 PM</option>
                                 </select>
                                 @error('timeslot')
                                     <span class="invalid-feedback d-block">{{ $message }}</span>
