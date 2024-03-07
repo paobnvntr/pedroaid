@@ -11458,3 +11458,8 @@
     max-height: 350px; /* Adjust the height as needed */
     overflow-y: auto; /* Add a scrollbar when content exceeds the container height */
   }
+
+  .notification-container {
+    max-height: 350px; /* Adjust the height as needed */
+    overflow-y: auto; /* Add a scrollbar when content exceeds the container height */
+  }

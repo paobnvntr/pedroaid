@@ -44,8 +44,9 @@
 						Brgy. Poblacion, <br>
 						City of San Pedro, 4023<br>
 						Laguna, Philippines <br><br>
-						<strong>Phone:</strong> +69 912 345 6789<br>
-						<strong>Email:</strong> pedroaid@gov.ph<br>
+						<strong>Phone:</strong> 8082020305<br>
+						<strong>Mobile:</strong> 09205001415<br>
+						<strong>Email:</strong> santosritch@gmail.com<br>
 					</p>
 
 				</div>

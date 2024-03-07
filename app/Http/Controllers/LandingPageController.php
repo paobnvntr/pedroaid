@@ -236,7 +236,7 @@ class LandingPageController extends Controller
                 $superAdmin->notify(new NewAppointment($notificationData));
             }
     
-            return redirect()->route('appointmentForm')->with('success', 'Appointment Booked Successfully!');
+            return redirect()->route('appointmentForm')->with('success', 'Appointment Booked Successfully! Kindly check your email for confirmation.');
         } else {
 
             return redirect()->route('appointmentForm')->with('failed', 'Failed to Book Appointment!');
@@ -314,7 +314,7 @@ class LandingPageController extends Controller
                 $superAdmin->notify(new NewInquiry($notificationData));
             }
 
-            return redirect()->route('inquiryForm')->with('success', 'Inquiry Sent Successfully!');
+            return redirect()->route('inquiryForm')->with('success', 'Inquiry Sent Successfully! Kindly check your email for confirmation.');
         }else {
             return redirect()->route('inquiryForm')->with('failed', 'Failed to Send Inquiry!');
         }
@@ -1024,7 +1024,7 @@ class LandingPageController extends Controller
     }
     
     private function successResponse() {
-        return redirect()->route('documentRequestForm')->with('success', 'Document Request Sent Successfully!');
+        return redirect()->route('documentRequestForm')->with('success', 'Document Request Sent Successfully! Kindly check your email for confirmation.');
     }
     
     private function failedResponse() {

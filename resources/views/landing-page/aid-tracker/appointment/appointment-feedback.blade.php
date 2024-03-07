@@ -44,37 +44,37 @@
                                 <label class="rating-label" for="rating">Service Rating:</label>
                                 
                                 <div class="form-check ml-4">
-                                    <input class="form-check-input" type="radio" name="rating" value="Poor" id="rating-poor">
-                                    <label class="form-check-label" for="rating-poor">
-                                        Poor
+                                    <input class="form-check-input" type="radio" name="rating" value="Excellent" id="rating-excellent">
+                                    <label class="form-check-label" for="rating-excellent">
+                                        Excellent
                                     </label>
                                 </div>
-                                
-                                <div class="form-check ml-4">
-                                    <input class="form-check-input" type="radio" name="rating" value="Fair" id="rating-fair">
-                                    <label class="form-check-label" for="rating-fair">
-                                        Fair
-                                    </label>
-                                </div>
-                                
-                                <div class="form-check ml-4">
-                                    <input class="form-check-input" type="radio" name="rating" value="Good" id="rating-good">
-                                    <label class="form-check-label" for="rating-good">
-                                        Good
-                                    </label>
-                                </div>
-                                
+
                                 <div class="form-check ml-4">
                                     <input class="form-check-input" type="radio" name="rating" value="Very Good" id="rating-verygood">
                                     <label class="form-check-label" for="rating-verygood">
                                         Very Good
                                     </label>
                                 </div>
-                                
+
                                 <div class="form-check ml-4">
-                                    <input class="form-check-input" type="radio" name="rating" value="Excellent" id="rating-excellent">
-                                    <label class="form-check-label" for="rating-excellent">
-                                        Excellent
+                                    <input class="form-check-input" type="radio" name="rating" value="Good" id="rating-good">
+                                    <label class="form-check-label" for="rating-good">
+                                        Good
+                                    </label>
+                                </div>
+
+                                <div class="form-check ml-4">
+                                    <input class="form-check-input" type="radio" name="rating" value="Fair" id="rating-fair">
+                                    <label class="form-check-label" for="rating-fair">
+                                        Fair
+                                    </label>
+                                </div>
+
+                                <div class="form-check ml-4">
+                                    <input class="form-check-input" type="radio" name="rating" value="Poor" id="rating-poor">
+                                    <label class="form-check-label" for="rating-poor">
+                                        Poor
                                     </label>
                                 </div>
                             </div>

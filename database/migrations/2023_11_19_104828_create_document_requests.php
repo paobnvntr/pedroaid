@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('email');
             $table->string('cellphone_number');
             $table->string('documentRequest_status')->default('Pending');
+            $table->timestamp('date_claimed')->nullable();
             $table->timestamps();
         });
     }

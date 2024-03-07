@@ -61,6 +61,8 @@
               <i class="fas fa-check"></i> <!-- Adjust the icon class as needed -->
           </a>
         </h6>
+          
+        <div class="notification-container">
           @php
               $unreadNotificationsFiltered = auth()->user()->unreadNotifications
                   ->filter(function ($notification) {
@@ -106,6 +108,7 @@
                   </div>
               </a>
           @endforeach
+        </div>
 
         <a class="dropdown-item text-center small text-gray-500" href="{{ route('showAllNotifications') }}">Show All Alerts</a>
       </div>
@@ -137,53 +140,54 @@
                 <i class="fas fa-envelope-open-text"></i> <!-- Adjust the icon class as needed -->
             </a>
           </h6>
-          
-          @php
-              $unreadNotificationsFiltered = auth()->user()->unreadNotifications
-                  ->filter(function ($notification) {
-                      return $notification->type === 'App\Notifications\NewAppointmentMessage' ||
-                            $notification->type === 'App\Notifications\NewDocumentRequestMessage' ||
-                            $notification->type === 'App\Notifications\NewInquiryMessage';
-                  });
 
-              $unreadNotificationsGrouped = $unreadNotificationsFiltered->groupBy(function($notification) {
-                  $transactionType = $notification->data['transaction_type'];
-                  $id = '';
-                  if ($transactionType === 'Appointment') {
-                      $id = $notification->data['appointment_id'];
-                  } else if ($transactionType === 'Document Request') {
-                      $id = $notification->data['documentRequest_id'];
-                  } else if ($transactionType === 'Inquiry') {
-                      $id = $notification->data['inquiry_id'];
-                  }
-                  return $transactionType . '_' . $id;
-              });
-          @endphp
+          <div class="notification-container">
+            @php
+                $unreadNotificationsFiltered = auth()->user()->unreadNotifications
+                    ->filter(function ($notification) {
+                        return $notification->type === 'App\Notifications\NewAppointmentMessage' ||
+                              $notification->type === 'App\Notifications\NewDocumentRequestMessage' ||
+                              $notification->type === 'App\Notifications\NewInquiryMessage';
+                    });
 
-          @foreach ($unreadNotificationsGrouped as $transactionKey => $notifications)
-              @php
-                  $unreadCount = count($notifications);
-                  $transactionType = $notifications[0]->data['transaction_type'];
-                  [$type, $id] = explode('_', $transactionKey);
-              @endphp
+                $unreadNotificationsGrouped = $unreadNotificationsFiltered->groupBy(function($notification) {
+                    $transactionType = $notification->data['transaction_type'];
+                    $id = '';
+                    if ($transactionType === 'Appointment') {
+                        $id = $notification->data['appointment_id'];
+                    } else if ($transactionType === 'Document Request') {
+                        $id = $notification->data['documentRequest_id'];
+                    } else if ($transactionType === 'Inquiry') {
+                        $id = $notification->data['inquiry_id'];
+                    }
+                    return $transactionType . '_' . $id;
+                });
+            @endphp
 
-                  <a id="notification_{{ $notifications[0]->id }}" class="dropdown-item d-flex align-items-center message-item" href="{{ 
-                      $transactionType === 'Appointment' ? route('appointment.appointmentDetails', $id) :
-                      ($transactionType === 'Document Request' ? route('document-request.documentRequestDetails', $id) :
-                      ($transactionType === 'Inquiry' ? route('inquiry.inquiryDetails', $id) : '')) 
-                  }}" data-transaction-id="{{ $id }}">
+            @foreach ($unreadNotificationsGrouped as $transactionKey => $notifications)
+                @php
+                    $unreadCount = count($notifications);
+                    $transactionType = $notifications[0]->data['transaction_type'];
+                    [$type, $id] = explode('_', $transactionKey);
+                @endphp
 
-                  <div class="dropdown-list-image mr-3">
-                      <img class="rounded-circle" src="/uploads/profile/staff/default_staff.jpg" alt="...">
-                  </div>
-                  <div class="font-weight-bold">
-                      <div class="text-truncate">New Message! @if ($unreadCount > 1) <span class="badge badge-danger">{{ $unreadCount }}</span> @endif</div>
-                      <div class="small text-gray-500">{{ $notifications[0]->data['name'] }} · {{ $transactionType }}</div>
-                      <div class="small text-gray-500">{{ $notifications[0]->created_at->diffForHumans() }}</div>
-                  </div>
-              </a>
-          @endforeach
+                    <a id="notification_{{ $notifications[0]->id }}" class="dropdown-item d-flex align-items-center message-item" href="{{ 
+                        $transactionType === 'Appointment' ? route('appointment.appointmentDetails', $id) :
+                        ($transactionType === 'Document Request' ? route('document-request.documentRequestDetails', $id) :
+                        ($transactionType === 'Inquiry' ? route('inquiry.inquiryDetails', $id) : '')) 
+                    }}" data-transaction-id="{{ $id }}">
 
+                    <div class="dropdown-list-image mr-3">
+                        <img class="rounded-circle" src="/uploads/profile/staff/default_staff.jpg" alt="...">
+                    </div>
+                    <div class="font-weight-bold">
+                        <div class="text-truncate">New Message! @if ($unreadCount > 1) <span class="badge badge-danger">{{ $unreadCount }}</span> @endif</div>
+                        <div class="small text-gray-500">{{ $notifications[0]->data['name'] }} · {{ $transactionType }}</div>
+                        <div class="small text-gray-500">{{ $notifications[0]->created_at->diffForHumans() }}</div>
+                    </div>
+                </a>
+            @endforeach
+          </div>
 
           <a class="dropdown-item text-center small text-gray-500" href="{{ route('showAllMessages') }}">Show All Messages</a>
       </div>
