@@ -11,6 +11,7 @@ use App\Models\DeedOfSale;
 use App\Models\DocumentRequest;
 use App\Models\DocumentRequestMessage;
 use App\Models\ExtraJudicial;
+use App\Models\Heir;
 use App\Models\OtherDocument;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
@@ -23,6 +24,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
 use App\Models\Feedback;
+use Illuminate\Validation\Rule;
 
 class DocumentRequestController extends Controller
 {
@@ -95,60 +97,86 @@ class DocumentRequestController extends Controller
             'document_type' => 'required',
 
             'document_name' => 'required_if:document_type,Affidavit of Loss,Affidavit of No income,Affidavit of No fix income',
-            'document_age' => 'required_if:document_type,Affidavit of Loss,Affidavit of No income,Affidavit of No fix income|gte:18',
+            'document_civil_status' => 'required_if:document_type,Affidavit of Loss,Affidavit of Guardianship,Affidavit of No income,Affidavit of No fix income,Deed of Sale',
 
-            'document_city' => 'required_if:document_type,Affidavit of Loss,Affidavit of Guardianship,Affidavit of No Income,Affidavit of No fix income,Deed of Donation',
+            'document_city' => 'required_if:document_type,Affidavit of Loss,Affidavit of Guardianship,Affidavit of No income,Affidavit of No fix income,Deed of Sale,Deed of Donation',
             'document_barangay' => 'required_if:document_city,San Pedro City',
             'document_street' => 'required_if:document_city,San Pedro City',
             'document_other_city' => 'required_if:document_city,Other City',
             'document_other_barangay' => 'required_if:document_city,Other City',
             'document_other_street' => 'required_if:document_city,Other City',
 
-            'document_city_2' => 'required_if:document_type,Affidavit of Guardianship,Deed of Donation',
+            'document_city_2' => 'required_if:document_type,Deed of Donation',
             'document_barangay_2' => 'required_if:document_city_2,San Pedro City',
             'document_street_2' => 'required_if:document_city_2,San Pedro City',
             'document_other_city_2' => 'required_if:document_city_2,Other City',
             'document_other_barangay_2' => 'required_if:document_city_2,Other City',
             'document_other_street_2' => 'required_if:document_city_2,Other City',
 
-            'valid_id_front' => 'required_if:document_type,Affidavit of Loss,Other Document|image|mimes:jpg,jpeg,png',
-            'valid_id_back' => 'required_if:document_type,Affidavit of Loss,Other Document|image|mimes:jpg,jpeg,png',
-            'cedula' => 'required_if:document_type,Affidavit of Loss|mimes:pdf',
+            'valid_id_front' => 'required_if:document_type,Affidavit of Loss,Affidavit of Guardianship,Affidavit of No income,Affidavit of No fix income,Other Document|image|mimes:jpg,jpeg,png',
+            'valid_id_back' => 'required_if:document_type,Affidavit of Loss,Affidavit of Guardianship,Affidavit of No income,Affidavit of No fix income,Other Document|image|mimes:jpg,jpeg,png',
+
+            'item_lost' => 'required_if:document_type,Affidavit of Loss',
+            'reason_of_loss' => 'required_if:document_type,Affidavit of Loss',
 
             'guardian_name' => 'required_if:document_type,Affidavit of Guardianship',
-            'guardian_age' => 'required_if:document_type,Affidavit of Guardianship|gte:18',
-            'guardian_occupation' => 'required_if:document_type,Affidavit of Guardianship',
-            'barangay_clearance' => 'required_if:document_type,Affidavit of Guardianship|mimes:pdf',
-            'relationship' => 'required_if:document_type,Affidavit of Guardianship',
             'minor_name' => 'required_if:document_type,Affidavit of Guardianship',
-            'minor_age' => 'required_if:document_type,Affidavit of Guardianship|lt:18',
-            'minor_relationship' => 'required_if:document_type,Affidavit of Guardianship',
+            'years_in_care' => 'required_if:document_type,Affidavit of Guardianship',
+            
+            'year_of_no_income' => 'required_if:document_type,Affidavit of No income,Affidavit of No fix income|regex:/^\d{4}$/',
+            'certificate_of_indigency' => 'required_if:document_type,Affidavit of No income|mimes:pdf',
 
-            'certificate_of_indigency' => 'required_if:document_type,Affidavit of No income,Affidavit of No fix income|mimes:pdf',
-            'previous_employer_name' => 'required_with:previous_employer_contact',
-            'previous_employer_contact' => 'required_with:previous_employer_name',
-            'business_name' => 'required_if:document_type,Affidavit of No income',
-            'registration_number' => 'required_if:document_type,Affidavit of No income',
-            'business_address' => 'required_if:document_type,Affidavit of No income',
-            'business_period' => 'required_if:document_type,Affidavit of No income',
-            'no_income_period' => 'required_if:document_type,Affidavit of No income',
+            'certificate_of_residency' => 'required_if:document_type,Affidavit of No fix income|mimes:pdf',
 
-            'source_of_income' => 'required_if:document_type,Affidavit of No fix income',
+            'title_of_property' => 'required_if:document_type,Extra Judicial',
+            'title_holder' => 'required_if:document_type,Extra Judicial',
+            'surviving_spouse' => [
+                Rule::requiredIf(function () use ($request) {
+                    return $request->input('document_type') === 'Extra Judicial' &&
+                            !$request->input('deceased_spouse') && empty($request->input('surviving_spouse'));
+                }),
+            ],            
+            'spouse_valid_id_front' => [
+                'image',
+                'mimes:jpg,jpeg,png',
+                Rule::requiredIf(function () use ($request) {
+                    // Check if the checkbox is checked
+                    return $request->input('document_type') === 'Extra Judicial' &&
+                            !$request->input('deceased_spouse');
+                }),
+            ],
+            'spouse_valid_id_back' => [
+                'image',
+                'mimes:jpg,jpeg,png',
+                Rule::requiredIf(function () use ($request) {
+                    // Check if the checkbox is checked
+                    return $request->input('document_type') === 'Extra Judicial' &&
+                            !$request->input('deceased_spouse');
+                }),
+            ],
+            'surviving_heir.*' => 'required_if:deceased_spouse,on', 
 
-            'death_certificate' => 'required_if:document_type,Extra Judicial|mimes:pdf',
-            'heirship_documents' => 'required_if:document_type,Extra Judicial|mimes:pdf',
-            'inventory_of_estate' => 'required_if:document_type,Extra Judicial|mimes:pdf',
-            'tax_clearance' => 'required_if:document_type,Extra Judicial|mimes:pdf',
-            'deed_of_extrajudicial_settlement' => 'required_if:document_type,Extra Judicial|mimes:pdf',
-
-            'party1_name' => 'required_if:document_type,Deed of Sale',
-            'party2_name' => 'required_if:document_type,Deed of Sale',
-            'property_details' => 'required_if:document_type,Deed of Sale',
+            'name_of_vendor' => 'required_if:document_type,Deed of Sale',
+            'property_document' => 'required_if:document_type,Deed of Sale|mimes:pdf',
+            'property_price' => 'required_if:document_type,Deed of Sale',
+            'vendor_valid_id_front' => 'required_if:document_type,Deed of Sale|image|mimes:jpg,jpeg,png',
+            'vendor_valid_id_back' => 'required_if:document_type,Deed of Sale|image|mimes:jpg,jpeg,png',
+            'name_of_vendee' => 'required_if:document_type,Deed of Sale',
+            'vendee_valid_id_front' => 'required_if:document_type,Deed of Sale|image|mimes:jpg,jpeg,png',
+            'vendee_valid_id_back' => 'required_if:document_type,Deed of Sale|image|mimes:jpg,jpeg,png',
+            'name_of_witness' => 'required_if:document_type,Deed of Sale',
+            'witness_valid_id_front' => 'required_if:document_type,Deed of Sale|image|mimes:jpg,jpeg,png',
+            'witness_valid_id_back' => 'required_if:document_type,Deed of Sale|image|mimes:jpg,jpeg,png',
 
             'donor_name' => 'required_if:document_type,Deed of Donation',
-            'donor_age' => 'required_if:document_type,Deed of Donation',
+            'donor_civil_status' => 'required_if:document_type,Deed of Donation',
+            'donor_valid_id_front' => 'required_if:document_type,Deed of Donation|image|mimes:jpg,jpeg,png',
+            'donor_valid_id_back' => 'required_if:document_type,Deed of Donation|image|mimes:jpg,jpeg,png',
             'donee_name' => 'required_if:document_type,Deed of Donation',
-            'donee_age' => 'required_if:document_type,Deed of Donation',
+            'donee_civil_status' => 'required_if:document_type,Deed of Donation',
+            'donee_valid_id_front' => 'required_if:document_type,Deed of Donation|image|mimes:jpg,jpeg,png',
+            'donee_valid_id_back' => 'required_if:document_type,Deed of Donation|image|mimes:jpg,jpeg,png',
+            'property_description' => 'required_if:document_type,Deed of Donation',
         ],
         [
             'barangay.required_if' => 'The barangay field is required.',
@@ -158,7 +186,7 @@ class DocumentRequestController extends Controller
             'other_street.required_if' => 'The street field is required.',
 
             'document_name.required_if' => 'The name field is required.',
-            'document_age.required_if' => 'The age field is required.',
+            'document_civil_status.required_if' => 'The civil status field is required.',
             
             'document_city.required_if' => 'The city field is required.',
             'document_barangay.required_if' => 'The barangay field is required.',
@@ -176,44 +204,47 @@ class DocumentRequestController extends Controller
 
             'valid_id_front.required_if' => 'The valid ID front field is required.',
             'valid_id_back.required_if' => 'The valid ID back field is required.',
-            'cedula.required_if' => 'The cedula field is required.',
+            'item_lost.required_if' => 'The item lost field is required.',
+            'reason_of_loss.required_if' => 'The reason of loss field is required.',
 
-            'guardian_name.required_if' => 'The name field is required.',
-            'guardian_age.required_if' => 'The age field is required.',
-            'guardian_occupation.required_if' => 'The occupation field is required.',
-            'barangay_clearance.required_if' => 'The barangay clearance field is required.',
-            'relationship.required_if' => 'The relationship field is required.',
-            'minor_name.required_if' => 'The name field is required.',
-            'minor_age.required_if' => 'The age field is required.',
-            'minor_relationship.required_if' => 'The relationship field is required.',
+            'guardian_name.required_if' => 'The guardian name field is required.',
+            'minor_name.required_if' => 'The minor name field is required.',
+            'years_in_care.required_if' => 'The years in care field is required.',
 
             'certificate_of_indigency.required_if' => 'The certificate of indigency field is required.',
-            'previous_employer_name.required_with' => 'The previous employer name field is required.',
-            'previous_employer_contact.required_with' => 'The previous employer contact field is required.',
-            'business_name.required_if' => 'The business name field is required.',
-            'registration_number.required_if' => 'The registration number field is required.',
-            'business_address.required_if' => 'The business address field is required.',
-            'business_period.required_if' => 'The business period field is required.',
-            'no_income_period.required_if' => 'The no income period field is required.',
+            'year_of_no_income.required_if' => 'The year of no income field is required.',
+            'certificate_of_residency.required_if' => 'The certificate of residency field is required.',
 
-            'source_of_income.required_if' => 'The source of income field is required.',
+            'title_of_property.required_if' => 'The title of property field is required.',
+            'title_holder.required_if' => 'The title holder field is required.',
+            'surviving_spouse.required_if' => 'The surviving spouse field is required.',
+            'spouse_valid_id_front.required_if' => 'The spouse valid ID front field is required.',
+            'spouse_valid_id_back.required_if' => 'The spouse valid ID back field is required.',
+            'surviving_heir.*.required_if' => 'The name of surviving heir field is required.',
 
-            'death_certificate.required_if' => 'The death certificate field is required.',
-            'heirship_documents.required_if' => 'The heirship documents field is required.',
-            'inventory_of_estate.required_if' => 'The inventory of estate field is required.',
-            'tax_clearance.required_if' => 'The tax clearance field is required.',
-            'deed_of_extrajudicial_settlement.required_if' => 'The deed of extrajudicial settlement field is required.',
-
-            'party1_name.required_if' => 'The name field is required.',
-            'party2_name.required_if' => 'The name field is required.',
-            'property_details.required_if' => 'The details field is required.',
+            'name_of_vendor.required_if' => 'The name of vendor field is required.',
+            'property_document.required_if' => 'The property document field is required.',
+            'property_price.required_if' => 'The property price field is required.',
+            'vendor_valid_id_front.required_if' => 'The vendor valid ID front field is required.',
+            'vendor_valid_id_back.required_if' => 'The vendor valid ID back field is required.',
+            'name_of_vendee.required_if' => 'The name of vendee field is required.',
+            'vendee_valid_id_front.required_if' => 'The vendee valid ID front field is required.',
+            'vendee_valid_id_back.required_if' => 'The vendee valid ID back field is required.',
+            'name_of_witness.required_if' => 'The name of witness field is required.',
+            'witness_valid_id_front.required_if' => 'The witness valid ID front field is required.',
+            'witness_valid_id_back.required_if' => 'The witness valid ID back field is required.',
 
             'donor_name.required_if' => 'The name field is required.',
-            'donor_age.required_if' => 'The age field is required.',
+            'donor_civil_status.required_if' => 'The civil status field is required.',
             'donor_address.required_if' => 'The address field is required.',
+            'donor_valid_id_front.required_if' => 'The valid ID front field is required.',
+            'donor_valid_id_back.required_if' => 'The valid ID back field is required.',
             'donee_name.required_if' => 'The name field is required.',
-            'donee_age.required_if' => 'The age field is required.',
+            'donee_civil_status.required_if' => 'The civil status field is required.',
             'donee_address.required_if' => 'The address field is required.',
+            'donee_valid_id_front.required_if' => 'The valid ID front field is required.',
+            'donee_valid_id_back.required_if' => 'The valid ID back field is required.',
+            'property_description.required_if' => 'The property description field is required.',
         ]);
 
         if ($validator->fails()) {
@@ -224,7 +255,7 @@ class DocumentRequestController extends Controller
     }
 
     public function saveDocumentRequest(Request $request) {
-        $user = Auth::user()->name;
+        $user = Auth::user()->username;
         $address = $this->generateAddress($request);
         $documentAddress = $this->generateDocumentAddress($request);
         
@@ -233,11 +264,10 @@ class DocumentRequestController extends Controller
         $createDocumentRequest = $this->createDocumentRequest($request, $address, $documentRequestID);
 
         if ($request->document_type == 'Affidavit of Loss') {
-            $validIdFrontFilePath = $this->uploadValidIdFront($request);
-            $validIdBackFilePath = $this->uploadValidIdBack($request);
-            $cedulaFilePath = $this->uploadCedula($request);
+            $validIdFrontFilePath = $this->uploadValidIdFrontAffidavitOfLoss($request);
+            $validIdBackFilePath = $this->uploadValidIdBackAffidavitOfLoss($request);
     
-            $createAffidavitOfLoss = $this->createAffidavitOfLoss($request, $documentAddress, $validIdFrontFilePath, $validIdBackFilePath, $cedulaFilePath, $documentRequestID);
+            $createAffidavitOfLoss = $this->createAffidavitOfLoss($request, $documentAddress, $validIdFrontFilePath, $validIdBackFilePath, $documentRequestID);
             
             if ($createDocumentRequest && $createAffidavitOfLoss) {
                 $this->logSuccess($user, $documentRequestID);
@@ -251,10 +281,10 @@ class DocumentRequestController extends Controller
                 return $this->failedRedirect();
             }
         } else if ($request->document_type == 'Affidavit of Guardianship') {
-            $barangayClearanceFilePath = $this->uploadBarangayClearanceAOG($request);
-            $document2Address = $this->generateDocument2Address($request);
+            $validIdFrontFilePath = $this->uploadValidIdFrontAffidavitOfGuardianship($request);
+            $validIdBackFilePath = $this->uploadValidIdBackAffidavitOfGuardianship($request);
 
-            $createAffidavitOfGuardianship = $this->createAffidavitOfGuardianship($request, $documentAddress, $document2Address, $barangayClearanceFilePath, $documentRequestID);
+            $createAffidavitOfGuardianship = $this->createAffidavitOfGuardianship($request, $documentAddress, $validIdFrontFilePath, $validIdBackFilePath, $documentRequestID);
     
             if ($createDocumentRequest && $createAffidavitOfGuardianship) {
                 $this->logSuccess($user, $documentRequestID);
@@ -268,9 +298,11 @@ class DocumentRequestController extends Controller
                 return $this->failedRedirect();
             }
         } else if ($request->document_type == 'Affidavit of No income') {
-            $certOfIndigencyFilePath = $this->uploadCertOfIndigencyAONI($request);
+            $certOfIndigencyFilePath = $this->uploadCertOfIndigency($request);
+            $validIdFrontFilePath = $this->uploadValidIdFrontAONI($request);
+            $validIdBackFilePath = $this->uploadValidIdBackAONI($request);
     
-            $createAffidavitOfNoIncome = $this->createAffidavitOfNoIncome($request, $documentAddress, $certOfIndigencyFilePath, $documentRequestID);
+            $createAffidavitOfNoIncome = $this->createAffidavitOfNoIncome($request, $documentAddress, $certOfIndigencyFilePath, $validIdFrontFilePath, $validIdBackFilePath, $documentRequestID);
     
             if ($createDocumentRequest && $createAffidavitOfNoIncome) {
                 $this->logSuccess($user, $documentRequestID);
@@ -284,9 +316,11 @@ class DocumentRequestController extends Controller
                 return $this->failedRedirect();
             }
         } else if ($request->document_type == 'Affidavit of No fix income') {
-            $certOfIndigencyFilePath = $this->uploadCertOfIndigencyAONFI($request);
+            $certOfResidencyFilePath = $this->uploadCertOfResidency($request);
+            $validIdFrontFilePath = $this->uploadValidIdFrontAONFI($request);
+            $validIdBackFilePath = $this->uploadValidIdBackAONFI($request);
     
-            $createAffidavitOfNoFixIncome = $this->createAffidavitOfNoFixIncome($request, $documentAddress, $certOfIndigencyFilePath, $documentRequestID);
+            $createAffidavitOfNoFixIncome = $this->createAffidavitOfNoFixIncome($request, $documentAddress, $certOfResidencyFilePath, $validIdFrontFilePath, $validIdBackFilePath, $documentRequestID);
     
             if ($createDocumentRequest && $createAffidavitOfNoFixIncome) {
                 $this->logSuccess($user, $documentRequestID);
@@ -300,27 +334,56 @@ class DocumentRequestController extends Controller
                 return $this->failedRedirect();
             }
         } else if ($request->document_type == 'Extra Judicial') {
-            $deathCertificateFilePath = $this->uploadDeathCertificate($request);
-            $heirshipFilePath = $this->uploadHeirship($request);
-            $invOfEstateFilePath = $this->uploadInvOfEstate($request);
-            $taxClearanceFilePath = $this->uploadTaxClearance($request);
-            $deedOfExtraJudicialSettlementFilePath = $this->uploadDeedOfExtraJudicialSettlement($request);
+            $titleOfPropertyFilePath = $this->uploadTitleOfProperty($request);
     
-            $createExtraJudicial = $this->createExtraJudicial($deathCertificateFilePath, $heirshipFilePath, $invOfEstateFilePath, $taxClearanceFilePath, $deedOfExtraJudicialSettlementFilePath, $documentRequestID);
-    
-            if ($createDocumentRequest && $createExtraJudicial) {
-                $this->logSuccess($user, $documentRequestID);
-                $mailData = $this->prepareMailData($request, $documentRequestID);
-                $mailSubject = $this->prepareMailSubject($documentRequestID, $request);
-    
-                $this->sendMail($request->email, $mailData, $mailSubject);
-    
-                return $this->successRedirect();
+            if($request->deceased_spouse == "on") {
+                $survivingSpouseName = null;
+                $spouseValidIdFrontFilePath = null;
+                $spouseValidIdBackFilePath = null;
+
+                $createExtraJudicial = $this->createExtraJudicial($request, $titleOfPropertyFilePath, $survivingSpouseName, $spouseValidIdFrontFilePath, $spouseValidIdBackFilePath, $documentRequestID);
+                $createHeirs = $this->createHeirs($request, $documentRequestID);
+
+                if ($createDocumentRequest && $createExtraJudicial && $createHeirs) {
+                    $this->logSuccess($user, $documentRequestID);
+                    $mailData = $this->prepareMailData($request, $documentRequestID);
+                    $mailSubject = $this->prepareMailSubject($documentRequestID, $request);
+        
+                    $this->sendMail($request->email, $mailData, $mailSubject);
+        
+                    return $this->successRedirect();
+                } else {
+                    return $this->failedRedirect();
+                }
             } else {
-                return $this->failedRedirect();
+                $survivingSpouseName = $request->surviving_spouse;
+                $spouseValidIdFrontFilePath = $this->uploadSpouseValidIdFront($request);
+                $spouseValidIdBackFilePath = $this->uploadSpouseValidIdBack($request);
+
+                $createExtraJudicial = $this->createExtraJudicial($request, $titleOfPropertyFilePath, $survivingSpouseName, $spouseValidIdFrontFilePath, $spouseValidIdBackFilePath, $documentRequestID);
+
+                if ($createDocumentRequest && $createExtraJudicial) {
+                    $this->logSuccess($user, $documentRequestID);
+                    $mailData = $this->prepareMailData($request, $documentRequestID);
+                    $mailSubject = $this->prepareMailSubject($documentRequestID, $request);
+        
+                    $this->sendMail($request->email, $mailData, $mailSubject);
+        
+                    return $this->successRedirect();
+                } else {
+                    return $this->failedRedirect();
+                }
             }
         } else if ($request->document_type == 'Deed of Sale') {
-            $createDeedOfSale = $this->createDeedOfSale($request, $documentRequestID);
+            $propertyDocumentFilePath = $this->uploadPropertyDocument($request);
+            $vendorValidIdFrontFilePath = $this->uploadVendorValidIdFront($request);
+            $vendorValidIdBackFilePath = $this->uploadVendorValidIdBack($request);
+            $vendeeValidIdFrontFilePath = $this->uploadVendeeValidIdFront($request);
+            $vendeeValidIdBackFilePath = $this->uploadVendeeValidIdBack($request);
+            $witnessValidIdFrontFilePath = $this->uploadWitnessValidIdFront($request);
+            $witnessValidIdBackFilePath = $this->uploadWitnessValidIdBack($request);
+
+            $createDeedOfSale = $this->createDeedOfSale($request, $documentAddress, $propertyDocumentFilePath, $vendorValidIdFrontFilePath, $vendorValidIdBackFilePath, $vendeeValidIdFrontFilePath, $vendeeValidIdBackFilePath, $witnessValidIdFrontFilePath, $witnessValidIdBackFilePath, $documentRequestID);
     
             if ($createDocumentRequest && $createDeedOfSale) {
                 $this->logSuccess($user, $documentRequestID);
@@ -334,8 +397,13 @@ class DocumentRequestController extends Controller
                 return $this->failedRedirect();
             }
         } else if ($request->document_type == 'Deed of Donation') {
+            $donorValidIdFrontFilePath = $this->uploadDonorValidIdFront($request);
+            $donorValidIdBackFilePath = $this->uploadDonorValidIdBack($request);
             $document2Address = $this->generateDocument2Address($request);
-            $createDeedOfDonation = $this->createDeedOfDonation($request, $documentAddress, $document2Address, $documentRequestID);
+            $doneeValidIdFrontFilePath = $this->uploadDoneeValidIdFront($request);
+            $doneeValidIdBackFilePath = $this->uploadDoneeValidIdBack($request);
+
+            $createDeedOfDonation = $this->createDeedOfDonation($request, $documentAddress, $donorValidIdFrontFilePath, $donorValidIdBackFilePath, $document2Address, $doneeValidIdFrontFilePath, $doneeValidIdBackFilePath, $documentRequestID);
     
             if ($createDocumentRequest && $createDeedOfDonation) {
                 $this->logSuccess($user, $documentRequestID);
@@ -391,7 +459,7 @@ class DocumentRequestController extends Controller
         return trim($street) . ', Brgy. ' . trim($barangay) . ', ' . trim($city);
     }
 
-    private function uploadValidIdFront(Request $request) {
+    private function uploadValidIdFrontAffidavitOfLoss(Request $request) {
         $file = $request->file('valid_id_front');
         $originalFileName = $file->getClientOriginalName();
         $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
@@ -401,12 +469,202 @@ class DocumentRequestController extends Controller
         return $filePath;
     }
 
-    private function uploadValidIdBack(Request $request) {
+    private function uploadValidIdBackAffidavitOfLoss(Request $request) {
         $file = $request->file('valid_id_back');
         $originalFileName = $file->getClientOriginalName();
         $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
         $filePath = 'uploads/document-request/affidavitOfLoss/' . $fileName;
         $file->move('uploads/document-request/affidavitOfLoss/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadValidIdFrontAffidavitOfGuardianship(Request $request) {
+        $file = $request->file('valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/affidavitOfGuardianship/' . $fileName;
+        $file->move('uploads/document-request/affidavitOfGuardianship/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadValidIdBackAffidavitOfGuardianship(Request $request) {
+        $file = $request->file('valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/affidavitOfGuardianship/' . $fileName;
+        $file->move('uploads/document-request/affidavitOfGuardianship/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadCertOfIndigency(Request $request) {
+        $file = $request->file('certificate_of_indigency');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/affidavitOfNoIncome/' . $fileName;
+        $file->move('uploads/document-request/affidavitOfNoIncome/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadValidIdFrontAONI(Request $request) {
+        $file = $request->file('valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/affidavitOfNoIncome/' . $fileName;
+        $file->move('uploads/document-request/affidavitOfNoIncome/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadValidIdBackAONI(Request $request) {
+        $file = $request->file('valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/affidavitOfNoIncome/' . $fileName;
+        $file->move('uploads/document-request/affidavitOfNoIncome/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadCertOfResidency(Request $request) {
+        $file = $request->file('certificate_of_residency');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/affidavitOfNoFixIncome/' . $fileName;
+        $file->move('uploads/document-request/affidavitOfNoFixIncome/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadValidIdFrontAONFI(Request $request) {
+        $file = $request->file('valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/affidavitOfNoFixIncome/' . $fileName;
+        $file->move('uploads/document-request/affidavitOfNoFixIncome/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadValidIdBackAONFI(Request $request) {
+        $file = $request->file('valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/affidavitOfNoFixIncome/' . $fileName;
+        $file->move('uploads/document-request/affidavitOfNoFixIncome/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadPropertyDocument(Request $request) {
+        $file = $request->file('property_document');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfSale/' . $fileName;
+        $file->move('uploads/document-request/deedOfSale/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadVendorValidIdFront(Request $request) {
+        $file = $request->file('vendor_valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfSale/' . $fileName;
+        $file->move('uploads/document-request/deedOfSale/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadVendorValidIdBack(Request $request) {
+        $file = $request->file('vendor_valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfSale/' . $fileName;
+        $file->move('uploads/document-request/deedOfSale/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadVendeeValidIdFront(Request $request) {
+        $file = $request->file('vendee_valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfSale/' . $fileName;
+        $file->move('uploads/document-request/deedOfSale/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadVendeeValidIdBack(Request $request) {
+        $file = $request->file('vendee_valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfSale/' . $fileName;
+        $file->move('uploads/document-request/deedOfSale/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadWitnessValidIdFront(Request $request) {
+        $file = $request->file('witness_valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfSale/' . $fileName;
+        $file->move('uploads/document-request/deedOfSale/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadWitnessValidIdBack(Request $request) {
+        $file = $request->file('witness_valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfSale/' . $fileName;
+        $file->move('uploads/document-request/deedOfSale/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadDonorValidIdFront(Request $request) {
+        $file = $request->file('donor_valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfDonation/' . $fileName;
+        $file->move('uploads/document-request/deedOfDonation/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadDonorValidIdBack(Request $request) {
+        $file = $request->file('donor_valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfDonation/' . $fileName;
+        $file->move('uploads/document-request/deedOfDonation/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadDoneeValidIdFront(Request $request) {
+        $file = $request->file('donee_valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfDonation/' . $fileName;
+        $file->move('uploads/document-request/deedOfDonation/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadDoneeValidIdBack(Request $request) {
+        $file = $request->file('donee_valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfDonation/' . $fileName;
+        $file->move('uploads/document-request/deedOfDonation/', $fileName);
     
         return $filePath;
     }
@@ -431,48 +689,8 @@ class DocumentRequestController extends Controller
         return $filePath;
     }
 
-    private function uploadCedula(Request $request) {
-        $file = $request->file('cedula');
-        $originalFileName = $file->getClientOriginalName();
-        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-        $filePath = 'uploads/document-request/affidavitOfLoss/' . $fileName;
-        $file->move('uploads/document-request/affidavitOfLoss/', $fileName);
-    
-        return $filePath;
-    }
-
-    private function uploadBarangayClearanceAOG(Request $request) {
-        $file = $request->file('barangay_clearance');
-        $originalFileName = $file->getClientOriginalName();
-        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-        $filePath = 'uploads/document-request/affidavitOfGuardianship/' . $fileName;
-        $file->move('uploads/document-request/affidavitOfGuardianship/', $fileName);
-    
-        return $filePath;
-    }
-
-    private function uploadCertOfIndigencyAONI(Request $request) {
-        $file = $request->file('certificate_of_indigency');
-        $originalFileName = $file->getClientOriginalName();
-        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-        $filePath = 'uploads/document-request/affidavitOfNoIncome/' . $fileName;
-        $file->move('uploads/document-request/affidavitOfNoIncome/', $fileName);
-    
-        return $filePath;
-    }
-
-    private function uploadCertOfIndigencyAONFI(Request $request) {
-        $file = $request->file('certificate_of_indigency');
-        $originalFileName = $file->getClientOriginalName();
-        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-        $filePath = 'uploads/document-request/affidavitOfNoFixIncome/' . $fileName;
-        $file->move('uploads/document-request/affidavitOfNoFixIncome/', $fileName);
-    
-        return $filePath;
-    }
-
-    private function uploadDeathCertificate(Request $request) {
-        $file = $request->file('death_certificate');
+    private function uploadTitleOfProperty(Request $request) {
+        $file = $request->file('title_of_property');
         $originalFileName = $file->getClientOriginalName();
         $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
         $filePath = 'uploads/document-request/ExtraJudicial/' . $fileName;
@@ -481,8 +699,8 @@ class DocumentRequestController extends Controller
         return $filePath;
     }
 
-    private function uploadHeirship(Request $request) {
-        $file = $request->file('heirship_documents');
+    private function uploadSpouseValidIdFront(Request $request) {
+        $file = $request->file('spouse_valid_id_front');
         $originalFileName = $file->getClientOriginalName();
         $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
         $filePath = 'uploads/document-request/ExtraJudicial/' . $fileName;
@@ -491,8 +709,8 @@ class DocumentRequestController extends Controller
         return $filePath;
     }
 
-    private function uploadInvOfEstate(Request $request) {
-        $file = $request->file('inventory_of_estate');
+    private function uploadSpouseValidIdBack(Request $request) {
+        $file = $request->file('spouse_valid_id_back');
         $originalFileName = $file->getClientOriginalName();
         $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
         $filePath = 'uploads/document-request/ExtraJudicial/' . $fileName;
@@ -501,26 +719,6 @@ class DocumentRequestController extends Controller
         return $filePath;
     }
 
-    private function uploadTaxClearance(Request $request) {
-        $file = $request->file('tax_clearance');
-        $originalFileName = $file->getClientOriginalName();
-        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-        $filePath = 'uploads/document-request/ExtraJudicial/' . $fileName;
-        $file->move('uploads/document-request/ExtraJudicial/', $fileName);
-    
-        return $filePath;
-    }
-
-    private function uploadDeedOfExtraJudicialSettlement(Request $request) {
-        $file = $request->file('deed_of_extrajudicial_settlement');
-        $originalFileName = $file->getClientOriginalName();
-        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-        $filePath = 'uploads/document-request/ExtraJudicial/' . $fileName;
-        $file->move('uploads/document-request/ExtraJudicial/', $fileName);
-    
-        return $filePath;
-    }
-    
     private function createDocumentRequest(Request $request, $address, $documentRequestID) {
         $data = [
             'documentRequest_id' => $documentRequestID,
@@ -536,15 +734,16 @@ class DocumentRequestController extends Controller
         return DocumentRequest::create($data);
     }
 
-    private function createAffidavitOfLoss(Request $request, $address, $validIdFrontFilePath, $validIdBackFilePath, $cedulaFilePath, $documentRequestID) {
+    private function createAffidavitOfLoss(Request $request, $address, $validIdFrontFilePath, $validIdBackFilePath, $documentRequestID) {
         $data = [
             'documentRequest_id' => $documentRequestID,
-            'aol_name' => trim($request->document_name),
-            'aol_age' => $request->document_age,
-            'aol_address' => $address,
+            'name' => trim($request->document_name),
+            'civil_status' => trim($request->document_civil_status),
+            'address' => $address,
+            'item_lost' => trim($request->item_lost),
+            'reason_of_loss' => trim($request->reason_of_loss),
             'valid_id_front' => $validIdFrontFilePath,
             'valid_id_back' => $validIdBackFilePath,
-            'cedula' => $cedulaFilePath,
             'created_at' => Carbon::now('Asia/Manila'),
             'updated_at' => Carbon::now('Asia/Manila'),
         ];
@@ -552,19 +751,16 @@ class DocumentRequestController extends Controller
         return AffidavitOfLoss::create($data);
     }
 
-    private function createAffidavitOfGuardianship(Request $request, $address, $address2, $barangayClearanceFilePath, $documentRequestID) {
+    private function createAffidavitOfGuardianship(Request $request, $address, $validIdFrontFilePath, $validIdBackFilePath, $documentRequestID) {
         $data = [
             'documentRequest_id' => $documentRequestID,
             'guardian_name' => trim($request->guardian_name),
-            'guardian_age' => $request->guardian_age,
-            'guardian_address' => $address,
-            'guardian_occupation' => trim($request->guardian_occupation),
-            'guardian_brgy_clearance' => $barangayClearanceFilePath,
-            'guardian_relationship' => trim($request->relationship),
+            'civil_status' => trim($request->document_civil_status),
+            'address' => $address,
             'minor_name' => trim($request->minor_name),
-            'minor_age' => $request->minor_age,
-            'minor_address' => $address2,
-            'minor_relationship' => trim($request->minor_relationship),
+            'years_in_care' => $request->years_in_care,
+            'valid_id_front' => $validIdFrontFilePath,
+            'valid_id_back' => $validIdBackFilePath,
             'created_at' => Carbon::now('Asia/Manila'),
             'updated_at' => Carbon::now('Asia/Manila'),
         ];
@@ -572,18 +768,16 @@ class DocumentRequestController extends Controller
         return AffidavitOfGuardianship::create($data);
     }
 
-    private function createAffidavitOfNoIncome(Request $request, $address, $certOfIndigencyFilePath, $documentRequestID) {
+    private function createAffidavitOfNoIncome(Request $request, $address, $certOfIndigencyFilePath, $validIdFrontFilePath, $validIdBackFilePath, $documentRequestID) {
         $data = [
             'documentRequest_id' => $documentRequestID,
-            'aoni_name' => trim($request->document_name),
-            'aoni_age' => $request->document_age,
-            'aoni_address' => $address,
+            'name' => trim($request->document_name),
+            'civil_status' => trim($request->document_civil_status),
+            'address' => $address,
+            'year_of_no_income' => $request->year_of_no_income,
             'certificate_of_indigency' => $certOfIndigencyFilePath,
-            'business_name' => trim($request->business_name),
-            'registration_number' => trim($request->registration_number),
-            'business_address' => trim($request->business_address),
-            'business_period' => trim($request->business_period),
-            'no_income_period' => trim($request->no_income_period),
+            'valid_id_front' => $validIdFrontFilePath,
+            'valid_id_back' => $validIdBackFilePath,
             'created_at' => Carbon::now('Asia/Manila'),
             'updated_at' => Carbon::now('Asia/Manila'),
         ];
@@ -596,14 +790,16 @@ class DocumentRequestController extends Controller
         return AffidavitOfNoIncome::create($data);
     }
 
-    private function createAffidavitOfNoFixIncome(Request $request, $address, $certOfIndigencyFilePath, $documentRequestID) {
+    private function createAffidavitOfNoFixIncome(Request $request, $address, $certOfResidencyFilePath, $validIdFrontFilePath, $validIdBackFilePath, $documentRequestID) {
         $data = [
             'documentRequest_id' => $documentRequestID,
-            'aonfi_name' => trim($request->document_name),
-            'aonfi_age' => $request->document_age,
-            'aonfi_address' => $address,
-            'source_income' => trim($request->source_of_income),
-            'indigency' => $certOfIndigencyFilePath,
+            'name' => trim($request->document_name),
+            'civil_status' => trim($request->document_civil_status),
+            'address' => $address,
+            'year_of_no_income' => $request->year_of_no_income,
+            'certificate_of_residency' => $certOfResidencyFilePath,
+            'valid_id_front' => $validIdFrontFilePath,
+            'valid_id_back' => $validIdBackFilePath,
             'created_at' => Carbon::now('Asia/Manila'),
             'updated_at' => Carbon::now('Asia/Manila'),
         ];
@@ -611,16 +807,14 @@ class DocumentRequestController extends Controller
         return AffidavitOfNoFixIncome::create($data);
     }
 
-    private function createExtraJudicial($deathCertificateFilePath, $heirshipDocumentsFilePath, 
-    $inventoryOfEstateFilePath, $taxClearanceFilePath, $deedOfExtraJudicialSettlementFilePath, 
-    $documentRequestID) {
+    private function createExtraJudicial(Request $request, $titleOfPropertyFilePath, $survivingSpouseName, $spouseValidIdFrontFilePath, $spouseValidIdBackFilePath, $documentRequestID) {
         $data = [
             'documentRequest_id' => $documentRequestID,
-            'death_cert' => $deathCertificateFilePath,
-            'heirship' => $heirshipDocumentsFilePath,
-            'inv_estate' => $inventoryOfEstateFilePath,
-            'tax_clearance' => $taxClearanceFilePath,
-            'deed_extrajudicial' => $deedOfExtraJudicialSettlementFilePath,
+            'title_of_property' => $titleOfPropertyFilePath,
+            'title_holder' => trim($request->title_holder),
+            'surviving_spouse' => $survivingSpouseName,
+            'spouse_valid_id_front' => $spouseValidIdFrontFilePath,
+            'spouse_valid_id_back' => $spouseValidIdBackFilePath,
             'created_at' => Carbon::now('Asia/Manila'),
             'updated_at' => Carbon::now('Asia/Manila'),
         ];
@@ -628,12 +822,40 @@ class DocumentRequestController extends Controller
         return ExtraJudicial::create($data);
     }
 
-    private function createDeedOfSale(Request $request, $documentRequestID) {
+    private function createHeirs(Request $request, $documentRequestID) {
+        $survivingHeirs = $request->input('surviving_heir');
+        $spousesOfHeirs = $request->input('spouse_of_heir');
+    
+        foreach ($survivingHeirs as $key => $heirName) {
+            $heir = new Heir();
+            $heir->surviving_heir = $heirName;
+            $heir->documentRequest_id = $documentRequestID;
+
+            if (isset($spousesOfHeirs[$key])) {
+                $heir->spouse_of_heir = $spousesOfHeirs[$key];
+            }
+            $heir->save();
+        }
+
+        return true;
+    }
+    
+    private function createDeedOfSale(Request $request, $address, $propertyDocumentFilePath, $vendorValidIdFrontFilePath, $vendorValidIdBackFilePath, $vendeeValidIdFrontFilePath, $vendeeValidIdBackFilePath, $witnessValidIdFrontFilePath, $witnessValidIdBackFilePath, $documentRequestID) {
         $data = [
             'documentRequest_id' => $documentRequestID,
-            'name_identity_1' => trim($request->party1_name),
-            'name_identity_2' => trim($request->party2_name),
-            'details' => trim($request->property_details),
+            'name_of_vendor' => trim($request->name_of_vendor),
+            'vendor_civil_status' => trim($request->document_civil_status),
+            'vendor_address' => $address,
+            'property_document' => $propertyDocumentFilePath,
+            'property_price' => $request->property_price,
+            'vendor_valid_id_front' => $vendorValidIdFrontFilePath,
+            'vendor_valid_id_back' => $vendorValidIdBackFilePath,
+            'name_of_vendee' => trim($request->name_of_vendee),
+            'vendee_valid_id_front' => $vendeeValidIdFrontFilePath,
+            'vendee_valid_id_back' => $vendeeValidIdBackFilePath,
+            'name_of_witness' => trim($request->name_of_witness),
+            'witness_valid_id_front' => $witnessValidIdFrontFilePath,
+            'witness_valid_id_back' => $witnessValidIdBackFilePath,
             'created_at' => Carbon::now('Asia/Manila'),
             'updated_at' => Carbon::now('Asia/Manila'),
         ];
@@ -641,15 +863,20 @@ class DocumentRequestController extends Controller
         return DeedOfSale::create($data);
     }
 
-    private function createDeedOfDonation(Request $request, $address, $address2, $documentRequestID) {
+    private function createDeedOfDonation(Request $request, $address, $donorValidIdFrontFilePath, $donorValidIdBackFilePath, $address2, $doneeValidIdFrontFilePath, $doneeValidIdBackFilePath, $documentRequestID) {
         $data = [
             'documentRequest_id' => $documentRequestID,
             'donor_name' => trim($request->donor_name),
-            'donor_age' => $request->donor_age,
+            'donor_civil_status' => trim($request->donor_civil_status),
             'donor_address' => $address,
+            'donor_valid_id_front' => $donorValidIdFrontFilePath,
+            'donor_valid_id_back' => $donorValidIdBackFilePath,
             'donee_name' => trim($request->donee_name),
-            'donee_age' => $request->donee_age,
+            'donee_civil_status' => trim($request->donee_civil_status),
             'donee_address' => $address2,
+            'donee_valid_id_front' => $doneeValidIdFrontFilePath,
+            'donee_valid_id_back' => $doneeValidIdBackFilePath,
+            'property_description' => trim($request->property_description),
             'created_at' => Carbon::now('Asia/Manila'),
             'updated_at' => Carbon::now('Asia/Manila'),
         ];
@@ -686,7 +913,7 @@ class DocumentRequestController extends Controller
             'name' => trim($request->name),
             'message' => 'Document Request Received!',
             'tracking_id' => $documentRequestID,
-            'link' => 'http://127.0.0.1:8000/tracker/documentRequest-details/check-details?documentRequest_id=' . $documentRequestID . '&email=' . trim($request->email),
+            'link' => route('documentRequestDetails', ['documentRequest_id' => $documentRequestID, 'email' => $request->email]),
         ];
     }
     
@@ -711,6 +938,7 @@ class DocumentRequestController extends Controller
         $documentRequest = DocumentRequest::where('documentRequest_id', $documentRequest_id)->first();
         $messages = DocumentRequestMessage::where('documentRequest_id', $documentRequest_id)->where('email', $documentRequest->email)->get();
         $staffName = Auth::user()->name;
+        $heirs_info = '';
 
         if($documentRequest->document_type == 'Affidavit of Loss') {
             $additional_info = AffidavitOfLoss::where('documentRequest_id', $documentRequest_id)->get()->first();
@@ -722,6 +950,9 @@ class DocumentRequestController extends Controller
             $additional_info = AffidavitOfNoFixIncome::where('documentRequest_id', $documentRequest_id)->get()->first();
         } else if ($documentRequest->document_type == 'Extra Judicial') {
             $additional_info = ExtraJudicial::where('documentRequest_id', $documentRequest_id)->get()->first();
+            if($additional_info->surviving_spouse == null && $additional_info->spouse_valid_id_front == null && $additional_info->spouse_valid_id_back == null) {
+                $heirs_info = Heir::where('documentRequest_id', $documentRequest_id)->get();
+            }
         } else if ($documentRequest->document_type == 'Deed of Sale') {
             $additional_info = DeedOfSale::where('documentRequest_id', $documentRequest_id)->get()->first();
         } else if ($documentRequest->document_type == 'Deed of Donation') {
@@ -739,7 +970,7 @@ class DocumentRequestController extends Controller
             $comment = $feedback->comment;
         }  
 
-        return view('document-request.documentRequestDetails', compact('documentRequest', 'messages', 'staffName', 'rating', 'comment', 'feedback', 'additional_info'));
+        return view('document-request.documentRequestDetails', compact('documentRequest', 'messages', 'staffName', 'rating', 'comment', 'feedback', 'additional_info', 'heirs_info'));
     }
 
     public function documentRequestSendMessage(Request $request, string $id) {
@@ -3523,54 +3754,113 @@ class DocumentRequestController extends Controller
                     unlink(public_path($additionalInfo->valid_id_back));
                 }
 
-                if (file_exists(public_path($additionalInfo->cedula))) {
-                    unlink(public_path($additionalInfo->cedula));
-                }
-
             } else if ($documentRequest->document_type == 'Affidavit of Guardianship') {
                 $additionalInfo = AffidavitOfGuardianship::where('documentRequest_id', $id)->get()->first();
 
-                if (file_exists(public_path($additionalInfo->guardian_brgy_clearance))) {
-                    unlink(public_path($additionalInfo->guardian_brgy_clearance));
+                if (file_exists(public_path($additionalInfo->valid_id_front))) {
+                    unlink(public_path($additionalInfo->valid_id_front));
                 }
 
-            } else if ($documentRequest->document_type == 'Affidavit of No Income') {
+                if (file_exists(public_path($additionalInfo->valid_id_back))) {
+                    unlink(public_path($additionalInfo->valid_id_back));
+                }
+
+            } else if ($documentRequest->document_type == 'Affidavit of No income') {
                 $additionalInfo = AffidavitOfNoIncome::where('documentRequest_id', $id)->get()->first();
 
                 if (file_exists(public_path($additionalInfo->certificate_of_indigency))) {
                     unlink(public_path($additionalInfo->certificate_of_indigency));
                 }
 
-            } else if ($documentRequest->document_type == 'Affidavit of No Fix Income') {
+                if (file_exists(public_path($additionalInfo->valid_id_front))) {
+                    unlink(public_path($additionalInfo->valid_id_front));
+                }
+
+                if (file_exists(public_path($additionalInfo->valid_id_back))) {
+                    unlink(public_path($additionalInfo->valid_id_back));
+                }
+
+            } else if ($documentRequest->document_type == 'Affidavit of No fix income') {
                 $additionalInfo = AffidavitOfNoFixIncome::where('documentRequest_id', $id)->get()->first();
 
-                if (file_exists(public_path($additionalInfo->indigency))) {
-                    unlink(public_path($additionalInfo->indigency));
+                if (file_exists(public_path($additionalInfo->certificate_of_residency))) {
+                    unlink(public_path($additionalInfo->certificate_of_residency));
+                }
+
+                if (file_exists(public_path($additionalInfo->valid_id_front))) {
+                    unlink(public_path($additionalInfo->valid_id_front));
+                }
+
+                if (file_exists(public_path($additionalInfo->valid_id_back))) {
+                    unlink(public_path($additionalInfo->valid_id_back));
                 }
 
             } else if ($documentRequest->document_type == 'Extra Judicial') {
                 $additionalInfo = ExtraJudicial::where('documentRequest_id', $id)->get()->first();
 
-                if (file_exists(public_path($additionalInfo->death_cert))) {
-                    unlink(public_path($additionalInfo->death_cert));
+
+                if (file_exists(public_path($additionalInfo->title_of_property))) {
+                    unlink(public_path($additionalInfo->title_of_property));
                 }
 
-                if (file_exists(public_path($additionalInfo->heirship))) {
-                    unlink(public_path($additionalInfo->heirship));
+                if (file_exists(public_path($additionalInfo->spouse_valid_id_front))) {
+                    unlink(public_path($additionalInfo->spouse_valid_id_front));
                 }
 
-                if (file_exists(public_path($additionalInfo->inv_estate))) {
-                    unlink(public_path($additionalInfo->inv_estate));
+                if (file_exists(public_path($additionalInfo->spouse_valid_id_back))) {
+                    unlink(public_path($additionalInfo->spouse_valid_id_back));
                 }
 
-                if (file_exists(public_path($additionalInfo->tax_clearance))) {
-                    unlink(public_path($additionalInfo->tax_clearance));
+            } else if ($documentRequest->document_type == 'Deed of Sale') {
+                $additionalInfo = DeedOfSale::where('documentRequest_id', $id)->get()->first();
+
+                if (file_exists(public_path($additionalInfo->property_document))) {
+                    unlink(public_path($additionalInfo->property_document));
                 }
 
-                if (file_exists(public_path($additionalInfo->deed_extrajudicial))) {
-                    unlink(public_path($additionalInfo->deed_extrajudicial));
+                if (file_exists(public_path($additionalInfo->vendor_valid_id_front))) {
+                    unlink(public_path($additionalInfo->vendor_valid_id_front));
                 }
 
+                if (file_exists(public_path($additionalInfo->vendor_valid_id_back))) {
+                    unlink(public_path($additionalInfo->vendor_valid_id_back));
+                }
+
+                if (file_exists(public_path($additionalInfo->vendee_valid_id_front))) {
+                    unlink(public_path($additionalInfo->vendee_valid_id_front));
+                }
+
+                if (file_exists(public_path($additionalInfo->vendee_valid_id_back))) {
+                    unlink(public_path($additionalInfo->vendee_valid_id_back));
+                }
+
+                if (file_exists(public_path($additionalInfo->witness_valid_id_front))) {
+                    unlink(public_path($additionalInfo->witness_valid_id_front));
+                }
+
+                if (file_exists(public_path($additionalInfo->witness_valid_id_back))) {
+                    unlink(public_path($additionalInfo->witness_valid_id_back));
+                }
+
+            } else if ($documentRequest->document_type == 'Deed of Donation') {
+                $additionalInfo = DeedOfDonation::where('documentRequest_id', $id)->get()->first();
+
+                if (file_exists(public_path($additionalInfo->donor_valid_id_front))) {
+                    unlink(public_path($additionalInfo->donor_valid_id_front));
+                }
+
+                if (file_exists(public_path($additionalInfo->donor_valid_id_back))) {
+                    unlink(public_path($additionalInfo->donor_valid_id_back));
+                }
+
+                if (file_exists(public_path($additionalInfo->donee_valid_id_front))) {
+                    unlink(public_path($additionalInfo->donee_valid_id_front));
+                }
+
+                if (file_exists(public_path($additionalInfo->donee_valid_id_back))) {
+                    unlink(public_path($additionalInfo->donee_valid_id_back));
+                }
+            
             } else if ($documentRequest->document_type == 'Other Document') {
                 $additionalInfo = OtherDocument::where('documentRequest_id', $id)->get()->first();
 

@@ -400,7 +400,7 @@ class LandingPageController extends Controller
                             !$request->input('deceased_spouse');
                 }),
             ],
-            'surviving_heir.*' => 'required_if:document_type,Extra Judicial|required_if:deceased_spouse,1', 
+            'surviving_heir.*' => 'required_if:deceased_spouse,on', 
 
             'name_of_vendor' => 'required_if:document_type,Deed of Sale',
             'property_document' => 'required_if:document_type,Deed of Sale|mimes:pdf',

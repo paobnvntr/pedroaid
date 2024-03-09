@@ -1,5 +1,5 @@
 <div class="form-group text-center">
-    <label>Affidavit Of No Fix Income Information:</label>
+    <label>Affidavit Of No Income Information:</label>
 </div>
 
 <div class="form-group row">
@@ -10,9 +10,17 @@
     </div>
 
     <div class="col-sm-6">
-        <input name="document_age" id="document_age" type="number"
-            class="form-control form-control-user @error('document_age')is-invalid @enderror"
-            id="document_age" placeholder="Age" value="{{ old('document_age') }}">
+        <select name="document_civil_status" id="document_civil_status" class="form-control @error('document_civil_status')is-invalid @enderror">
+            <option value="">-- Select Civil Status --</option>
+            <option value="Single" {{ old('document_civil_status') == 'Single' ? 'selected' : '' }}>Single</option>
+            <option value="Married" {{ old('document_civil_status') == 'Married' ? 'selected' : '' }}>Married</option>
+            <option value="Divorced" {{ old('document_civil_status') == 'Divorced' ? 'selected' : '' }}>Divorced</option>
+            <option value="Widowed" {{ old('document_civil_status') == 'Widowed' ? 'selected' : '' }}>Widowed</option>
+            <option value="Separated" {{ old('document_civil_status') == 'Separated' ? 'selected' : '' }}>Separated</option>
+        </select>
+        @error('document_civil_status')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
     </div>
 </div>
 
@@ -120,20 +128,37 @@
 </div>
 
 <div class="form-group">
-    <label for="source_of_income">Source of Income:</label>
-    <input name="source_of_income" id="source_of_income" type="text"
-        class="form-control form-control-user @error('source_of_income')is-invalid @enderror"
-        placeholder="Source of Income" value="{{ old('source_of_income') }}">
-    @error('source_of_income')
+    <input name="year_of_no_income" id="year_of_no_income" type="number"
+        class="form-control form-control-user @error('year_of_no_income')is-invalid @enderror"
+        placeholder="Year when you last had income" value="{{ old('year_of_no_income') }}">
+    @error('year_of_no_income')
     <span class="invalid-feedback">{{ $message }}</span>
     @enderror
 </div>
 
 <div class="form-group">
-    <label for="certificate_of_indigency">Certificate of Indigency:</label>
-    <input type="file" name="certificate_of_indigency" id="certificate_of_indigency" accept=".pdf"
-        class="form-control @error('certificate_of_indigency')is-invalid @enderror">
-    @error('certificate_of_indigency')
+    <label for="certificate_of_residency">Certificate of Residency:</label>
+    <input name="certificate_of_residency" id="certificate_of_residency" type="file" accept=".pdf"
+        class="form-control @error('certificate_of_residency')is-invalid @enderror">
+    @error('certificate_of_residency')
     <span class="invalid-feedback">{{ $message }}</span>
     @enderror
+</div>
+
+<div class="form-group row">
+    <div class="col-sm-6">
+        <label for="valid_id_front">Valid ID (Front):</label>
+        <input name="valid_id_front" id="valid_id_front" type="file" accept="image/jpeg, image/jpg, image/png" class="form-control @error('valid_id_front')is-invalid @enderror">
+        @error('valid_id_front')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
+    </div>
+
+    <div class="col-sm-6">
+        <label for="valid_id_back">Valid ID (Back):</label>
+        <input name="valid_id_back" id="valid_id_back" type="file" accept="image/jpeg, image/jpg, image/png" class="form-control @error('valid_id_back')is-invalid @enderror">
+        @error('valid_id_back')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
+    </div>
 </div>

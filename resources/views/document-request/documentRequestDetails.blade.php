@@ -43,80 +43,99 @@
 
                     @if($documentRequest->document_type == 'Affidavit of Loss')
 
-                        <p><strong>Name:</strong> {{ $additional_info->aol_name }}</p>
-                        <p><strong>Age:</strong> {{ $additional_info->aol_age }}</p>
-                        <p><strong>Address:</strong> {{ $additional_info->aol_address }}</p>
+                        <p><strong>Name:</strong> {{ $additional_info->name }}</p>
+                        <p><strong>Civil Status:</strong> {{ $additional_info->civil_status }}</p>
+                        <p><strong>Address:</strong> {{ $additional_info->address }}</p>
+                        <p><strong>Item Lost:</strong> {{ $additional_info->item_lost }}</p>
+                        <p><strong>Reason of Loss:</strong> {{ $additional_info->reason_of_loss }}</p>
                         <p><strong>Valid ID (Front):</strong> <a href="{{ asset($additional_info->valid_id_front) }}" target="_blank">Valid ID (Front)</a></p>
                         <p><strong>Valid ID (Back):</strong> <a href="{{ asset($additional_info->valid_id_back) }}" target="_blank">Valid ID (Back)</a></p>
-                        <p><strong>Cedula:</strong> <a href="{{ asset($additional_info->cedula) }}" target="_blank">Cedula</a></p>
 
                     @elseif($documentRequest->document_type == 'Affidavit of Guardianship')
 
                         <p><strong>Guardian's Name:</strong> {{ $additional_info->guardian_name }}</p>
-                        <p><strong>Guardian's Age:</strong> {{ $additional_info->guardian_age }}</p>
-                        <p><strong>Guardian's Address:</strong> {{ $additional_info->guardian_address }}</p>
-                        <p><strong>Guardian's Occupation:</strong> {{ $additional_info->guardian_occupation }}</p>
-                        <p><strong>Guardian's Relationship to the Minor:</strong> {{ $additional_info->guardian_relationship }}</p>
-                        <p><strong>Guardian's Barangay Clearance:</strong> <a href="{{ asset($additional_info->guardian_brgy_clearance) }}" target="_blank" >Barangay Clearance</a></p>
+                        <p><strong>Guardian's Civil Status:</strong> {{ $additional_info->civil_status }}</p>
+                        <p><strong>Guardian's Address:</strong> {{ $additional_info->address }}</p>
+                        <p><strong>Valid ID (Front):</strong> <a href="{{ asset($additional_info->valid_id_front) }}" target="_blank">Valid ID (Front)</a></p>
+                        <p><strong>Valid ID (Back):</strong> <a href="{{ asset($additional_info->valid_id_back) }}" target="_blank">Valid ID (Back)</a></p>
                         <br>
                         <p><strong>Minor's Name:</strong> {{ $additional_info->minor_name }}</p>
-                        <p><strong>Minor's Age:</strong> {{ $additional_info->minor_age }}</p>
-                        <p><strong>Minor's Address:</strong> {{ $additional_info->minor_address }}</p>
-                        <p><strong>Minor's Relationship to the Guardian:</strong> {{ $additional_info->minor_relationship }}</p>
-                    
+                        <p><strong>Years in Care:</strong> {{ $additional_info->years_in_care }}</p>
+
                     @elseif($documentRequest->document_type == 'Affidavit of No income')
 
-                        <p><strong>Name:</strong> {{ $additional_info->aoni_name }}</p>
-                        <p><strong>Age:</strong> {{ $additional_info->aoni_age }}</p>
-                        <p><strong>Address:</strong> {{ $additional_info->aoni_address }}</p>
+                        <p><strong>Name:</strong> {{ $additional_info->name }}</p>
+                        <p><strong>Civil Status:</strong> {{ $additional_info->civil_status }}</p>
+                        <p><strong>Address:</strong> {{ $additional_info->address }}</p>
+                        <p><strong>Year of No Income:</strong> {{ $additional_info->year_of_no_income }}</p>
                         <p><strong>Certificate of Indigency:</strong> <a href="{{ asset($additional_info->certificate_of_indigency) }}" target="_blank">Certificate of Indigency</a></p>
-                        <br>
-                        <p><strong>Previous Employer's Name:</strong> {{ $additional_info->previous_employer_name }}</p>
-                        <p><strong>Previous Employer's Contact:</strong> {{ $additional_info->previous_employer_contact }}</p>
-                        <br>
-                        <p><strong>Business Name:</strong> {{ $additional_info->business_name }}</p>
-                        <p><strong>Registration Number:</strong> {{ $additional_info->registration_number }}</p>
-                        <p><strong>Business Address:</strong> {{ $additional_info->business_address }}</p>
-                        <p><strong>Business Period:</strong> {{ $additional_info->business_period }}</p>
-                        <p><strong>No Income Period:</strong> {{ $additional_info->no_income_period }}</p>
+                        <p><strong>Valid ID (Front):</strong> <a href="{{ asset($additional_info->valid_id_front) }}" target="_blank">Valid ID (Front)</a></p>
+                        <p><strong>Valid ID (Back):</strong> <a href="{{ asset($additional_info->valid_id_back) }}" target="_blank">Valid ID (Back)</a></p>
 
                     @elseif($documentRequest->document_type == 'Affidavit of No fix income')
 
-                        <p><strong>Name:</strong> {{ $additional_info->aonfi_name }}</p>
-                        <p><strong>Age:</strong> {{ $additional_info->aonfi_age }}</p>
-                        <p><strong>Address:</strong> {{ $additional_info->aonfi_address }}</p>
-                        <p><strong>Source of Income:</strong> {{ $additional_info->source_income }}</p>
-                        <p><strong>Certificate of Indigency:</strong> <a href="{{ asset($additional_info->indigency) }}" target="_blank">Certificate of Indigency</a></p>
+                        <p><strong>Name:</strong> {{ $additional_info->name }}</p>
+                        <p><strong>Civil Status:</strong> {{ $additional_info->civil_status }}</p>
+                        <p><strong>Address:</strong> {{ $additional_info->address }}</p>
+                        <p><strong>Year of No Income:</strong> {{ $additional_info->year_of_no_income }}</p>
+                        <p><strong>Certificate of Residency:</strong> <a href="{{ asset($additional_info->certificate_of_residency) }}" target="_blank">Certificate of Residency</a></p>
+                        <p><strong>Valid ID (Front):</strong> <a href="{{ asset($additional_info->valid_id_front) }}" target="_blank">Valid ID (Front)</a></p>
+                        <p><strong>Valid ID (Back):</strong> <a href="{{ asset($additional_info->valid_id_back) }}" target="_blank">Valid ID (Back)</a></p>
 
                     @elseif($documentRequest->document_type == 'Extra Judicial')
 
-                        <p><strong>Death Certificate:</strong> <a href="{{ asset($additional_info->death_cert) }}" target="_blank">Death Certificate</a></p>
-                        <p><strong>Heirship Documents:</strong> <a href="{{ asset($additional_info->heirship) }}" target="_blank">Heirship</a></p>
-                        <p><strong>Inventory of Estate:</strong> <a href="{{ asset($additional_info->inv_estate) }}" target="_blank">Inventory of Estate</a></p>
-                        <p><strong>Tax Clearance from BIR:</strong> <a href="{{ asset($additional_info->tax_clearance) }}" target="_blank">Tax Clearance</a></p>
-                        <p><strong>Deed of Extra Judicial Settlement:</strong> <a href="{{ asset($additional_info->deed_extrajudicial) }}" target="_blank">Deed of Extra Judicial</a></p>
+                        <p><strong>Title of Property</strong> <a href="{{ asset($additional_info->title_of_property) }}" target="_blank">Title of Property</a></p>
+                        <p><strong>Title Holder:</strong> {{ $additional_info->title_holder }}</p>
+                        @if($additional_info->surviving_spouse == null && $additional_info->spouse_valid_id_front == null && $additional_info->spouse_valid_id_back == null)
+                            @foreach($heirs_info as $heir)
+                                <br>
+                                <p><strong>Heir's Name:</strong> {{ $heir->surviving_heir }}</p>
+                                <p><strong>Heir's Spouse:</strong> {{ $heir->spouse_of_heir }}</p>
+                            @endforeach
+                        @else
+                            <p><strong>Surviving Spouse:</strong> {{ $additional_info->surviving_spouse }}</p>
+                            <p><strong>Spouse's Valid ID (Front):</strong> <a href="{{ asset($additional_info->spouse_valid_id_front) }}" target="_blank">Spouse's Valid ID (Front)</a></p>
+                            <p><strong>Spouse's Valid ID (Back):</strong> <a href="{{ asset($additional_info->spouse_valid_id_back) }}" target="_blank">Spouse's Valid ID (Back)</a></p>
+                        @endif
 
                     @elseif($documentRequest->document_type == 'Deed of Sale')
 
-                        <p><strong>Party 1's Name:</strong> {{ $additional_info->name_identity_1 }}</p>
-                        <p><strong>Party 2's Name:</strong> {{ $additional_info->name_identity_2 }}</p>
-                        <p><strong>Details of Property/Vehicle:</strong> {{ $additional_info->details }}</p>
+                        <p><strong>Vendor's Name:</strong> {{ $additional_info->name_of_vendor }}</p>
+                        <p><strong>Vendor's Civil Status:</strong> {{ $additional_info->vendor_civil_status }}</p>
+                        <p><strong>Property Document:</strong> <a href="{{ asset($additional_info->property_document) }}" target="_blank">Property Document</a></p>
+                        <p><strong>Property Price:</strong> {{ $additional_info->property_price }}</p>
+                        <p><strong>Vendor's Valid ID (Front):</strong> <a href="{{ asset($additional_info->vendor_valid_id_front) }}" target="_blank">Vendor's Valid ID (Front)</a></p>
+                        <p><strong>Vendor's Valid ID (Back):</strong> <a href="{{ asset($additional_info->vendor_valid_id_back) }}" target="_blank">Vendor's Valid ID (Back)</a></p>
+                        <br>
+                        <p><strong>Vendee's Name:</strong> {{ $additional_info->name_of_vendee }}</p>
+                        <p><strong>Vendee's Valid ID (Front):</strong> <a href="{{ asset($additional_info->vendee_valid_id_front) }}" target="_blank">Vendee's Valid ID (Front)</a></p>
+                        <p><strong>Vendee's Valid ID (Back):</strong> <a href="{{ asset($additional_info->vendee_valid_id_back) }}" target="_blank">Vendee's Valid ID (Back)</a></p>
+                        <br>
+                        <p><strong>Witness's Name:</strong> {{ $additional_info->name_of_witness }}</p>
+                        <p><strong>Witness's Valid ID (Front):</strong> <a href="{{ asset($additional_info->witness_valid_id_front) }}" target="_blank">Witness's Valid ID (Front)</a></p>
+                        <p><strong>Witness's Valid ID (Back):</strong> <a href="{{ asset($additional_info->witness_valid_id_back) }}" target="_blank">Witness's Valid ID (Back)</a></p>
 
                     @elseif($documentRequest->document_type == 'Deed of Donation')
 
                         <p><strong>Donor's Name:</strong> {{ $additional_info->donor_name }}</p>
-                        <p><strong>Donor's Age:</strong> {{ $additional_info->donor_age }}</p>
+                        <p><strong>Donor's Civil Status:</strong> {{ $additional_info->donor_civil_status }}</p>
                         <p><strong>Donor's Address:</strong> {{ $additional_info->donor_address }}</p>
+                        <p><strong>Donor's Valid ID (Front):</strong> <a href="{{ asset($additional_info->donor_valid_id_front) }}" target="_blank">Donor's Valid ID (Front)</a></p>
+                        <p><strong>Donor's Valid ID (Back):</strong> <a href="{{ asset($additional_info->donor_valid_id_back) }}" target="_blank">Donor's Valid ID (Back)</a></p>
                         <br>
                         <p><strong>Donee's Name:</strong> {{ $additional_info->donee_name }}</p>
-                        <p><strong>Donee's Age:</strong> {{ $additional_info->donee_age }}</p>
+                        <p><strong>Donee's Civil Status:</strong> {{ $additional_info->donee_civil_status }}</p>
                         <p><strong>Donee's Address:</strong> {{ $additional_info->donee_address }}</p>
+                        <p><strong>Donee's Valid ID (Front):</strong> <a href="{{ asset($additional_info->donee_valid_id_front) }}" target="_blank">Donee's Valid ID (Front)</a></p>
+                        <p><strong>Donee's Valid ID (Back):</strong> <a href="{{ asset($additional_info->donee_valid_id_back) }}" target="_blank">Donee's Valid ID (Back)</a></p>
+                        <br>
+                        <p><strong>Property Description:</strong> {{ $additional_info->property_description }}</p>
 
                     @elseif($documentRequest->document_type == 'Other Document')
 
                         <p><strong>Valid ID (Front):</strong> <a href="{{ asset($additional_info->valid_id_front) }}" target="_blank">Valid ID (Front)</a></p>
                         <p><strong>Valid ID (Back):</strong> <a href="{{ asset($additional_info->valid_id_back) }}" target="_blank">Valid ID (Back)</a></p>
-
+                    
                     @else
                     
                     @endif
