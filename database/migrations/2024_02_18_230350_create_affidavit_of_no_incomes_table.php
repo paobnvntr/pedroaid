@@ -15,17 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('documentRequest_id', 11);
             $table->foreign('documentRequest_id')->references('documentRequest_id')->on('document_requests')->onDelete('cascade');
-            $table->string('aoni_name');
-            $table->string('aoni_age');
-            $table->string('aoni_address');
+            $table->string('name');
+            $table->string('civil_status');
+            $table->string('address');
+            $table->string('year_of_no_income');
             $table->string('certificate_of_indigency');
-            $table->string('previous_employer_name')->nullable();
-            $table->string('previous_employer_contact')->nullable();
-            $table->string('business_name');
-            $table->string('registration_number');
-            $table->string('business_address');
-            $table->string('business_period');
-            $table->string('no_income_period');
+            $table->string('valid_id_front');
+            $table->string('valid_id_back');
             $table->timestamps();
         });
     }

@@ -11,17 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('affidavit_of_no_fix_incomes', function (Blueprint $table) {
+        Schema::create('heirs', function (Blueprint $table) {
             $table->id();
             $table->string('documentRequest_id', 11);
             $table->foreign('documentRequest_id')->references('documentRequest_id')->on('document_requests')->onDelete('cascade');
-            $table->string('name');
-            $table->string('civil_status');
-            $table->string('address');
-            $table->string('year_of_no_income');
-            $table->string('certificate_of_residency');
-            $table->string('valid_id_front');
-            $table->string('valid_id_back');
+            $table->string('surviving_heir');
+            $table->string('spouse_of_heir')->nullable();
             $table->timestamps();
         });
     }
@@ -31,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('affidavit_of_no_fix_incomes');
+        Schema::dropIfExists('heirs');
     }
 };

@@ -16,15 +16,12 @@ return new class extends Migration
             $table->string('documentRequest_id', 11);
             $table->foreign('documentRequest_id')->references('documentRequest_id')->on('document_requests')->onDelete('cascade');
             $table->string('guardian_name');
-            $table->string('guardian_age');
-            $table->string('guardian_address');
-            $table->string('guardian_occupation');
-            $table->string('guardian_brgy_clearance');
-            $table->string('guardian_relationship');
+            $table->string('civil_status');
+            $table->string('address');
             $table->string('minor_name');
-            $table->string('minor_age');
-            $table->string('minor_address');
-            $table->string('minor_relationship');
+            $table->string('years_in_care');
+            $table->string('valid_id_front');
+            $table->string('valid_id_back');
             $table->timestamps();
         });
     }

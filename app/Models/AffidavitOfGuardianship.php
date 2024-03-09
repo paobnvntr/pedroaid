@@ -12,14 +12,11 @@ class AffidavitOfGuardianship extends Model
     protected $fillable = [
         'documentRequest_id',
         'guardian_name',
-        'guardian_age',
-        'guardian_address',
-        'guardian_occupation',
-        'guardian_brgy_clearance',
-        'guardian_relationship',
+        'civil_status',
+        'address',
         'minor_name',
-        'minor_age',
-        'minor_address',
-        'minor_relationship',
+        'years_in_care',
+        'valid_id_front',
+        'valid_id_back',
     ];
 }

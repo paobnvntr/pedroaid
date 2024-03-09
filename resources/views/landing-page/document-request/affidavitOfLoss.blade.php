@@ -10,9 +10,17 @@
     </div>
 
     <div class="col-sm-6">
-        <input name="document_age" id="document_age" type="number"
-            class="form-control form-control-user @error('document_age')is-invalid @enderror"
-            placeholder="Age" value="{{ old('document_age') }}">
+        <select name="document_civil_status" id="document_civil_status" class="form-control @error('document_civil_status')is-invalid @enderror">
+            <option value="">-- Select Civil Status --</option>
+            <option value="Single" {{ old('document_civil_status') == 'Single' ? 'selected' : '' }}>Single</option>
+            <option value="Married" {{ old('document_civil_status') == 'Married' ? 'selected' : '' }}>Married</option>
+            <option value="Divorced" {{ old('document_civil_status') == 'Divorced' ? 'selected' : '' }}>Divorced</option>
+            <option value="Widowed" {{ old('document_civil_status') == 'Widowed' ? 'selected' : '' }}>Widowed</option>
+            <option value="Separated" {{ old('document_civil_status') == 'Separated' ? 'selected' : '' }}>Separated</option>
+        </select>
+        @error('document_civil_status')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
     </div>
 </div>
 
@@ -119,6 +127,25 @@
     @enderror
 </div>
 
+<div class="form-group row">
+    <div class="col-sm-6">
+        <input name="item_lost" id="item_lost" type="text" class="form-control form-control-user
+        @error('item_lost')is-invalid @enderror" value="{{ old('item_lost') }}"
+        placeholder="Item Lost">
+        @error('item_lost')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
+    </div>
+
+    <div class="col-sm-6">
+        <input name="reason_of_loss" id="reason_of_loss" type="text" class="form-control form-control-user
+        @error('reason_of_loss')is-invalid @enderror" value="{{ old('reason_of_loss') }}"
+        placeholder="Reason Why That Item Got Lost">
+        @error('reason_of_loss')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
+    </div>
+</div>
 
 <div class="form-group row">
     <div class="col-sm-6">
@@ -136,12 +163,4 @@
         <span class="invalid-feedback">{{ $message }}</span>
         @enderror
     </div>
-</div>
-
-<div class="form-group">
-    <label for="cedula">Cedula:</label>
-    <input name="cedula" id="cedula" type="file" accept=".pdf" class="form-control @error('cedula')is-invalid @enderror">
-    @error('cedula')
-    <span class="invalid-feedback">{{ $message }}</span>
-    @enderror
 </div>

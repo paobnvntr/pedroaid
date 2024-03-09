@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('documentRequest_id', 11);
             $table->foreign('documentRequest_id')->references('documentRequest_id')->on('document_requests')->onDelete('cascade');
-            $table->string('death_cert');
-            $table->string('heirship');
-            $table->string('inv_estate');
-            $table->string('tax_clearance');
-            $table->string('deed_extrajudicial');
+            $table->string('title_of_property');
+            $table->string('title_holder');
+            $table->string('surviving_spouse')->nullable();
+            $table->string('spouse_valid_id_front')->nullable();
+            $table->string('spouse_valid_id_back')->nullable();
             $table->timestamps();
         });
     }

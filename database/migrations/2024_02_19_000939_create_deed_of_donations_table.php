@@ -16,11 +16,16 @@ return new class extends Migration
             $table->string('documentRequest_id', 11);
             $table->foreign('documentRequest_id')->references('documentRequest_id')->on('document_requests')->onDelete('cascade');
             $table->string('donor_name');
-            $table->string('donor_age');
+            $table->string('donor_civil_status');
             $table->string('donor_address');
+            $table->string('donor_valid_id_front');
+            $table->string('donor_valid_id_back');
             $table->string('donee_name');
-            $table->string('donee_age');
+            $table->string('donee_civil_status');
             $table->string('donee_address');
+            $table->string('donee_valid_id_front');
+            $table->string('donee_valid_id_back');
+            $table->string('property_description');
             $table->timestamps();
         });
     }

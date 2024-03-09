@@ -6,13 +6,21 @@
     <div class="col-sm-6">
         <input name="donor_name" id="donor_name" type="text"
             class="form-control form-control-user @error('donor_name')is-invalid @enderror"
-            placeholder="Name of Individual / Business Name / Land Donor" value="{{ old('donor_name') }}">
+            placeholder="Name of Donor" value="{{ old('donor_name') }}">
     </div>
 
     <div class="col-sm-6">
-        <input name="donor_age" id="donor_age" type="number"
-            class="form-control form-control-user @error('donor_age')is-invalid @enderror"
-            placeholder="Donor's Age" value="{{ old('donor_age') }}">
+        <select name="donor_civil_status" id="donor_civil_status" class="form-control @error('donor_civil_status')is-invalid @enderror">
+            <option value="">-- Select Civil Status --</option>
+            <option value="Single" {{ old('donor_civil_status') == 'Single' ? 'selected' : '' }}>Single</option>
+            <option value="Married" {{ old('donor_civil_status') == 'Married' ? 'selected' : '' }}>Married</option>
+            <option value="Divorced" {{ old('donor_civil_status') == 'Divorced' ? 'selected' : '' }}>Divorced</option>
+            <option value="Widowed" {{ old('donor_civil_status') == 'Widowed' ? 'selected' : '' }}>Widowed</option>
+            <option value="Separated" {{ old('donor_civil_status') == 'Separated' ? 'selected' : '' }}>Separated</option>
+        </select>
+        @error('donor_civil_status')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
     </div>
 </div>
 
@@ -119,6 +127,24 @@
     @enderror
 </div>
 
+<div class="form-group row">
+    <div class="col-sm-6">
+        <label for="donor_valid_id_front">Valid ID (Front):</label>
+        <input name="donor_valid_id_front" id="donor_valid_id_front" type="file" accept="image/jpeg, image/jpg, image/png" class="form-control @error('donor_valid_id_front')is-invalid @enderror">
+        @error('donor_valid_id_front')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
+    </div>
+
+    <div class="col-sm-6">
+        <label for="donor_valid_id_back">Valid ID (Back):</label>
+        <input name="donor_valid_id_back" id="donor_valid_id_back" type="file" accept="image/jpeg, image/jpg, image/png" class="form-control @error('donor_valid_id_back')is-invalid @enderror">
+        @error('donor_valid_id_back')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
+    </div>
+</div>
+
 <hr>
 <div class="form-group text-center">
     <label>Deed of Donation Information (Donee):</label>
@@ -132,9 +158,17 @@
     </div>
 
     <div class="col-sm-6">
-        <input name="donee_age" id="donee_age" type="number"
-            class="form-control form-control-user @error('donee_age')is-invalid @enderror"
-            placeholder="Donee's Age" value="{{ old('donee_age') }}">
+        <select name="donee_civil_status" id="donee_civil_status" class="form-control @error('donee_civil_status')is-invalid @enderror">
+            <option value="">-- Select Civil Status --</option>
+            <option value="Single" {{ old('donee_civil_status') == 'Single' ? 'selected' : '' }}>Single</option>
+            <option value="Married" {{ old('donee_civil_status') == 'Married' ? 'selected' : '' }}>Married</option>
+            <option value="Divorced" {{ old('donee_civil_status') == 'Divorced' ? 'selected' : '' }}>Divorced</option>
+            <option value="Widowed" {{ old('donee_civil_status') == 'Widowed' ? 'selected' : '' }}>Widowed</option>
+            <option value="Separated" {{ old('donee_civil_status') == 'Separated' ? 'selected' : '' }}>Separated</option>
+        </select>
+        @error('donee_civil_status')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
     </div>
 </div>
 
@@ -238,5 +272,48 @@
     </div>
     @error('document_city_2')
     <span class="invalid-feedback d-block">{{ $message }}</span>
+    @enderror
+</div>
+
+<div class="form-group row">
+    <div class="col-sm-6">
+        <label for="donee_valid_id_front">Donee Valid ID (Front):</label>
+        <input name="donee_valid_id_front" id="donee_valid_id_front" type="file" accept="image/jpeg, image/jpg, image/png" class="form-control @error('donee_valid_id_front')is-invalid @enderror">
+        @error('donee_valid_id_front')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
+    </div>
+
+    <div class="col-sm-6">
+        <label for="donee_valid_id_back">Donee Valid ID (Back):</label>
+        <input name="donee_valid_id_back" id="donee_valid_id_back" type="file" accept="image/jpeg, image/jpg, image/png" class="form-control @error('donee_valid_id_back')is-invalid @enderror">
+        @error('donee_valid_id_back')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="property_description">Property Description:</label>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="property_description" id="property_house" value="House" {{ old('property_description') == 'House' ? 'checked' : '' }}>
+        <label class="form-check-label" for="property_house">
+            House
+        </label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="property_description" id="property_land" value="Land" {{ old('property_description') == 'Land' ? 'checked' : '' }}>
+        <label class="form-check-label" for="property_land">
+            Land
+        </label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="property_description" id="property_vehicle" value="Vehicle" {{ old('property_description') == 'Vehicle' ? 'checked' : '' }}>
+        <label class="form-check-label" for="property_vehicle">
+            Vehicle
+        </label>
+    </div>
+    @error('property_description')
+    <span class="invalid-feedback">{{ $message }}</span>
     @enderror
 </div>

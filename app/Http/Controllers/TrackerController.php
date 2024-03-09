@@ -10,6 +10,7 @@ use App\Models\DeedOfDonation;
 use App\Models\DeedOfSale;
 use App\Models\ExtraJudicial;
 use App\Models\Feedback;
+use App\Models\Heir;
 use App\Models\InquiryMessage;
 use App\Models\User;
 use App\Notifications\NewAppointmentMessage;
@@ -223,7 +224,7 @@ class TrackerController extends Controller
             'name' => $appointment->name,
             'message' => 'Your appointment has been rescheduled.',
             'tracking_id' => $id,
-            'link' => 'http://127.0.0.1:8000/tracker/appointment-details/check-details?appointment_id=' . $id . '&email=' . $appointment_email,
+            'link' =>  route('appointmentDetails', ['appointment_id' => $id, 'email' => $appointment_email]),
         ];
 
         $mailSubject = '[#'. $id . '] Rescheduled Appointment: Appointment from ' . $appointment->name;
@@ -252,7 +253,7 @@ class TrackerController extends Controller
             'name' => $appointment->name,
             'message' => 'Your appointment has been cancelled.',
             'tracking_id' => $id,
-            'link' => 'http://127.0.0.1:8000/tracker/appointment-details/check-details?appointment_id=' . $id . '&email=' . $appointment_email,
+            'link' => route('appointmentDetails', ['appointment_id' => $id, 'email' => $appointment_email]),
         ];
 
         $mailSubject = '[#'. $id . '] Cancelled Appointment: Appointment from ' . $appointment->name;
@@ -339,7 +340,7 @@ class TrackerController extends Controller
                     'name' => $appointment->name,
                     'message' => 'Thank you for your feedback!',
                     'tracking_id' => $id,
-                    'link' => 'http://127.0.0.1:8000/tracker/appointment-details/check-details?appointment_id=' . $id . '&email=' . $appointment_email,
+                    'link' => route('appointmentDetails', ['appointment_id' => $id, 'email' => $appointment_email]),
                 ];
 
                 $mailSubject = '[#'. $id . '] Feedback Received: Appointment from ' . $appointment->name;
@@ -371,7 +372,7 @@ class TrackerController extends Controller
                     'name' => $documentRequest->name,
                     'message' => 'Thank you for your feedback!',
                     'tracking_id' => $id,
-                    'link' => 'http://127.0.0.1:8000/tracker/documentRequest-details/check-details?documentRequest_id=' . $id . '&email=' . $documentRequest_email,
+                    'link' => route('documentRequestDetails', ['documentRequest_id' => $id, 'email' => $documentRequest_email]),
                 ];
 
                 $mailSubject = '[#'. $id . '] Feedback Received: Document Request from ' . $documentRequest->name;
@@ -447,7 +448,7 @@ class TrackerController extends Controller
                         'name' => $appointment->name,
                         'message' => 'Your feedback has been updated.',
                         'tracking_id' => $id,
-                        'link' => 'http://127.0.0.1:8000/tracker/appointment-details/check-details?appointment_id=' . $id . '&email=' . $appointment_email,
+                        'link' => route('appointmentDetails', ['appointment_id' => $id, 'email' => $appointment_email]),
                     ];
 
                     $mailSubject = '[#'. $id . '] Updated Feedback: Appointment from ' . $appointment->name;
@@ -481,7 +482,7 @@ class TrackerController extends Controller
                     'name' => $documentRequest->name,
                     'message' => 'Your feedback has been updated.',
                     'tracking_id' => $id,
-                    'link' => 'http://127.0.0.1:8000/tracker/documentRequest-details/check-details?documentRequest_id=' . $id . '&email=' . $documentRequest_email,
+                    'link' => route('documentRequestDetails', ['documentRequest_id' => $id, 'email' => $documentRequest_email]),
                 ];
 
                 $mailSubject = '[#'. $id . '] Updated Feedback: Document Request from ' . $documentRequest->name;
@@ -610,7 +611,6 @@ class TrackerController extends Controller
 
     public function documentRequestDetails(Request $request) { 
         Validator::make($request->all(), [
-            '_token' => 'required',
             'documentRequest_id' => ['required', 'regex:/^[A-Z0-9]{3}-[A-Z0-9]{3}-[A-Z0-9]{3}$/'],
             'email' => 'required|email'
         ])->validate();
@@ -639,6 +639,7 @@ class TrackerController extends Controller
 
         $documentRequest = DocumentRequest::where('documentRequest_id', $documentRequest_id)->first();
         $messages = DocumentRequestMessage::where('documentRequest_id', $documentRequest_id)->where('email', $documentRequest->email)->get();
+        $heirs_info = '';
 
         if($documentRequest->document_type == 'Affidavit of Loss') {
             $additional_info = AffidavitOfLoss::where('documentRequest_id', $documentRequest_id)->get()->first();
@@ -650,6 +651,9 @@ class TrackerController extends Controller
             $additional_info = AffidavitOfNoFixIncome::where('documentRequest_id', $documentRequest_id)->get()->first();
         } else if ($documentRequest->document_type == 'Extra Judicial') {
             $additional_info = ExtraJudicial::where('documentRequest_id', $documentRequest_id)->get()->first();
+            if($additional_info->surviving_spouse == null && $additional_info->spouse_valid_id_front == null && $additional_info->spouse_valid_id_back == null) {
+                $heirs_info = Heir::where('documentRequest_id', $documentRequest_id)->get();
+            }
         } else if ($documentRequest->document_type == 'Deed of Sale') {
             $additional_info = DeedOfSale::where('documentRequest_id', $documentRequest_id)->get()->first();
         } else if ($documentRequest->document_type == 'Deed of Donation') {
@@ -667,7 +671,7 @@ class TrackerController extends Controller
 
         session()->forget('documentRequest_id');
 
-        return view('landing-page.aid-tracker.document-request.documentRequest-details', compact('documentRequest', 'messages', 'feedback', 'rating', 'comment', 'additional_info'));
+        return view('landing-page.aid-tracker.document-request.documentRequest-details', compact('documentRequest', 'messages', 'feedback', 'rating', 'comment', 'additional_info', 'heirs_info'));
     }
 
     public function refreshDocumentRequest(string $id) {
@@ -755,7 +759,7 @@ class TrackerController extends Controller
             'name' => $documentRequest->name,
             'message' => 'Your document request has been cancelled.',
             'tracking_id' => $id,
-            'link' => 'http://127.0.0.1:8000/tracker/documentRequest-details/check-details?documentRequest_id=' . $documentRequest_id . '&email=' . $documentRequest_email,
+            'link' => route('documentRequestDetails', ['documentRequest_id' => $id, 'email' => $documentRequest_email]),
         ];
 
         $mailSubject = '[#'. $id . '] Cancelled Document Request: Document Request from ' . $documentRequest->name;
@@ -852,7 +856,7 @@ class TrackerController extends Controller
                         'name' => $appointment->name,
                         'message' => 'Your feedback has been updated.',
                         'tracking_id' => $id,
-                        'link' => 'http://127.0.0.1:8000/tracker/appointment-details/check-details?appointment_id=' . $id . '&email=' . $appointment_email,
+                        'link' => route('appointmentDetails', ['appointment_id' => $id, 'email' => $appointment_email]),
                     ];
 
                     $mailSubject = '[#'. $id . '] Updated Feedback: Appointment from ' . $appointment->name;
@@ -886,7 +890,7 @@ class TrackerController extends Controller
                     'name' => $documentRequest->name,
                     'message' => 'Your feedback has been updated.',
                     'tracking_id' => $id,
-                    'link' => 'http://127.0.0.1:8000/tracker/documentRequest-details/check-details?documentRequest_id=' . $id . '&email=' . $documentRequest_email,
+                    'link' => route('documentRequestDetails', ['documentRequest_id' => $id, 'email' => $documentRequest_email]),
                 ];
 
                 $mailSubject = '[#'. $id . '] Updated Feedback: Document Request from ' . $documentRequest->name;

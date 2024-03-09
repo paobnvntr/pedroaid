@@ -16,14 +16,36 @@
 
             @if(Session::has('success'))
                 <div class="alert alert-success" role="alert">
-                    {{ Session::get('success') }}
+                    {{ Session::get('success') }} <span id="reloadMessage">Reloading in <span id="countdown">5</span> seconds...</span>
                 </div>
+                <script>
+                    var timer = 5;
+                    var countdown = setInterval(function() {
+                        timer--;
+                        document.getElementById('countdown').innerText = timer;
+                        if (timer <= 0) {
+                            clearInterval(countdown);
+                            window.location.reload();
+                        }
+                    }, 1000);
+                </script>
             @endif
 
             @if(Session::has('failed'))
                 <div class="alert alert-danger" role="alert">
-                    {{ Session::get('failed') }}
+                    {{ Session::get('failed') }} <span id="reloadMessage">Reloading in <span id="countdown">5</span> seconds...</span>
                 </div>
+                <script>
+                    var timer = 5;
+                    var countdown = setInterval(function() {
+                        timer--;
+                        document.getElementById('countdown').innerText = timer;
+                        if (timer <= 0) {
+                            clearInterval(countdown);
+                            window.location.reload();
+                        }
+                    }, 1000);
+                </script>
             @endif
 
             <header class="section-header">

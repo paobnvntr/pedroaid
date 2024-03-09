@@ -11,10 +11,12 @@ class AffidavitOfNoFixIncome extends Model
 
     protected $fillable = [
         'documentRequest_id',
-        'aonfi_name',
-        'aonfi_age',
-        'aonfi_address',
-        'source_income',
-        'indigency',
+        'name',
+        'civil_status',
+        'address',
+        'year_of_no_income',
+        'certificate_of_residency',
+        'valid_id_front',
+        'valid_id_back',
     ];
 }

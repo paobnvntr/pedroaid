@@ -10,17 +10,20 @@
     <h1>{{ $mailData['title'] }}</h1>
  
     <p>Hi {{ $mailData['name'] }},</p>
-
+    
     <p>{{ $mailData['message'] }}</p>
 
-    <p><strong>Tracking ID:</strong></p>
-    <p>{{ $mailData['tracking_id'] }}</p>
+    <br>
+
+    <p><strong>Tracking ID:</strong> {{ $mailData['tracking_id'] }}</p>
 
     <p>You can view your request here:</p>
     <p>{{ $mailData['link'] }}</p>
 
+    <br>
+
     <p>Sincerely,</p>
     <p><strong>PedroAID</strong></p>
-    <p>http://127.0.0.1:8000/</p>
+    <p>https://pedroaid.com/</p>
 </body>
 </html>

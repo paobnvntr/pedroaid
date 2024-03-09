@@ -15,12 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('documentRequest_id', 11);
             $table->foreign('documentRequest_id')->references('documentRequest_id')->on('document_requests')->onDelete('cascade');
-            $table->string('aol_name');
-            $table->string('aol_age');
-            $table->string('aol_address');
+            $table->string('name');
+            $table->string('civil_status');
+            $table->string('address');
+            $table->string('item_lost');
+            $table->string('reason_of_loss');
             $table->string('valid_id_front');
             $table->string('valid_id_back');
-            $table->string('cedula');
             $table->timestamps();
         });        
     }

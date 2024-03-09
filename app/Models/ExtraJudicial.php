@@ -11,10 +11,10 @@ class ExtraJudicial extends Model
 
     protected $fillable = [
         'documentRequest_id',
-        'death_cert',
-        'heirship',
-        'inv_estate',
-        'tax_clearance',
-        'deed_extrajudicial',
+        'title_of_property',
+        'title_holder',
+        'surviving_spouse',
+        'spouse_valid_id_front',
+        'spouse_valid_id_back',
     ];
 }

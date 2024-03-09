@@ -13,17 +13,39 @@
 
     <section class="ordinance p-5 appointmentForm">
 		<div class="container" data-aos="fade-up">
-
+            
             @if(Session::has('success'))
                 <div class="alert alert-success" role="alert">
-                    {{ Session::get('success') }}
+                    {{ Session::get('success') }} <span id="reloadMessage">Reloading in <span id="countdown">5</span> seconds...</span>
                 </div>
+                <script>
+                    var timer = 5;
+                    var countdown = setInterval(function() {
+                        timer--;
+                        document.getElementById('countdown').innerText = timer;
+                        if (timer <= 0) {
+                            clearInterval(countdown);
+                            window.location.reload();
+                        }
+                    }, 1000);
+                </script>
             @endif
 
             @if(Session::has('failed'))
                 <div class="alert alert-danger" role="alert">
-                    {{ Session::get('failed') }}
+                    {{ Session::get('failed') }} <span id="reloadMessage">Reloading in <span id="countdown">5</span> seconds...</span>
                 </div>
+                <script>
+                    var timer = 5;
+                    var countdown = setInterval(function() {
+                        timer--;
+                        document.getElementById('countdown').innerText = timer;
+                        if (timer <= 0) {
+                            clearInterval(countdown);
+                            window.location.reload();
+                        }
+                    }, 1000);
+                </script>
             @endif
 
             <header class="section-header">
@@ -386,6 +408,93 @@
         });
     }
 
+    function extraJudicialDeceased() {
+        document.getElementById('deceased_spouse').addEventListener('change', function() {
+            var heirFields = document.getElementById('heirFields');
+            var survivingSpouseField = document.getElementById('surviving_spouse');
+            var spouseValidIDFields = document.getElementById('spouseValidIDFields');
+            
+            if (this.checked) {
+                heirFields.style.display = 'block';
+                survivingSpouseField.value = '';
+                survivingSpouseField.disabled = true;
+                spouseValidIDFields.style.display = 'none';
+            } else {
+                heirFields.style.display = 'none';
+                survivingSpouseField.disabled = false;
+                spouseValidIDFields.style.display = 'block';
+            }
+        });
+
+        // Declare cloneCount outside of the event handler function
+        var cloneCount = 0;
+
+        document.getElementById('addHeirBtn').addEventListener('click', function() {
+            var heirFields = document.getElementById('heirFields');
+            var deceasedFields = document.getElementById('deceasedFields');
+            var clone = deceasedFields.cloneNode(true); // Clone the entire deceasedFields section
+
+            // Increment cloneCount each time the button is clicked
+            cloneCount++;
+
+            // Modify the id attribute of the cloned fields and adjust the names to use array-like structure
+            var clonedFields = clone.querySelectorAll('input, select, textarea');
+            clonedFields.forEach(function(field) {
+                var originalId = field.id;
+                var originalName = field.name;
+                
+                field.id = originalName.replace(/\[\d+\]/, '[' + cloneCount + ']'); // Adjust id for array-like structure
+                field.name = originalName.replace(/\[\d+\]/, '[' + cloneCount + ']'); // Adjust name for array-like structure
+
+                var errorElement = document.querySelector('[data-error="' + originalName + '"]');
+                if (errorElement) {
+                    errorElement.setAttribute('data-error', field.name);
+                }
+
+                // Update value using old() function for Laravel
+                field.value = '{{ old(' + JSON.stringify(originalName) + ') }}';
+            });
+
+            // Modify the id attribute of the cloned deceasedField
+            clone.id = 'deceasedFields_' + cloneCount;
+
+            // Insert the cloned fields before the addHeirBtn
+            heirFields.insertBefore(clone, document.getElementById('buttons'));
+
+            // Enable the delete button
+            document.getElementById('deleteHeirBtn').disabled = false;
+        });
+
+        document.getElementById('deleteHeirBtn').addEventListener('click', function() {
+            // Find the most recent cloned field
+            var mostRecentClone = document.getElementById('deceasedFields_' + cloneCount);
+            if (mostRecentClone) {
+                // Remove the most recent cloned field when the delete button is clicked
+                mostRecentClone.remove();
+                // Decrement the cloneCount variable
+                cloneCount--;
+
+                // If there are no remaining cloned fields, disable the delete button
+                var deleteButton = document.getElementById('deleteHeirBtn');
+                deleteButton.disabled = cloneCount === 0;
+
+                // Adjust the index of the remaining fields
+                var heirFields = document.getElementById('heirFields');
+                var clonedFields = heirFields.querySelectorAll('[id^="deceasedFields_"]');
+                clonedFields.forEach(function(field, index) {
+                    var newIndex = index + 1;
+                    field.id = 'deceasedFields_' + newIndex;
+                    var inputs = field.querySelectorAll('input, select, textarea');
+                    inputs.forEach(function(input) {
+                        var name = input.name.replace(/\[\d+\]/, '[' + newIndex + ']');
+                        input.name = name;
+                    });
+                });
+            }
+        });
+
+    }
+
     documentType.addEventListener('change', () => {
         if(documentType.value === 'Affidavit of Loss') {
             additionalInfo.innerHTML = `
@@ -401,10 +510,7 @@
             `;
 
             additionalInfoAddress();
-            additionalInfoAddress2();
-
             useSameAddress();
-            useSameAddress2();
 
         } else if(documentType.value === 'Affidavit of No income') {
             additionalInfo.innerHTML = `
@@ -412,7 +518,6 @@
             `;
 
             additionalInfoAddress();
-
             useSameAddress();
 
         } else if(documentType.value === 'Affidavit of No fix income') {
@@ -421,17 +526,23 @@
             `;
 
             additionalInfoAddress();
-
             useSameAddress();
 
         } else if(documentType.value === 'Extra Judicial') {
             additionalInfo.innerHTML = `
                 @include('landing-page.document-request.extraJudicial')
             `;
+
+            extraJudicialDeceased();
+
         } else if(documentType.value === 'Deed of Sale') {
             additionalInfo.innerHTML = `
                 @include('landing-page.document-request.deedOfSale')
             `;
+
+            additionalInfoAddress();
+            useSameAddress();
+            
         } else if(documentType.value === 'Deed of Donation') {
             additionalInfo.innerHTML = `
                 @include('landing-page.document-request.deedOfDonation')
@@ -447,7 +558,7 @@
             additionalInfo.innerHTML = `
                 @include('landing-page.document-request.otherDocument')
             `;
-        
+    
         } else {
             additionalInfo.innerHTML = '';
         }
@@ -525,7 +636,13 @@
                 });
 
                 for (const [key, value] of Object.entries(data.errors)) {
-                    const input = document.querySelector(`[name="${key}"]`);
+                    let modifiedKey = key;
+                    if (key.includes('.')) {
+                        modifiedKey = key.replace(/\./, '[') + ']'; // Replace dot with '[' and add ']'
+                    }
+
+                    console.log(`${modifiedKey}: ${value}`);
+                    const input = document.querySelector(`[name="${modifiedKey}"]`);
                     const error = document.createElement('div');
                     error.classList.add('invalid-feedback');
                     error.textContent = value;
