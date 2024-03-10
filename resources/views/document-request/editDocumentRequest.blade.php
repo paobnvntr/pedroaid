@@ -577,6 +577,118 @@
         });
     }
 
+    function extraJudicialDeceased() {
+        document.getElementById('deceased_spouse').addEventListener('change', function() {
+            var heirFields = document.getElementById('heirFields');
+            var survivingSpouseField = document.getElementById('surviving_spouse');
+            var spouseValidIDFields = document.getElementById('spouseValidIDFields');
+            
+            if (this.checked) {
+                heirFields.style.display = 'block';
+                survivingSpouseField.value = '';
+                survivingSpouseField.disabled = true;
+                spouseValidIDFields.style.display = 'none';
+            } else {
+                heirFields.style.display = 'none';
+                survivingSpouseField.disabled = false;
+                spouseValidIDFields.style.display = 'block';
+            }
+        });
+
+        // Declare cloneCount outside of the event handler function
+        var cloneCount = parseInt("{{ $heirs_clone_count }}");
+        cloneCount = cloneCount !== 0 ? cloneCount - 1 : cloneCount;
+
+        document.getElementById('addHeirBtn').addEventListener('click', function() {
+            var heirFields = document.getElementById('heirFields');
+            var deceasedFields = document.getElementById('deceasedFields');
+            var clone = deceasedFields.cloneNode(true); // Clone the entire deceasedFields section
+
+            // Increment cloneCount each time the button is clicked
+            cloneCount++;
+
+            // Modify the id attribute of the cloned fields and adjust the names to use array-like structure
+            var clonedFields = clone.querySelectorAll('input, select, textarea');
+            clonedFields.forEach(function(field) {
+                var originalId = field.id;
+                var originalName = field.name;
+                
+                field.id = originalName.replace(/\[\d+\]/, '[' + cloneCount + ']'); // Adjust id for array-like structure
+                field.name = originalName.replace(/\[\d+\]/, '[' + cloneCount + ']'); // Adjust name for array-like structure
+
+                var errorElement = document.querySelector('[data-error="' + originalName + '"]');
+                if (errorElement) {
+                    errorElement.setAttribute('data-error', field.name);
+                }
+
+                // Update value using old() function for Laravel
+                field.value = '{{ old(' + JSON.stringify(originalName) + ') }}';
+            });
+
+            // Modify the id attribute of the cloned deceasedField
+            clone.id = 'deceasedFields_' + cloneCount;
+
+            // Insert the cloned fields before the addHeirBtn
+            heirFields.insertBefore(clone, document.getElementById('buttons'));
+
+            // Enable the delete button
+            document.getElementById('deleteHeirBtn').disabled = false;
+        });
+
+        document.getElementById('deleteHeirBtn').addEventListener('click', function() {
+            // Find the most recent cloned field
+            var mostRecentClone = document.getElementById('deceasedFields_' + cloneCount);
+            if (mostRecentClone) {
+                // Remove the most recent cloned field when the delete button is clicked
+                mostRecentClone.remove();
+                // Decrement the cloneCount variable
+                cloneCount--;
+
+                // If there are no remaining cloned fields, disable the delete button
+                var deleteButton = document.getElementById('deleteHeirBtn');
+                deleteButton.disabled = cloneCount === 0;
+
+                // Adjust the index of the remaining fields
+                var heirFields = document.getElementById('heirFields');
+                var clonedFields = heirFields.querySelectorAll('[id^="deceasedFields_"]');
+                clonedFields.forEach(function(field, index) {
+                    var newIndex = index + 1;
+                    field.id = 'deceasedFields_' + newIndex;
+                    var inputs = field.querySelectorAll('input, select, textarea');
+                    inputs.forEach(function(input) {
+                        var name = input.name.replace(/\[\d+\]/, '[' + newIndex + ']');
+                        input.name = name;
+                    });
+                });
+            }
+        });
+    }
+
+    function heirDetails() {
+        const originalSurvivingSpouse = "{{ isset($additional_info->surviving_spouse) ? $additional_info->surviving_spouse : '' }}";
+        const originalSpouseValidIdFront = "{{ isset($additional_info->spouse_valid_id_front) ? $additional_info->spouse_valid_id_front : '' }}";
+        const originalSpouseValidIdBack = "{{ isset($additional_info->spouse_valid_id_back) ? $additional_info->spouse_valid_id_back : '' }}";
+
+        console.log(originalSurvivingSpouse);
+        console.log(originalSpouseValidIdFront);
+        console.log(originalSpouseValidIdBack);
+
+        var heirFields = document.getElementById('heirFields');
+        var survivingSpouseField = document.getElementById('surviving_spouse');
+        var spouseValidIDFields = document.getElementById('spouseValidIDFields');
+
+        if(originalSurvivingSpouse == '' && originalSpouseValidIdBack == '' && originalSpouseValidIdFront == '') {
+            document.getElementById('deceased_spouse').checked = true;
+            heirFields.style.display = 'block';
+            survivingSpouseField.value = '';
+            spouseValidIDFields.style.display = 'none';
+        } else {
+            document.getElementById('deceased_spouse').checked = false;
+            heirFields.style.display = 'none';
+            spouseValidIDFields.style.display = 'block';
+        }
+    }
+
     const additionalInfo = document.getElementById("additional-info");
 
     function generateAdditionalInfo(originalDocumentType) {
@@ -622,6 +734,10 @@
             additionalInfo.innerHTML = `
                 @include('document-request.additionalEditInfo.extraJudicial')
             `;
+
+            extraJudicialDeceased();
+            heirDetails();
+
         } else if (originalDocumentType === 'Deed of Sale') {
             additionalInfo.innerHTML = `
                 @include('document-request.additionalEditInfo.deedOfSale')
@@ -853,17 +969,51 @@
                 }
 
             } else if(originalDocumentType === 'Extra Judicial') {
-                const deathtCertificate = document.getElementById('death_certificate');
-                const heirshipDocument = document.getElementById('heirship_documents');
-                const inventoryOfEstate = document.getElementById('inventory_of_estate');
-                const taxClearance = document.getElementById('tax_clearance');
-                const deedOfExtrajudicialSettlement = document.getElementById('deed_of_extrajudicial_settlement');
+                const titleOfProperty = document.getElementById('title_of_property');
+                const titleHolder = document.getElementById('title_holder');
+                const deceasedSpouse = document.getElementById('deceased_spouse');
+                const survivingSpouse = document.getElementById('surviving_spouse');
+                const spouseValidIDFront = document.getElementById('spouse_valid_id_front');
+                const spouseValidIDBack = document.getElementById('spouse_valid_id_back');
 
-                deathtCertificate.disabled = false;
-                heirshipDocument.disabled = false;
-                inventoryOfEstate.disabled = false;
-                taxClearance.disabled = false;
-                deedOfExtrajudicialSettlement.disabled = false;
+                const survivingHeirInputs = document.querySelectorAll('input[name^="surviving_heir["]');
+                const spouseOfHeirInputs = document.querySelectorAll('input[name^="spouse_of_heir["]');
+
+                const addHeirBtn = document.getElementById('addHeirBtn');
+                const deleteHeirBtn = document.getElementById('deleteHeirBtn');
+
+                console.log(survivingHeirInputs);
+                console.log(spouseOfHeirInputs);
+
+                const originalSurvivingSpouse = "{{ $additional_info->surviving_spouse }}";
+                const originalSpouseValidIdFront = "{{ $additional_info->spouse_valid_id_front }}";
+                const originalSpouseValidIdBack = "{{ $additional_info->spouse_valid_id_back }}";
+
+                titleOfProperty.disabled = false;
+                titleHolder.disabled = false;
+                deceasedSpouse.disabled = false;
+                addHeirBtn.disabled = false;
+                deleteHeirBtn.disabled = false;
+
+                survivingHeirInputs.forEach(function(input) {
+                    // Enable the input by setting disabled attribute to false
+                    input.disabled = false;
+                });
+
+                spouseOfHeirInputs.forEach(function(input) {
+                    // Enable the input by setting disabled attribute to false
+                    input.disabled = false;
+                });
+
+                survivingSpouse.disabled = false;
+                spouseValidIDFront.disabled = false;
+                spouseValidIDBack.disabled = false;
+
+                if(originalSurvivingSpouse == '' && originalSpouseValidIdBack == '' && originalSpouseValidIdFront == '') {
+                    survivingSpouse.disabled = true;
+                    deleteHeirBtn.disabled = false;
+
+                }
 
             } else if(originalDocumentType === 'Deed of Sale') {
                 const vendorName = document.getElementById('name_of_vendor');
@@ -1053,6 +1203,9 @@
                     additionalInfo.innerHTML = `
                         @include('document-request.additionalInfo.extraJudicial')
                     `;
+
+                    extraJudicialDeceased();
+
                 } else if(documentType.value === 'Deed of Sale') {
                     additionalInfo.innerHTML = `
                         @include('document-request.additionalInfo.deedOfSale')
@@ -1459,23 +1612,57 @@
             } else if(originalDocumentType === 'Extra Judicial') {
                 generateAdditionalInfo(originalDocumentType);
 
-                const deathtCertificate = document.getElementById('death_certificate');
-                const heirshipDocument = document.getElementById('heirship_documents');
-                const inventoryOfEstate = document.getElementById('inventory_of_estate');
-                const taxClearance = document.getElementById('tax_clearance');
-                const deedOfExtrajudicialSettlement = document.getElementById('deed_of_extrajudicial_settlement');
+                const titleOfProperty = document.getElementById('title_of_property');
+                const titleHolder = document.getElementById('title_holder');
+                const deceasedSpouseCheckBox = document.getElementById('deceased_spouse');
+                const survivingSpouse = document.getElementById('surviving_spouse');
+                const spouseValidIDFront = document.getElementById('spouse_valid_id_front');
+                const spouseValidIDBack = document.getElementById('spouse_valid_id_back');
 
-                deathtCertificate.disabled = true;
-                heirshipDocument.disabled = true;
-                inventoryOfEstate.disabled = true;
-                taxClearance.disabled = true;
-                deedOfExtrajudicialSettlement.disabled = true;
+                const survivingHeirInputs = document.querySelectorAll('input[name^="surviving_heir["]');
+                const spouseOfHeirInputs = document.querySelectorAll('input[name^="spouse_of_heir["]');
 
-                deathtCertificate.value = "";
-                heirshipDocument.value = "";
-                inventoryOfEstate.value = "";
-                taxClearance.value = "";
-                deedOfExtrajudicialSettlement.value = "";
+                const addHeirBtn = document.getElementById('addHeirBtn');
+                const deleteHeirBtn = document.getElementById('deleteHeirBtn');
+
+                const originalTitleHolder = "{{ $additional_info->title_holder }}";
+                const originalSurvivingSpouse = "{{ $additional_info->surviving_spouse }}";
+                const originalSpouseValidIdFront = "{{ $additional_info->spouse_valid_id_front }}";
+                const originalSpouseValidIdBack = "{{ $additional_info->spouse_valid_id_back }}";
+
+                titleOfProperty.disabled = true;
+                titleHolder.disabled = true;
+                deceasedSpouseCheckBox.disabled = true;
+
+                titleHolder.value = originalTitleHolder;
+                survivingSpouse.disabled = true;
+
+                if(originalSurvivingSpouse == '' && originalSpouseValidIdBack == '' && originalSpouseValidIdFront == '') {
+                    addHeirBtn.disabled = true;
+                    deleteHeirBtn.disabled = true;
+                    deceasedSpouseCheckBox.checked = true;
+
+                    const heirsInfo = <?php echo json_encode($heirs_info); ?>;
+
+                    survivingHeirInputs.forEach(function(input, index) {
+                        input.value = heirsInfo[index].surviving_heir;
+                    });
+
+                    spouseOfHeirInputs.forEach(function(input, index) {
+                        input.value = heirsInfo[index].spouse_of_heir;
+                    });
+
+                } else {
+                    deceasedSpouseCheckBox.checked = false;
+                    spouseValidIDFront.disabled = true;
+                    spouseValidIDBack.disabled = true;
+
+                    survivingSpouse.value = originalSurvivingSpouse;
+                    spouseValidIDFront.value = "";
+                    spouseValidIDBack.value = "";
+                }
+
+
 
                 const errorElements = document.querySelectorAll('.invalid-feedback');
                 errorElements.forEach(errorElement => {

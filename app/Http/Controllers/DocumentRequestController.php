@@ -1192,6 +1192,10 @@ class DocumentRequestController extends Controller
         $document_other_barangay_2 = '';
         $document_other_street_2 = '';
 
+        $heirs_info = [];
+        $heirs_clone_count = 0;
+        
+
         if($documentRequest->document_type == 'Affidavit of Loss') {
             $additional_info = AffidavitOfLoss::where('documentRequest_id', $id)->get()->first();
 
@@ -1317,6 +1321,7 @@ class DocumentRequestController extends Controller
             
             if($additional_info->surviving_spouse == null && $additional_info->spouse_valid_id_front == null && $additional_info->spouse_valid_id_back == null) {
                 $heirs_info = Heir::where('documentRequest_id', $id)->get();
+                $heirs_clone_count = $heirs_info->count();
             }
 
         } else if ($documentRequest->document_type == 'Deed of Sale') {
@@ -1411,7 +1416,7 @@ class DocumentRequestController extends Controller
             $additional_info = OtherDocument::where('documentRequest_id', $id)->get()->first();
         }
 
-        return view('document-request.editDocumentRequest', compact('documentRequest', 'city', 'final_barangay', 'street', 'other_city', 'other_barangay', 'other_street', 'additional_info', 'document_city', 'document_final_barangay', 'document_street', 'document_other_city', 'document_other_barangay', 'document_other_street', 'document_city_2', 'document_final_barangay_2', 'document_street_2', 'document_other_city_2', 'document_other_barangay_2', 'document_other_street_2'));
+        return view('document-request.editDocumentRequest', compact('documentRequest', 'city', 'final_barangay', 'street', 'other_city', 'other_barangay', 'other_street', 'additional_info', 'document_city', 'document_final_barangay', 'document_street', 'document_other_city', 'document_other_barangay', 'document_other_street', 'document_city_2', 'document_final_barangay_2', 'document_street_2', 'document_other_city_2', 'document_other_barangay_2', 'document_other_street_2', 'heirs_info', 'heirs_clone_count'));
     }
 
     public function validateEditSameDocumentRequestForm(Request $request) {
@@ -1470,11 +1475,21 @@ class DocumentRequestController extends Controller
             ],            
             'spouse_valid_id_front' => [
                 'image',
-                'mimes:jpg,jpeg,png'
+                'mimes:jpg,jpeg,png',
+                Rule::requiredIf(function () use ($request) {
+                    $extraJudicialInfo = ExtraJudicial::where('documentRequest_id', $request->input('documentRequest_id'))->get()->first();
+                    
+                    return $request->input('document_type') === 'Extra Judicial' && is_null($extraJudicialInfo->spouse_valid_id_front) && !$request->input('deceased_spouse');
+                }),
             ],
             'spouse_valid_id_back' => [
                 'image',
                 'mimes:jpg,jpeg,png',
+                Rule::requiredIf(function () use ($request) {
+                    $extraJudicialInfo = ExtraJudicial::where('documentRequest_id', $request->input('documentRequest_id'))->get()->first();
+                    
+                    return $request->input('document_type') === 'Extra Judicial' && is_null($extraJudicialInfo->spouse_valid_id_back) && !$request->input('deceased_spouse');
+                }),
             ],
             'surviving_heir.*' => 'required_if:deceased_spouse,on', 
 
@@ -1616,18 +1631,16 @@ class DocumentRequestController extends Controller
                 'image',
                 'mimes:jpg,jpeg,png',
                 Rule::requiredIf(function () use ($request) {
-                    // Check if the checkbox is checked
                     return $request->input('document_type') === 'Extra Judicial' &&
-                            !$request->input('deceased_spouse');
+                            !$request->input('deceased_spouse') && empty($request->input('surviving_spouse'));
                 }),
             ],
             'spouse_valid_id_back' => [
                 'image',
                 'mimes:jpg,jpeg,png',
                 Rule::requiredIf(function () use ($request) {
-                    // Check if the checkbox is checked
                     return $request->input('document_type') === 'Extra Judicial' &&
-                            !$request->input('deceased_spouse');
+                            !$request->input('deceased_spouse') && empty($request->input('surviving_spouse'));
                 }),
             ],
             'surviving_heir.*' => 'required_if:deceased_spouse,on', 
@@ -1736,13 +1749,14 @@ class DocumentRequestController extends Controller
     
         if ($this->shouldUpdateDocumentRequest($request, $documentRequest)){
             $address = $this->generateEditAddress($request);
-            $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
+            
 
             if($request->document_type == $documentRequest->document_type) {
                 if($request->document_type == 'Affidavit of Loss') {
                         $document_address = $this->generateEditDocumentAddress($request);
                         
                         if($this->shouldUpdateAffidavitOfLoss($request, $id)) {
+                            $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                             $updateAffidavitOfLossDetails = $this->updateAffidavitOfLoss($request, $document_address, $id);
 
                             if($updateDocumentRequestDetails && $updateAffidavitOfLossDetails) {
@@ -1753,6 +1767,7 @@ class DocumentRequestController extends Controller
                                 return $this->failedEditRedirect($id);
                             }
                         } else {
+                            $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                             if($updateDocumentRequestDetails) {
                                 $this->logDocumentRequestEditSuccess($user, $id);
     
@@ -1767,6 +1782,7 @@ class DocumentRequestController extends Controller
                     $document_address = $this->generateEditDocumentAddress($request);
 
                     if($this->shouldUpdateAffidavitOfGuardianship($request, $id)) {
+                        $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                         $updateAffidavitOfGuardianshipDetails = $this->updateAffidavitOfGuardianship($request, $document_address, $id);
 
                         if($updateDocumentRequestDetails && $updateAffidavitOfGuardianshipDetails) {
@@ -1777,6 +1793,7 @@ class DocumentRequestController extends Controller
                             return $this->failedEditRedirect($id);
                         }
                     } else {
+                        $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                         if($updateDocumentRequestDetails) {
                             $this->logDocumentRequestEditSuccess($user, $id);
 
@@ -1791,6 +1808,7 @@ class DocumentRequestController extends Controller
                     $document_address = $this->generateEditDocumentAddress($request);
                     
                     if($this->shouldUpdateAffidavitOfNoIncome($request, $id)) {
+                        $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                         $updateAffidavitOfNoIncomeDetails = $this->updateAffidavitOfNoIncome($request, $document_address, $id);
 
                         if($updateDocumentRequestDetails && $updateAffidavitOfNoIncomeDetails) {
@@ -1801,6 +1819,7 @@ class DocumentRequestController extends Controller
                             return $this->failedEditRedirect($id);
                         }
                     } else {
+                        $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                         if($updateDocumentRequestDetails) {
                             $this->logDocumentRequestEditSuccess($user, $id);
 
@@ -1815,6 +1834,7 @@ class DocumentRequestController extends Controller
                     $document_address = $this->generateEditDocumentAddress($request);
                     
                     if($this->shouldUpdateAffidavitOfNoFixIncome($request, $id)) {
+                        $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                         $updateAffidavitOfNoFixIncomeDetails = $this->updateAffidavitOfNoFixIncome($request, $document_address, $id);
 
                         if($updateDocumentRequestDetails && $updateAffidavitOfNoFixIncomeDetails) {
@@ -1825,6 +1845,7 @@ class DocumentRequestController extends Controller
                             return $this->failedEditRedirect($id);
                         }
                     } else {
+                        $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                         if($updateDocumentRequestDetails) {
                             $this->logDocumentRequestEditSuccess($user, $id);
 
@@ -1836,7 +1857,8 @@ class DocumentRequestController extends Controller
 
                 } else if($request->document_type == 'Extra Judicial') {
 
-                    if($this->shouldUpdateExtraJudicial($request)) {
+                    if($this->shouldUpdateExtraJudicial($request, $id)) {
+                        $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                         $updateExtraJudicialDetails = $this->updateExtraJudicial($request, $id);
 
                         if($updateDocumentRequestDetails && $updateExtraJudicialDetails) {
@@ -1847,6 +1869,7 @@ class DocumentRequestController extends Controller
                             return $this->failedEditRedirect($id);
                         }
                     } else {
+                        $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                         if($updateDocumentRequestDetails) {
                             $this->logDocumentRequestEditSuccess($user, $id);
 
@@ -1860,6 +1883,7 @@ class DocumentRequestController extends Controller
                     $document_address = $this->generateEditDocumentAddress($request);
                         
                     if($this->shouldUpdateDeedOfSale($request, $id)) {
+                        $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                         $updateDeedOfSaleDetails = $this->updateDeedOfSale($request, $document_address, $id);
 
                         if($updateDocumentRequestDetails && $updateDeedOfSaleDetails) {
@@ -1870,6 +1894,7 @@ class DocumentRequestController extends Controller
                             return $this->failedEditRedirect($id);
                         }
                     } else {
+                        $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                         if($updateDocumentRequestDetails) {
                             $this->logDocumentRequestEditSuccess($user, $id);
 
@@ -1884,6 +1909,7 @@ class DocumentRequestController extends Controller
                     $document_address2 = $this->generateEditDocument2Address($request);
                     
                     if($this->shouldUpdateDeedOfDonation($request, $id)) {
+                        $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                         $updateDeedOfDonationDetails = $this->updateDeedOfDonation($request, $document_address, $document_address2, $id);
 
                         if($updateDocumentRequestDetails && $updateDeedOfDonationDetails) {
@@ -1894,6 +1920,7 @@ class DocumentRequestController extends Controller
                             return $this->failedEditRedirect($id);
                         }
                     } else {
+                        $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                         if($updateDocumentRequestDetails) {
                             $this->logDocumentRequestEditSuccess($user, $id);
 
@@ -1906,6 +1933,7 @@ class DocumentRequestController extends Controller
                 } else if($request->document_type == 'Other Document') {
                     
                     if($this->shouldUpdateOtherDocument($request, $id)) {
+                        $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                         $updateOtherDocumentDetails = $this->updateOtherDocument($request, $id);
 
                         if($updateDocumentRequestDetails && $updateOtherDocumentDetails) {
@@ -1916,6 +1944,7 @@ class DocumentRequestController extends Controller
                             return $this->failedEditRedirect($id);
                         }
                     } else {
+                        $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                         if($updateDocumentRequestDetails) {
                             $this->logDocumentRequestEditSuccess($user, $id);
 
@@ -1928,6 +1957,7 @@ class DocumentRequestController extends Controller
                 } else {
                     return $this->failedEditRedirect($id);
                 }
+                
             } else {
                 if($request->document_type == 'Affidavit of Loss') {
                     
@@ -2123,6 +2153,7 @@ class DocumentRequestController extends Controller
                     $validIdFrontFilePath = $this->uploadEditValidIdFrontAOL($request);
                     $validIdBackFilePath = $this->uploadEditValidIdBackAOL($request);
     
+                    $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                     $createAffidavitOfLoss = $this->createAffidavitOfLoss($request, $documentAddress, $validIdFrontFilePath, $validIdBackFilePath, $id);
 
                     if($updateDocumentRequestDetails && $createAffidavitOfLoss) {
@@ -2327,6 +2358,7 @@ class DocumentRequestController extends Controller
                     $validIdFrontFilePath = $this->uploadEditValidIdFrontAOG($request);
                     $validIdBackFilePath = $this->uploadEditValidIdBackAOG($request);
     
+                    $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                     $createAffidavitOfGuardianship = $this->createAffidavitOfGuardianship($request, $documentAddress, $validIdFrontFilePath, $validIdBackFilePath, $id);
 
                     if($updateDocumentRequestDetails && $createAffidavitOfGuardianship) {
@@ -2532,6 +2564,7 @@ class DocumentRequestController extends Controller
                     $validIdFrontFilePath = $this->uploadEditValidIdFrontAONI($request);
                     $validIdBackFilePath = $this->uploadEditValidIdBackAONI($request);
 
+                    $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                     $createAffidavitOfNoIncome = $this->createAffidavitOfNoIncome($request, $documentAddress, $certificateOfIndigencyFilePath, $validIdFrontFilePath, $validIdBackFilePath, $id);
 
                     if($updateDocumentRequestDetails && $createAffidavitOfNoIncome) {
@@ -2737,6 +2770,7 @@ class DocumentRequestController extends Controller
                     $validIdFrontFilePath = $this->uploadEditValidIdFrontAONFI($request);
                     $validIdBackFilePath = $this->uploadEditValidIdBackAONFI($request);
 
+                    $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                     $createAffidavitOfNoFixIncome = $this->createAffidavitOfNoFixIncome($request, $documentAddress, $certificateOfResidencyFilePath, $validIdFrontFilePath, $validIdBackFilePath, $id);
 
                     if($updateDocumentRequestDetails && $createAffidavitOfNoFixIncome) {
@@ -2937,22 +2971,41 @@ class DocumentRequestController extends Controller
             
                     }
 
-                    $deathCertFilePath = $this->uploadEditDeathCertificate($request);
-                    $heirshipFilePath = $this->uploadEditHeirship($request);
-                    $invEstateFilePath = $this->uploadEditInvOfEstate($request);
-                    $taxClearanceFilePath = $this->uploadEditTaxClearance($request);
-                    $deedExtrajudicialFilePath = $this->uploadEditDeedOfExtraJudicialSettlement($request);
-
-                    $createExtraJudicial = $this->createExtraJudicial($deathCertFilePath, $heirshipFilePath, $invEstateFilePath, $taxClearanceFilePath, $deedExtrajudicialFilePath, $id);
-
-                    if($updateDocumentRequestDetails && $createExtraJudicial) {
-                        $this->logDocumentRequestEditSuccess($user, $id);
+                    $titleOfPropertyFilePath = $this->uploadTitleOfProperty($request);
     
-                        return $this->successEditRedirect($id);
+                    if($request->deceased_spouse == "on") {
+                        $survivingSpouseName = null;
+                        $spouseValidIdFrontFilePath = null;
+                        $spouseValidIdBackFilePath = null;
+
+                        $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
+                        $createExtraJudicial = $this->createExtraJudicial($request, $titleOfPropertyFilePath, $survivingSpouseName, $spouseValidIdFrontFilePath, $spouseValidIdBackFilePath, $id);
+                        $createHeirs = $this->createHeirs($request, $id);
+
+                        if($updateDocumentRequestDetails && $createExtraJudicial && $createHeirs) {
+                            $this->logDocumentRequestEditSuccess($user, $id);
+        
+                            return $this->successEditRedirect($id);
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
                     } else {
-                        return $this->failedEditRedirect($id);
+                        $survivingSpouseName = $request->surviving_spouse;
+                        $spouseValidIdFrontFilePath = $this->uploadSpouseValidIdFront($request);
+                        $spouseValidIdBackFilePath = $this->uploadSpouseValidIdBack($request);
+
+                        $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
+                        $createExtraJudicial = $this->createExtraJudicial($request, $titleOfPropertyFilePath, $survivingSpouseName, $spouseValidIdFrontFilePath, $spouseValidIdBackFilePath, $id);
+                        
+                        if($updateDocumentRequestDetails && $createExtraJudicial) {
+                            $this->logDocumentRequestEditSuccess($user, $id);
+        
+                            return $this->successEditRedirect($id);
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
                     }
-                    
+
                     
                 } else if($request->document_type == 'Deed of Sale') {
                         
@@ -3153,6 +3206,7 @@ class DocumentRequestController extends Controller
                     $witnessValidIdFrontFilePath = $this->uploadEditWitnessValidIdFront($request);
                     $witnessValidIdBackFilePath = $this->uploadEditWitnessValidIdBack($request);
 
+                    $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                     $createDeedOfSale = $this->createDeedOfSale($request, $documentAddress, $propertyDocumentFilePath, $vendorValidIdFrontFilePath, $vendorValidIdBackFilePath, $vendeeValidIdFrontFilePath, $vendeeValidIdBackFilePath, $witnessValidIdFrontFilePath, $witnessValidIdBackFilePath, $id);
 
                     if($updateDocumentRequestDetails && $createDeedOfSale) {
@@ -3360,6 +3414,7 @@ class DocumentRequestController extends Controller
                     $doneeValidIdFrontFilePath = $this->uploadEditDoneeValidIdFront($request);
                     $doneeValidIdBackFilePath = $this->uploadEditDoneeValidIdBack($request);
 
+                    $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                     $createDeedOfDonation = $this->createDeedOfDonation($request, $documentAddress, $donorValidIdFrontFilePath, $donorValidIdBackFilePath, $documentAddress2, $doneeValidIdFrontFilePath, $doneeValidIdBackFilePath, $id);
 
                     if($updateDocumentRequestDetails && $createDeedOfDonation) {
@@ -3459,6 +3514,28 @@ class DocumentRequestController extends Controller
                     } else if($documentRequest->document_type == 'Extra Judicial') {
 
                         $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->title_of_property))) {
+                            unlink(public_path($additionalInfoDetails->title_of_property));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if ($additionalInfoDetails->spouse_valid_id_front != null && file_exists(public_path($additionalInfoDetails->spouse_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->spouse_valid_id_front));
+                        }
+
+                        if ($additionalInfoDetails->spouse_valid_id_back != null && file_exists(public_path($additionalInfoDetails->spouse_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->spouse_valid_id_back));
+                        }
+
+                        $heirsInfo = Heir::where('documentRequest_id', $id)->get();
+
+                        if($heirsInfo->count() > 0) {
+                            foreach($heirsInfo as $heir) {
+                                $heir->delete();
+                            }
+                        }
 
                         ExtraJudicial::where('documentRequest_id', $id)->delete();
 
@@ -3563,6 +3640,7 @@ class DocumentRequestController extends Controller
                     $validIdFrontFilePath = $this->uploadEditValidIdFrontOther($request);
                     $validIdBackFilePath = $this->uploadEditValidIdBackOther($request);
 
+                    $updateDocumentRequestDetails = $this->updateDocumentRequestDetails($request, $address, $id);
                     $createOtherDocument = $this->createOtherDocument($validIdFrontFilePath, $validIdBackFilePath, $id);
 
                     if($updateDocumentRequestDetails && $createOtherDocument) {
@@ -3625,7 +3703,7 @@ class DocumentRequestController extends Controller
             } else {
                 return $this->failedEditRedirect($id);
             }
-        } else if ($request->document_type == 'Extra Judicial' && $this->shouldUpdateExtraJudicial($request)) {
+        } else if ($request->document_type == 'Extra Judicial' && $this->shouldUpdateExtraJudicial($request, $id)) {
             $updateExtraJudicialDetails = $this->updateExtraJudicial($request, $id);
 
             if($updateExtraJudicialDetails) {
@@ -3782,22 +3860,42 @@ class DocumentRequestController extends Controller
                     return $value != null;
                 }));
         } else {
-            $heirInfo = Heir::where('documentRequest_id', $id)->get();
+            $heirs_info = Heir::where('documentRequest_id', $id)->get();
+            $modified = false;
 
-            $heirsModified = $heirInfo->contains(function ($heir) use ($request) {
-                // Check if the submitted value for each heir is different from the original value
-                return $request->has('surviving_heir') && $request->has('spouse_of_heir') &&
-                    $request->surviving_heir[$heir->id] != $heir->surviving_heir ||
-                    $request->spouse_of_heir[$heir->id] != $heir->spouse_of_heir;
-            });
+            $heirs_count = count($heirs_info);
+            $submitted_heirs_count = 0;
+            
+            foreach ($request->surviving_heir as $heir) {
+                if ($heir != null) {
+                    $submitted_heirs_count++;
+                }
+            }
+
+            if ($heirs_count != $submitted_heirs_count) {
+                $modified = true;
+            } else {
+                foreach ($heirs_info as $key => $heir) {
+                    $original_surviving_heir = $heir->surviving_heir;
+                    $original_spouse_of_heir = $heir->spouse_of_heir;
+    
+                    $submitted_surviving_heir = $request->surviving_heir[$key];
+                    $submitted_spouse_of_heir = $request->spouse_of_heir[$key];
+    
+                    if ($original_surviving_heir != $submitted_surviving_heir || $original_spouse_of_heir != $submitted_spouse_of_heir) {
+                        $modified = true;
+                        break;
+                    }
+                }
+            }
 
             return $request->title_of_property != null ||
-                $request->title_holder != $extraJudicialInfo->title_holder ||
-                $request->surviving_spouse != $extraJudicialInfo->surviving_spouse ||
-                $request->spouse_valid_id_front != null ||
-                $request->spouse_valid_id_back != null ||
-                $heirsModified;
-        }
+                    $request->title_holder != $extraJudicialInfo->title_holder ||
+                    $request->surviving_spouse != $extraJudicialInfo->surviving_spouse ||
+                    $request->spouse_valid_id_front != null ||
+                    $request->spouse_valid_id_back != null ||
+                    $modified == true;
+        }            
     }
 
     private function shouldUpdateDeedOfSale(Request $request, $id) {
@@ -4025,6 +4123,36 @@ class DocumentRequestController extends Controller
         $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
         $filePath = 'uploads/document-request/affidavitOfNoFixIncome/' . $fileName;
         $file->move('uploads/document-request/affidavitOfNoFixIncome/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditTitleOfProperty(Request $request) {
+        $file = $request->file('title_of_property');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/extraJudicial/' . $fileName;
+        $file->move('uploads/document-request/extraJudicial/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditSpouseValidIdFront(Request $request) {
+        $file = $request->file('spouse_valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/extraJudicial/' . $fileName;
+        $file->move('uploads/document-request/extraJudicial/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditSpouseValidIdBack(Request $request) {
+        $file = $request->file('spouse_valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/extraJudicial/' . $fileName;
+        $file->move('uploads/document-request/extraJudicial/', $fileName);
     
         return $filePath;
     }
@@ -4385,61 +4513,155 @@ class DocumentRequestController extends Controller
         $documentRequest = ExtraJudicial::where('documentRequest_id', $documentRequestID)->first();
 
         $data = [
+            'title_holder' => trim($request->title_holder),
             'updated_at' => Carbon::now('Asia/Manila'),
         ];
-        
-        if ($request->hasFile('death_certificate')) {
-            $filePath = $documentRequest->death_cert;
+
+        if ($request->hasFile('title_of_property')) {
+            $filePath = $documentRequest->title_of_property;
             if (file_exists(public_path($filePath))) {
                 unlink(public_path($filePath));
             }
 
-            $DeathCertificatePath = $this->uploadEditDeathCertificate($request);
-            $data['death_cert'] = $DeathCertificatePath;
+            $TitlePropertyPath = $this->uploadEditTitleOfProperty($request);
+            $data['title_of_property'] = $TitlePropertyPath;
         }
 
-        if ($request->hasFile('heirship_documents')) {
-            $filePath = $documentRequest->heirship;
-            if (file_exists(public_path($filePath))) {
-                unlink(public_path($filePath));
+        if($documentRequest->surviving_spouse != null && $documentRequest->spouse_valid_id_front != null && $documentRequest->spouse_valid_id_back != null) {
+            if($request->deceased_spouse == "on") {
+                $data['surviving_spouse'] = null;
+                $data['spouse_valid_id_front'] = null;
+                $data['spouse_valid_id_back'] = null;
+
+                $validIDFrontPath = $documentRequest->spouse_valid_id_front;
+                if (file_exists(public_path($validIDFrontPath))) {
+                    unlink(public_path($validIDFrontPath));
+                }
+
+                $validIDBackPath = $documentRequest->spouse_valid_id_back;
+                if (file_exists(public_path($validIDBackPath))) {
+                    unlink(public_path($validIDBackPath));
+                }
+
+                $this->createHeirs($request, $documentRequestID);
+                
+            } else {
+                if($request->surviving_spouse != $documentRequest->surviving_spouse) {
+                    $data['surviving_spouse'] = $request->surviving_spouse;
+                }
+
+                if ($request->hasFile('spouse_valid_id_front')) {
+                    $filePath = $documentRequest->spouse_valid_id_front;
+                    if (file_exists(public_path($filePath))) {
+                        unlink(public_path($filePath));
+                    }
+    
+                    $SpouseValidIdFrontPath = $this->uploadEditSpouseValidIdFront($request);
+                    $data['spouse_valid_id_front'] = $SpouseValidIdFrontPath;
+                }
+    
+                if ($request->hasFile('spouse_valid_id_back')) {
+                    $filePath = $documentRequest->spouse_valid_id_back;
+                    if (file_exists(public_path($filePath))) {
+                        unlink(public_path($filePath));
+                    }
+    
+                    $SpouseValidIdBackPath = $this->uploadEditSpouseValidIdBack($request);
+                    $data['spouse_valid_id_back'] = $SpouseValidIdBackPath;
+                }
             }
+        } else {
+            if($request->deceased_spouse == "on") {
 
-            $HeirshipDocumentsPath = $this->uploadEditHeirship($request);
-            $data['heirship'] = $HeirshipDocumentsPath;
-        }
+                $this->updateHeirs($request, $documentRequestID);
+                
+            } else {
+                $heirsInfo = Heir::where('documentRequest_id', $documentRequestID)->get();
 
-        if ($request->hasFile('inventory_of_estate')) {
-            $filePath = $documentRequest->inv_estate;
-            if (file_exists(public_path($filePath))) {
-                unlink(public_path($filePath));
+                if($heirsInfo->count() > 0) {
+                    foreach($heirsInfo as $heir) {
+                        $heir->delete();
+                    }
+                }
+
+                if($request->surviving_spouse != $documentRequest->surviving_spouse) {
+                    $data['surviving_spouse'] = $request->surviving_spouse;
+                }
+    
+                $SpouseValidIdFrontPath = $this->uploadEditSpouseValidIdFront($request);
+                $data['spouse_valid_id_front'] = $SpouseValidIdFrontPath;
+                
+                $SpouseValidIdBackPath = $this->uploadEditSpouseValidIdBack($request);
+                $data['spouse_valid_id_back'] = $SpouseValidIdBackPath;
             }
-
-            $InvOfEstatePath = $this->uploadEditInvOfEstate($request);
-            $data['inv_estate'] = $InvOfEstatePath;
-        }
-
-        if ($request->hasFile('tax_clearance')) {
-            $filePath = $documentRequest->tax_clearance;
-            if (file_exists(public_path($filePath))) {
-                unlink(public_path($filePath));
-            }
-
-            $TaxClearancePath = $this->uploadEditTaxClearance($request);
-            $data['tax_clearance'] = $TaxClearancePath;
-        }
-
-        if ($request->hasFile('deed_of_extrajudicial_settlement')) {
-            $filePath = $documentRequest->deed_extrajudicial;
-            if (file_exists(public_path($filePath))) {
-                unlink(public_path($filePath));
-            }
-
-            $DeedOfExtraJudicialSettlementPath = $this->uploadEditDeedOfExtraJudicialSettlement($request);
-            $data['deed_extrajudicial'] = $DeedOfExtraJudicialSettlementPath;
         }
 
         return ExtraJudicial::where('documentRequest_id', $documentRequestID)->update($data);
     }
+
+
+    private function updateHeirs(Request $request, $documentRequestID) {
+        $survivingHeirs = $request->input('surviving_heir');
+        $spousesOfHeirs = $request->input('spouse_of_heir');
+        
+        // Get all existing heirs for the document request ID
+        $existingHeirs = Heir::where('documentRequest_id', $documentRequestID)->get();
+    
+        // Iterate through existing heirs
+        foreach ($existingHeirs as $existingHeir) {
+            $key = $existingHeir->id; // Assuming each heir has a unique ID
+    
+            // Check if this heir exists in the submitted data
+            if (isset($survivingHeirs[$key])) {
+                $heirName = $survivingHeirs[$key];
+    
+                // Check if the heir name is different from the original value in the database
+                if ($heirName !== $existingHeir->surviving_heir) {
+                    // Update the heir's name
+                    $existingHeir->surviving_heir = $heirName;
+                    $existingHeir->save();
+                }
+    
+                // Check if there's a spouse for this heir in the submitted data
+                if (isset($spousesOfHeirs[$key])) {
+                    $spouseName = $spousesOfHeirs[$key];
+    
+                    // Check if the spouse name is different from the original value in the database
+                    if ($spouseName !== $existingHeir->spouse_of_heir) {
+                        // Update the spouse's name
+                        $existingHeir->spouse_of_heir = $spouseName;
+                        $existingHeir->save();
+                    }
+                } else {
+                    // No spouse is provided, so clear the spouse_of_heir field
+                    $existingHeir->spouse_of_heir = null;
+                    $existingHeir->save();
+                }
+    
+                // Remove this heir from the submitted data to track which heirs have been processed
+                unset($survivingHeirs[$key]);
+            } else {
+                // Heir is not present in the submitted data, so delete it
+                $existingHeir->delete();
+            }
+        }
+    
+        // Handle any new heirs that are not in the existing database records
+        foreach ($survivingHeirs as $key => $heirName) {
+            $heir = new Heir();
+            $heir->surviving_heir = $heirName;
+            $heir->documentRequest_id = $documentRequestID;
+    
+            // Check if there's a spouse for this heir
+            if (isset($spousesOfHeirs[$key])) {
+                $heir->spouse_of_heir = $spousesOfHeirs[$key];
+            }
+    
+            $heir->save();
+        }
+    
+        return true;
+    }    
 
     private function updateDeedOfSale(Request $request, $address, $documentRequestID) {
         $documentRequest = DeedOfSale::where('documentRequest_id', $documentRequestID)->first();

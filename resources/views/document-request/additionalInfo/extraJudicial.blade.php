@@ -13,7 +13,7 @@
     </div>
 
     <div class="col-sm-6">
-        <label for="title_holder"></label>
+        <label for="title_holder">Title Holder</label>
         <input type="text" name="title_holder" id="title_holder" class="form-control @error('title_holder') is-invalid @enderror" value="{{ old('title_holder') }}" placeholder="Title Holder/Owner">
         @error('title_holder')
         <span class="invalid-feedback">{{ $message }}</span>
