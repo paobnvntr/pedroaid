@@ -1255,7 +1255,7 @@ class DocumentRequestController extends Controller
         } else if ($documentRequest->document_type == 'Affidavit of No income') {
             $additional_info = AffidavitOfNoIncome::where('documentRequest_id', $id)->get()->first();
 
-            $document_address = explode(', ', $additional_info->aoni_address);
+            $document_address = explode(', ', $additional_info->address);
             $document_city = $document_address[2];
             $document_city = trim($document_city);
     
@@ -1285,7 +1285,7 @@ class DocumentRequestController extends Controller
         } else if ($documentRequest->document_type == 'Affidavit of No fix income') {
             $additional_info = AffidavitOfNoFixIncome::where('documentRequest_id', $id)->get()->first();
 
-            $document_address = explode(', ', $additional_info->aonfi_address);
+            $document_address = explode(', ', $additional_info->address);
             $document_city = $document_address[2];
             $document_city = trim($document_city);
     
@@ -1942,6 +1942,18 @@ class DocumentRequestController extends Controller
                         } else {
                             return $this->failedEditRedirect($id);
                         }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         AffidavitOfNoIncome::where('documentRequest_id', $id)->delete();
             
@@ -1949,8 +1961,20 @@ class DocumentRequestController extends Controller
             
                         $additionalInfoDetails = AffidavitOfNoFixIncome::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->indigency))) {
-                            unlink(public_path($additionalInfoDetails->indigency));
+                        if (file_exists(public_path($additionalInfoDetails->certificate_of_residency))) {
+                            unlink(public_path($additionalInfoDetails->certificate_of_residency));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
                         } else {
                             return $this->failedEditRedirect($id);
                         }
@@ -2082,6 +2106,18 @@ class DocumentRequestController extends Controller
                         } else {
                             return $this->failedEditRedirect($id);
                         }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         AffidavitOfNoIncome::where('documentRequest_id', $id)->delete();
             
@@ -2089,8 +2125,20 @@ class DocumentRequestController extends Controller
             
                         $additionalInfoDetails = AffidavitOfNoFixIncome::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->indigency))) {
-                            unlink(public_path($additionalInfoDetails->indigency));
+                        if (file_exists(public_path($additionalInfoDetails->certificate_of_residency))) {
+                            unlink(public_path($additionalInfoDetails->certificate_of_residency));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
                         } else {
                             return $this->failedEditRedirect($id);
                         }
@@ -2162,10 +2210,10 @@ class DocumentRequestController extends Controller
                     }
 
                     $documentAddress = $this->generateEditDocumentAddress($request);
-                    $documentAddress2 = $this->generateEditDocument2Address($request);
-                    $barangayClearanceFilePath = $this->uploadEditBarangayClearanceAOG($request);
+                    $validIdFrontFilePath = $this->uploadEditValidIdFrontAOG($request);
+                    $validIdBackFilePath = $this->uploadEditValidIdBackAOG($request);
     
-                    $createAffidavitOfGuardianship = $this->createAffidavitOfGuardianship($request, $documentAddress, $documentAddress2, $barangayClearanceFilePath, $id);
+                    $createAffidavitOfGuardianship = $this->createAffidavitOfGuardianship($request, $documentAddress, $validIdFrontFilePath, $validIdBackFilePath, $id);
 
                     if($updateDocumentRequestDetails && $createAffidavitOfGuardianship) {
                         $this->logDocumentRequestEditSuccess($user, $id);
@@ -2222,6 +2270,18 @@ class DocumentRequestController extends Controller
                         } else {
                             return $this->failedEditRedirect($id);
                         }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         AffidavitOfNoIncome::where('documentRequest_id', $id)->delete();
             
@@ -2229,8 +2289,20 @@ class DocumentRequestController extends Controller
             
                         $additionalInfoDetails = AffidavitOfNoFixIncome::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->indigency))) {
-                            unlink(public_path($additionalInfoDetails->indigency));
+                        if (file_exists(public_path($additionalInfoDetails->certificate_of_residency))) {
+                            unlink(public_path($additionalInfoDetails->certificate_of_residency));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
                         } else {
                             return $this->failedEditRedirect($id);
                         }
@@ -2302,9 +2374,11 @@ class DocumentRequestController extends Controller
                     }
 
                     $documentAddress = $this->generateEditDocumentAddress($request);
-                    $certificateOfIndigencyFilePath = $this->uploadEditCertOfIndigencyAONI($request);
+                    $certificateOfIndigencyFilePath =   $this->uploadEditCertificateOfIndigency($request);
+                    $validIdFrontFilePath = $this->uploadEditValidIdFrontAONI($request);
+                    $validIdBackFilePath = $this->uploadEditValidIdBackAONI($request);
 
-                    $createAffidavitOfNoIncome = $this->createAffidavitOfNoIncome($request, $documentAddress, $certificateOfIndigencyFilePath, $id);
+                    $createAffidavitOfNoIncome = $this->createAffidavitOfNoIncome($request, $documentAddress, $certificateOfIndigencyFilePath, $validIdFrontFilePath, $validIdBackFilePath, $id);
 
                     if($updateDocumentRequestDetails && $createAffidavitOfNoIncome) {
                         $this->logDocumentRequestEditSuccess($user, $id);
@@ -2361,6 +2435,18 @@ class DocumentRequestController extends Controller
                         } else {
                             return $this->failedEditRedirect($id);
                         }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         AffidavitOfNoIncome::where('documentRequest_id', $id)->delete();
             
@@ -2368,8 +2454,20 @@ class DocumentRequestController extends Controller
             
                         $additionalInfoDetails = AffidavitOfNoFixIncome::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->indigency))) {
-                            unlink(public_path($additionalInfoDetails->indigency));
+                        if (file_exists(public_path($additionalInfoDetails->certificate_of_residency))) {
+                            unlink(public_path($additionalInfoDetails->certificate_of_residency));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
                         } else {
                             return $this->failedEditRedirect($id);
                         }
@@ -2441,9 +2539,11 @@ class DocumentRequestController extends Controller
                     }
 
                     $documentAddress = $this->generateEditDocumentAddress($request);
-                    $indigencyFilePath = $this->uploadEditCertOfIndigencyAONFI($request);
+                    $certificateOfResidencyFilePath = $this->uploadEditCertificateOfResidency($request);
+                    $validIdFrontFilePath = $this->uploadEditValidIdFrontAONFI($request);
+                    $validIdBackFilePath = $this->uploadEditValidIdBackAONFI($request);
 
-                    $createAffidavitOfNoFixIncome = $this->createAffidavitOfNoFixIncome($request, $documentAddress, $indigencyFilePath, $id);
+                    $createAffidavitOfNoFixIncome = $this->createAffidavitOfNoFixIncome($request, $documentAddress, $certificateOfResidencyFilePath, $validIdFrontFilePath, $validIdBackFilePath, $id);
 
                     if($updateDocumentRequestDetails && $createAffidavitOfNoFixIncome) {
                         $this->logDocumentRequestEditSuccess($user, $id);
@@ -2500,6 +2600,18 @@ class DocumentRequestController extends Controller
                         } else {
                             return $this->failedEditRedirect($id);
                         }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         AffidavitOfNoIncome::where('documentRequest_id', $id)->delete();
             
@@ -2507,8 +2619,20 @@ class DocumentRequestController extends Controller
             
                         $additionalInfoDetails = AffidavitOfNoFixIncome::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->indigency))) {
-                            unlink(public_path($additionalInfoDetails->indigency));
+                        if (file_exists(public_path($additionalInfoDetails->certificate_of_residency))) {
+                            unlink(public_path($additionalInfoDetails->certificate_of_residency));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
                         } else {
                             return $this->failedEditRedirect($id);
                         }
@@ -2643,6 +2767,18 @@ class DocumentRequestController extends Controller
                         } else {
                             return $this->failedEditRedirect($id);
                         }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         AffidavitOfNoIncome::where('documentRequest_id', $id)->delete();
             
@@ -2650,8 +2786,20 @@ class DocumentRequestController extends Controller
             
                         $additionalInfoDetails = AffidavitOfNoFixIncome::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->indigency))) {
-                            unlink(public_path($additionalInfoDetails->indigency));
+                        if (file_exists(public_path($additionalInfoDetails->certificate_of_residency))) {
+                            unlink(public_path($additionalInfoDetails->certificate_of_residency));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
                         } else {
                             return $this->failedEditRedirect($id);
                         }
@@ -2767,7 +2915,7 @@ class DocumentRequestController extends Controller
                         } else {
                             return $this->failedEditRedirect($id);
                         }
-                        
+
                         AffidavitOfGuardianship::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Affidavit of No income') {
@@ -2779,6 +2927,18 @@ class DocumentRequestController extends Controller
                         } else {
                             return $this->failedEditRedirect($id);
                         }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         AffidavitOfNoIncome::where('documentRequest_id', $id)->delete();
             
@@ -2786,8 +2946,20 @@ class DocumentRequestController extends Controller
             
                         $additionalInfoDetails = AffidavitOfNoFixIncome::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->indigency))) {
-                            unlink(public_path($additionalInfoDetails->indigency));
+                        if (file_exists(public_path($additionalInfoDetails->certificate_of_residency))) {
+                            unlink(public_path($additionalInfoDetails->certificate_of_residency));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
                         } else {
                             return $this->failedEditRedirect($id);
                         }
@@ -2918,6 +3090,18 @@ class DocumentRequestController extends Controller
                         } else {
                             return $this->failedEditRedirect($id);
                         }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         AffidavitOfNoIncome::where('documentRequest_id', $id)->delete();
             
@@ -2925,8 +3109,20 @@ class DocumentRequestController extends Controller
             
                         $additionalInfoDetails = AffidavitOfNoFixIncome::where('documentRequest_id', $id)->first();
 
-                        if (file_exists(public_path($additionalInfoDetails->indigency))) {
-                            unlink(public_path($additionalInfoDetails->indigency));
+                        if (file_exists(public_path($additionalInfoDetails->certificate_of_residency))) {
+                            unlink(public_path($additionalInfoDetails->certificate_of_residency));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
                         } else {
                             return $this->failedEditRedirect($id);
                         }
@@ -3180,27 +3376,24 @@ class DocumentRequestController extends Controller
     private function shouldUpdateAffidavitOfNoIncome(Request $request, $id) {
         $affidavitOfNoIncomeInfo = AffidavitOfNoIncome::where('documentRequest_id', $id)->get()->first();
 
-        return $request->document_name != $affidavitOfNoIncomeInfo->aoni_name ||
-            $request->document_age != $affidavitOfNoIncomeInfo->aoni_age ||
-            $this->shouldUpdateDocumentAddress($request, $affidavitOfNoIncomeInfo->aoni_address) ||
+        return $request->document_name != $affidavitOfNoIncomeInfo->name ||
+            $request->document_civil_status != $affidavitOfNoIncomeInfo->civil_status ||
+            $this->shouldUpdateDocumentAddress($request, $affidavitOfNoIncomeInfo->address) ||
+            $request->year_of_no_income != $affidavitOfNoIncomeInfo->year_of_no_income ||
             $request->certificate_of_indigency != null ||
-            $request->previous_employer_name != $affidavitOfNoIncomeInfo->previous_employer_name ||
-            $request->previous_employer_contact != $affidavitOfNoIncomeInfo->previous_employer_contact ||
-            $request->business_name != $affidavitOfNoIncomeInfo->business_name ||
-            $request->registration_number != $affidavitOfNoIncomeInfo->registration_number ||
-            $request->business_address != $affidavitOfNoIncomeInfo->business_address ||
-            $request->business_period != $affidavitOfNoIncomeInfo->business_period ||
-            $request->no_income_period != $affidavitOfNoIncomeInfo->no_income_period;
+            $request->valid_id_front != null ||
+            $request->valid_id_back != null;
     }
 
     private function shouldUpdateAffidavitOfNoFixIncome(Request $request, $id) {
         $affidavitOfNoFixIncomeInfo = AffidavitOfNoFixIncome::where('documentRequest_id', $id)->get()->first();
 
-        return $request->document_name != $affidavitOfNoFixIncomeInfo->aonfi_name ||
-            $request->document_age != $affidavitOfNoFixIncomeInfo->aonfi_age ||
-            $this->shouldUpdateDocumentAddress($request, $affidavitOfNoFixIncomeInfo->aonfi_address) ||
-            $request->source_of_income != $affidavitOfNoFixIncomeInfo->source_income ||
-            $request->indigency != null;
+        return $request->document_name != $affidavitOfNoFixIncomeInfo->name ||
+            $request->document_civil_status != $affidavitOfNoFixIncomeInfo->civil_status ||
+            $this->shouldUpdateDocumentAddress($request, $affidavitOfNoFixIncomeInfo->address) ||
+            $request->certificate_of_residency != null ||
+            $request->valid_id_front != null ||
+            $request->valid_id_back != null;
     }
 
     private function shouldUpdateExtraJudicial(Request $request) {
@@ -3366,6 +3559,66 @@ class DocumentRequestController extends Controller
         return $filePath;
     }
 
+    private function uploadEditCertificateOfIndigency(Request $request) {
+        $file = $request->file('certificate_of_indigency');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/affidavitOfNoIncome/' . $fileName;
+        $file->move('uploads/document-request/affidavitOfNoIncome/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditValidIdFrontAONI(Request $request) {
+        $file = $request->file('valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/affidavitOfNoIncome/' . $fileName;
+        $file->move('uploads/document-request/affidavitOfNoIncome/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditValidIdBackAONI(Request $request) {
+        $file = $request->file('valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/affidavitOfNoIncome/' . $fileName;
+        $file->move('uploads/document-request/affidavitOfNoIncome/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditCertificateOfResidency(Request $request) {
+        $file = $request->file('certificate_of_residency');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/affidavitOfNoFixIncome/' . $fileName;
+        $file->move('uploads/document-request/affidavitOfNoFixIncome/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditValidIdFrontAONFI(Request $request) {
+        $file = $request->file('valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/affidavitOfNoFixIncome/' . $fileName;
+        $file->move('uploads/document-request/affidavitOfNoFixIncome/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditValidIdBackAONFI(Request $request) {
+        $file = $request->file('valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/affidavitOfNoFixIncome/' . $fileName;
+        $file->move('uploads/document-request/affidavitOfNoFixIncome/', $fileName);
+    
+        return $filePath;
+    }
+
     private function uploadEditValidIdFrontOther(Request $request) {
         $file = $request->file('valid_id_front');
         $originalFileName = $file->getClientOriginalName();
@@ -3382,26 +3635,6 @@ class DocumentRequestController extends Controller
         $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
         $filePath = 'uploads/document-request/otherDocument/' . $fileName;
         $file->move('uploads/document-request/otherDocument/', $fileName);
-    
-        return $filePath;
-    }
-
-    private function uploadEditCertOfIndigencyAONI(Request $request) {
-        $file = $request->file('certificate_of_indigency');
-        $originalFileName = $file->getClientOriginalName();
-        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-        $filePath = 'uploads/document-request/affidavitOfNoIncome/' . $fileName;
-        $file->move('uploads/document-request/affidavitOfNoIncome/', $fileName);
-    
-        return $filePath;
-    }
-
-    private function uploadEditCertOfIndigencyAONFI(Request $request) {
-        $file = $request->file('certificate_of_indigency');
-        $originalFileName = $file->getClientOriginalName();
-        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-        $filePath = 'uploads/document-request/affidavitOfNoFixIncome/' . $fileName;
-        $file->move('uploads/document-request/affidavitOfNoFixIncome/', $fileName);
     
         return $filePath;
     }
@@ -3544,14 +3777,10 @@ class DocumentRequestController extends Controller
         $documentRequest = AffidavitOfNoIncome::where('documentRequest_id', $documentRequestID)->first();
 
         $data = [
-            'aoni_name' => trim($request->document_name),
-            'aoni_age' => $request->document_age,
-            'aoni_address' => $address,
-            'business_name' => trim($request->business_name),
-            'registration_number' => trim($request->registration_number),
-            'business_address' => trim($request->business_address),
-            'business_period' => trim($request->business_period),
-            'no_income_period' => trim($request->no_income_period),
+            'name' => trim($request->document_name),
+            'civil_status' => $request->document_civil_status,
+            'address' => $address,
+            'year_of_no_income' => $request->year_of_no_income,
             'updated_at' => Carbon::now('Asia/Manila'),
         ];
 
@@ -3561,13 +3790,28 @@ class DocumentRequestController extends Controller
                 unlink(public_path($filePath));
             }
 
-            $CertOfIndigencyPath = $this->uploadEditCertOfIndigencyAONI($request);
+            $CertOfIndigencyPath = $this->uploadEditCertificateOfIndigency($request);
             $data['certificate_of_indigency'] = $CertOfIndigencyPath;
         }
 
-        if($request->previous_employer_name != $documentRequest->previous_employer_name || $request->previous_employer_contact != $documentRequest->previous_employer_contact) {
-            $data['previous_employer_name'] = trim($request->previous_employer_name);
-            $data['previous_employer_contact'] = trim($request->previous_employer_contact);
+        if ($request->hasFile('valid_id_front')) {
+            $filePath = $documentRequest->valid_id_front;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $validIDFrontFilePath = $this->uploadEditValidIdFrontAONI($request);
+            $data['valid_id_front'] = $validIDFrontFilePath;
+        }
+
+        if ($request->hasFile('valid_id_back')) {
+            $filePath = $documentRequest->valid_id_back;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $validIDBackFilePath = $this->uploadEditValidIdBackAONI($request);
+            $data['valid_id_back'] = $validIDBackFilePath;
         }
     
         return AffidavitOfNoIncome::where('documentRequest_id', $documentRequestID)->update($data);
@@ -3577,21 +3821,41 @@ class DocumentRequestController extends Controller
         $documentRequest = AffidavitOfNoFixIncome::where('documentRequest_id', $documentRequestID)->first();
 
         $data = [
-            'aonfi_name' => trim($request->document_name),
-            'aonfi_age' => $request->document_age,
-            'aonfi_address' => $address,
-            'source_income' => trim($request->source_of_income),
+            'name' => trim($request->document_name),
+            'civil_status' => $request->document_civil_status,
+            'address' => $address,
+            'year_of_no_income' => $request->year_of_no_income,
             'updated_at' => Carbon::now('Asia/Manila'),
         ];
 
-        if ($request->hasFile('certificate_of_indigency')) {
-            $filePath = $documentRequest->indigency;
+        if ($request->hasFile('certificate_of_residency')) {
+            $filePath = $documentRequest->certificate_of_residency;
             if (file_exists(public_path($filePath))) {
                 unlink(public_path($filePath));
             }
 
-            $CertOfIndigencyPath = $this->uploadEditCertOfIndigencyAONFI($request);
-            $data['indigency'] = $CertOfIndigencyPath;
+            $CertOfResidencyPath = $this->uploadEditCertificateOfResidency($request);
+            $data['certificate_of_residency'] = $CertOfResidencyPath;
+        }
+
+        if ($request->hasFile('valid_id_front')) {
+            $filePath = $documentRequest->valid_id_front;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $validIDFrontFilePath = $this->uploadEditValidIdFrontAONFI($request);
+            $data['valid_id_front'] = $validIDFrontFilePath;
+        }
+
+        if ($request->hasFile('valid_id_back')) {
+            $filePath = $documentRequest->valid_id_back;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $validIDBackFilePath = $this->uploadEditValidIdBackAONFI($request);
+            $data['valid_id_back'] = $validIDBackFilePath;
         }
     
         return AffidavitOfNoFixIncome::where('documentRequest_id', $documentRequestID)->update($data);

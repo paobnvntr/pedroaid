@@ -431,6 +431,152 @@
         });
     }
 
+    function useNewSameAddress() {
+        const useSameAddressCheckbox = document.getElementById('use_same_address');
+        const sanPedroCityRadio = document.getElementById('san-pedro-city');
+        const otherCityRadio = document.getElementById('other-city');
+        const barangay = document.getElementById('barangay');
+        const street = document.getElementById('street');
+        const otherCity = document.getElementById('other-city-input');
+        const otherBarangay = document.getElementById('other-barangay');
+        const otherStreet = document.getElementById('other-street');
+
+        useSameAddressCheckbox.addEventListener('change', () => {
+            const documentSanPedroCityRadio = document.getElementById('document-san-pedro-city');
+            const documentOtherCityRadio = document.getElementById('document-other-city');
+
+            const documentBarangayGroup = document.getElementById('document-barangay-group');
+            const documentStreetGroup = document.getElementById('document-street-group');
+            const documentBarangay = document.getElementById('document_barangay');
+            const documentStreet = document.getElementById('document_street');
+
+            const documentOtherAddressGroup = document.getElementById('document-other-address-group');
+            const documentOtherCity = document.getElementById('document-other-city-input');
+            const documentOtherBarangay = document.getElementById('document-other-barangay');
+            const documentOtherStreet = document.getElementById('document-other-street');
+
+            if (useSameAddressCheckbox.checked) {
+                if (sanPedroCityRadio.checked) {
+                    documentSanPedroCityRadio.checked = true;
+                    documentBarangayGroup.classList.remove('d-none');
+                    documentStreetGroup.classList.remove('d-none');
+                    documentBarangay.value = barangay.value;
+                    documentStreet.value = street.value;
+                    documentOtherCityRadio.checked = false;
+                    documentOtherCity.value = '';
+                    documentOtherBarangay.value = '';
+                    documentOtherStreet.value = '';
+                } else if (otherCityRadio.checked) {
+                    documentOtherCityRadio.checked = true;
+                    documentOtherAddressGroup.classList.remove('d-none');
+                    documentOtherCity.value = otherCity.value;
+                    documentOtherBarangay.value = otherBarangay.value;
+                    documentOtherStreet.value = otherStreet.value;
+                    documentSanPedroCityRadio.checked = false;
+                    documentBarangay.value = '';
+                    documentStreet.value = '';
+                }
+            } else {
+                    documentSanPedroCityRadio.checked = false;
+                    documentBarangayGroup.classList.add('d-none');
+                    documentStreetGroup.classList.add('d-none');
+                    documentBarangay.value = '';
+                    documentStreet.value = '';
+
+                    documentOtherCityRadio.checked = false;
+                    documentOtherAddressGroup.classList.add('d-none');
+                    documentOtherCity.value = '';
+                    documentOtherBarangay.value = '';
+                    documentOtherStreet.value = '';
+            }
+        });
+    }
+
+    function useNewSameAddress2() {
+        const useSameAddressCheckbox = document.getElementById('use_same_address_2');
+        const sanPedroCityRadio = document.getElementById('san-pedro-city');
+        const otherCityRadio = document.getElementById('other-city');
+        const barangay = document.getElementById('barangay');
+        const street = document.getElementById('street');
+        const otherCity = document.getElementById('other-city-input');
+        const otherBarangay = document.getElementById('other-barangay');
+        const otherStreet = document.getElementById('other-street');
+
+        useSameAddressCheckbox.addEventListener('change', () => {
+            const documentSanPedroCityRadio = document.getElementById('document-san-pedro-city-2');
+            const documentOtherCityRadio = document.getElementById('document-other-city-2');
+
+            const documentBarangayGroup = document.getElementById('document-barangay-group-2');
+            const documentStreetGroup = document.getElementById('document-street-group-2');
+            const documentBarangay = document.getElementById('document_barangay_2');
+            const documentStreet = document.getElementById('document_street_2');
+
+            const documentOtherAddressGroup = document.getElementById('document-other-address-group-2');
+            const documentOtherCity = document.getElementById('document-other-city-input-2');
+            const documentOtherBarangay = document.getElementById('document-other-barangay-2');
+            const documentOtherStreet = document.getElementById('document-other-street-2');
+
+            if (useSameAddressCheckbox.checked) {
+                if (sanPedroCityRadio.checked) {
+                    documentSanPedroCityRadio.checked = true;
+                    documentBarangayGroup.classList.remove('d-none');
+                    documentStreetGroup.classList.remove('d-none');
+                    documentBarangay.value = barangay.value;
+                    documentStreet.value = street.value;
+                    documentOtherCityRadio.checked = false;
+                    documentOtherCity.value = '';
+                    documentOtherBarangay.value = '';
+                    documentOtherStreet.value = '';
+                } else if (otherCityRadio.checked) {
+                    documentOtherCityRadio.checked = true;
+                    documentOtherAddressGroup.classList.remove('d-none');
+                    documentOtherCity.value = otherCity.value;
+                    documentOtherBarangay.value = otherBarangay.value;
+                    documentOtherStreet.value = otherStreet.value;
+                    documentSanPedroCityRadio.checked = false;
+                    documentBarangay.value = '';
+                    documentStreet.value = '';
+                }
+            } else {
+                const originalDocumentCity = "{{ $document_city_2 }}";
+                const originalDocumentBarangay = "{{ $document_final_barangay_2 }}";
+                const originalDocumentStreet = "{{ $document_street_2 }}";
+                const originalDocumentOtherCity = "{{ $document_other_city_2 }}";
+                const originalDocumentOtherBarangay = "{{ $document_other_barangay_2 }}";
+                const originalDocumentOtherStreet = "{{ $document_other_street_2 }}";
+
+                if (originalDocumentCity === 'San Pedro City') {
+
+                    documentSanPedroCityRadio.checked = true;
+                    documentBarangayGroup.classList.remove('d-none');
+                    documentStreetGroup.classList.remove('d-none');
+                    documentBarangay.value = originalDocumentBarangay;
+                    documentStreet.value = originalDocumentStreet;
+
+                    documentOtherCityRadio.checked = false;
+                    documentOtherAddressGroup.classList.add('d-none');
+                    documentOtherCity.value = '';
+                    documentOtherBarangay.value = '';
+                    documentOtherStreet.value = '';
+                    
+                } else {
+
+                    documentOtherCityRadio.checked = true;
+                    documentOtherAddressGroup.classList.remove('d-none');
+                    documentOtherCity.value = originalDocumentOtherCity;
+                    documentOtherBarangay.value = originalDocumentOtherBarangay;
+                    documentOtherStreet.value = originalDocumentOtherStreet;
+
+                    documentSanPedroCityRadio.checked = false;
+                    documentBarangayGroup.classList.add('d-none');
+                    documentStreetGroup.classList.add('d-none');
+                    documentBarangay.value = '';
+                    documentStreet.value = '';
+                }
+            }
+        });
+    }
+
     const additionalInfo = document.getElementById("additional-info");
 
     function generateAdditionalInfo(originalDocumentType) {
@@ -626,7 +772,7 @@
 
             } else if(originalDocumentType === 'Affidavit of No income') {
                 const documentName = document.getElementById('document_name');
-                const documentAge = document.getElementById('document_age');
+                const documentCivilStatus = document.getElementById('document_civil_status');
                 const useSameAddress = document.getElementById('use_same_address');
                 const documentSanPedroCityRadio = document.getElementById('document-san-pedro-city');
                 const documentOtherCityRadio = document.getElementById('document-other-city');
@@ -640,30 +786,20 @@
                 const documentOtherCityInput = document.getElementById('document-other-city-input');
                 const documentOtherBarangay = document.getElementById('document-other-barangay');
 
+                const yearOfNoIncome = document.getElementById('year_of_no_income');
                 const certificateOfIndigency = document.getElementById('certificate_of_indigency');
-
-                const employerName = document.getElementById('previous_employer_name');
-                const employerContact = document.getElementById('previous_employer_contact');
-
-                const businessName = document.getElementById('business_name');
-                const registrationNumber = document.getElementById('registration_number');
-                const businessAddress = document.getElementById('business_address');
-                const businessPeriod = document.getElementById('business_period');
-                const noIncomePeriod = document.getElementById('no_income_period');
+                const validIDFront = document.getElementById('valid-id-front');
+                const validIDBack = document.getElementById('valid-id-back');
 
                 documentName.disabled = false;
-                documentAge.disabled = false;
+                documentCivilStatus.disabled = false;
                 useSameAddress.disabled = false;
                 documentSanPedroCityRadio.disabled = false;
                 documentOtherCityRadio.disabled = false;
+                yearOfNoIncome.disabled = false;
                 certificateOfIndigency.disabled = false;
-                employerName.disabled = false;
-                employerContact.disabled = false;
-                businessName.disabled = false;
-                registrationNumber.disabled = false;
-                businessAddress.disabled = false;
-                businessPeriod.disabled = false;
-                noIncomePeriod.disabled = false;
+                validIDFront.disabled = false;
+                validIDBack.disabled = false;
 
                 if(documentSanPedroCityRadio.checked) {
                     documentBarangayGroup.classList.remove('d-none');
@@ -674,7 +810,7 @@
 
             } else if(originalDocumentType === 'Affidavit of No fix income') {
                 const documentName = document.getElementById('document_name');
-                const documentAge = document.getElementById('document_age');
+                const documentCivilStatus = document.getElementById('document_civil_status');
                 const useSameAddress = document.getElementById('use_same_address');
                 const documentSanPedroCityRadio = document.getElementById('document-san-pedro-city');
                 const documentOtherCityRadio = document.getElementById('document-other-city');
@@ -689,16 +825,20 @@
                 const documentOtherBarangay = document.getElementById('document-other-barangay');
                 const documentOtherStreet = document.getElementById('document-other-street');
 
-                const sourceOfIncome = document.getElementById('source_of_income');
-                const certificateOfIndigency = document.getElementById('certificate_of_indigency');
+                const yearOfNoIncome = document.getElementById('year_of_no_income');
+                const certificateOfResidency = document.getElementById('certificate_of_residency');
+                const validIDFront = document.getElementById('valid-id-front');
+                const validIDBack = document.getElementById('valid-id-back');
 
                 documentName.disabled = false;
-                documentAge.disabled = false;
+                documentCivilStatus.disabled = false;
                 useSameAddress.disabled = false;
                 documentSanPedroCityRadio.disabled = false;
                 documentOtherCityRadio.disabled = false;
-                sourceOfIncome.disabled = false;
-                certificateOfIndigency.disabled = false;
+                yearOfNoIncome.disabled = false;
+                certificateOfResidency.disabled = false;
+                validIDFront.disabled = false;
+                validIDBack.disabled = false;
 
                 if(documentSanPedroCityRadio.checked) {
                     documentBarangayGroup.classList.remove('d-none');
@@ -808,12 +948,16 @@
 
                     additionalInfoAddress();
 
+                    useNewSameAddress();
+
                 } else if(documentType.value === 'Affidavit of Guardianship') {
                     additionalInfo.innerHTML = `
                         @include('document-request.additionalInfo.affidavitOfGuardianship')
                     `;
 
                     additionalInfoAddress();
+
+                    useNewSameAddress();
 
                 } else if(documentType.value === 'Affidavit of No income') {
                     additionalInfo.innerHTML = `
@@ -822,12 +966,16 @@
 
                     additionalInfoAddress();
 
+                    useNewSameAddress();
+
                 } else if(documentType.value === 'Affidavit of No fix income') {
                     additionalInfo.innerHTML = `
                         @include('document-request.additionalInfo.affidavitOfNoFixIncome')
                     `;
 
                     additionalInfoAddress();
+
+                    useNewSameAddress();
 
                 } else if(documentType.value === 'Extra Judicial') {
                     additionalInfo.innerHTML = `
@@ -931,7 +1079,7 @@
                 const originalDocumentOtherCity = "{{ $document_other_city }}";
                 const originalDocumentOtherBarangay = "{{ $document_other_barangay }}";
                 const originalDocumentOtherStreet = "{{ $document_other_street }}";
-                const originalItemLost = "{{ $additional_info->item_lost }}";
+                const originalItemLost = "{!! $additional_info->item_lost !!}";
                 const originalReasonOfLoss = "{{ $additional_info->reason_of_loss }}";
 
                 documentName.disabled = true;
@@ -944,7 +1092,6 @@
                 validIDBack.disabled = true;
 
                 documentName.value = originalDocumentName;
-                documentAge.value = originalDocumentAge;
                 documentCivilStatus.value = originalDocumentCivilStatus;
                 itemLost.value = originalItemLost;
                 reasonOfLoss.value = originalReasonOfLoss;
@@ -1073,7 +1220,7 @@
                 generateAdditionalInfo(originalDocumentType);
 
                 const documentName = document.getElementById('document_name');
-                const documentAge = document.getElementById('document_age');
+                const documentCivilStatus = document.getElementById('document_civil_status');
                 const documentSanPedroCityRadio = document.getElementById('document-san-pedro-city');
                 const documentOtherCityRadio = document.getElementById('document-other-city');
 
@@ -1086,60 +1233,36 @@
                 const documentOtherCityInput = document.getElementById('document-other-city-input');
                 const documentOtherBarangay = document.getElementById('document-other-barangay');
 
+                const yearOfNoIncome = document.getElementById('year_of_no_income');
                 const certificateOfIndigency = document.getElementById('certificate_of_indigency');
+                const validIDFront = document.getElementById('valid-id-front');
+                const validIDBack = document.getElementById('valid-id-back');
 
-                const employerName = document.getElementById('previous_employer_name');
-                const employerContact = document.getElementById('previous_employer_contact');
-
-                const businessName = document.getElementById('business_name');
-                const registrationNumber = document.getElementById('registration_number');
-                const businessAddress = document.getElementById('business_address');
-                const businessPeriod = document.getElementById('business_period');
-                const noIncomePeriod = document.getElementById('no_income_period');
-
-                const originalDocumentName = "{{ $additional_info->aoni_name }}";
-                const originalDocumentAge = "{{ $additional_info->aoni_age }}";
+                const originalDocumentName = "{{ $additional_info->name }}";
+                const originalDocumentCivilStatus = "{{ $additional_info->civil_status }}";
                 const originalDocumentCity = "{{ $document_city }}";
                 const originalDocumentBarangay = "{{ $document_final_barangay }}";
                 const originalDocumentStreet = "{{ $document_street }}";
                 const originalDocumentOtherCity = "{{ $document_other_city }}";
                 const originalDocumentOtherBarangay = "{{ $document_other_barangay }}";
                 const originalDocumentOtherStreet = "{{ $document_other_street }}";
-
-                const originalEmployerName = "{{ $additional_info->previous_employer_name }}";
-                const originalEmployerContact = "{{ $additional_info->previous_employer_contact }}";
-
-                const originalBusinessName = "{{ $additional_info->business_name }}";
-                const originalRegistrationNumber = "{{ $additional_info->registration_number }}";
-                const originalBusinessAddress = "{{ $additional_info->business_address }}";
-                const originalBusinessPeriod = "{{ $additional_info->business_period }}";
-                const originalNoIncomePeriod = "{{ $additional_info->no_income_period }}";
+                const originalYearOfNoIncome = "{{ $additional_info->year_of_no_income }}";
 
                 documentName.disabled = true;
-                documentAge.disabled = true;
+                documentCivilStatus.disabled = true;
                 documentSanPedroCityRadio.disabled = true;
                 documentOtherCityRadio.disabled = true;
+                yearOfNoIncome.disabled = true;
                 certificateOfIndigency.disabled = true;
-                employerName.disabled = true;
-                employerContact.disabled = true;
-                businessName.disabled = true;
-                registrationNumber.disabled = true;
-                businessAddress.disabled = true;
-                businessPeriod.disabled = true;
-                noIncomePeriod.disabled = true;
+                validIDFront.disabled = true;
+                validIDBack.disabled = true;
 
                 documentName.value = originalDocumentName;
-                documentAge.value = originalDocumentAge;
+                documentCivilStatus.value = originalDocumentCivilStatus;
+                yearOfNoIncome.value = originalYearOfNoIncome;
                 certificateOfIndigency.value = "";
-
-                employerName.value = originalEmployerName;
-                employerContact.value = originalEmployerContact;
-
-                businessName.value = originalBusinessName;
-                registrationNumber.value = originalRegistrationNumber;
-                businessAddress.value = originalBusinessAddress;
-                businessPeriod.value = originalBusinessPeriod;
-                noIncomePeriod.value = originalNoIncomePeriod;
+                validIDFront.value = "";
+                validIDBack.value = "";
 
                 if (originalDocumentCity === 'San Pedro City') {
                     documentSanPedroCityRadio.checked = true;
@@ -1176,7 +1299,7 @@
                 generateAdditionalInfo(originalDocumentType);
 
                 const documentName = document.getElementById('document_name');
-                const documentAge = document.getElementById('document_age');
+                const documentCivilStatus = document.getElementById('document_civil_status');
                 const documentSanPedroCityRadio = document.getElementById('document-san-pedro-city');
                 const documentOtherCityRadio = document.getElementById('document-other-city');
 
@@ -1190,30 +1313,36 @@
                 const documentOtherBarangay = document.getElementById('document-other-barangay');
                 const documentOtherStreet = document.getElementById('document-other-street');
 
-                const sourceOfIncome = document.getElementById('source_of_income');
-                const certificateOfIndigency = document.getElementById('certificate_of_indigency');
+                const yearOfNoIncome = document.getElementById('year_of_no_income');
+                const certificateOfResidency = document.getElementById('certificate_of_residency');
+                const validIDFront = document.getElementById('valid-id-front');
+                const validIDBack = document.getElementById('valid-id-back');
 
-                const originalDocumentName = "{{ $additional_info->aonfi_name }}";
-                const originalDocumentAge = "{{ $additional_info->aonfi_age }}";
+                const originalDocumentName = "{{ $additional_info->name }}";
+                const originalDocumentCivilStatus = "{{ $additional_info->civil_status }}";
                 const originalDocumentCity = "{{ $document_city }}";
                 const originalDocumentBarangay = "{{ $document_final_barangay }}";
                 const originalDocumentStreet = "{{ $document_street }}";
                 const originalDocumentOtherCity = "{{ $document_other_city }}";
                 const originalDocumentOtherBarangay = "{{ $document_other_barangay }}";
                 const originalDocumentOtherStreet = "{{ $document_other_street }}";
-                const originalSourceOfIncome = "{{ $additional_info->source_of_income }}";
+                const originalYearOfNoIncome = "{{ $additional_info->year_of_no_income }}";
 
                 documentName.disabled = true;
-                documentAge.disabled = true;
+                documentCivilStatus.disabled = true;
                 documentSanPedroCityRadio.disabled = true;
                 documentOtherCityRadio.disabled = true;
-                sourceOfIncome.disabled = true;
-                certificateOfIndigency.disabled = true;
+                yearOfNoIncome.disabled = true;
+                certificateOfResidency.disabled = true;
+                validIDFront.disabled = true;
+                validIDBack.disabled = true;
 
                 documentName.value = originalDocumentName;
-                documentAge.value = originalDocumentAge;
-                sourceOfIncome.value = originalSourceOfIncome;
-                certificateOfIndigency.value = "";
+                documentCivilStatus.value = originalDocumentCivilStatus;
+                yearOfNoIncome.value = originalYearOfNoIncome;
+                certificateOfResidency.value = "";
+                validIDFront.value = "";
+                validIDBack.value = "";
 
                 if (originalDocumentCity === 'San Pedro City') {
                     documentSanPedroCityRadio.checked = true;

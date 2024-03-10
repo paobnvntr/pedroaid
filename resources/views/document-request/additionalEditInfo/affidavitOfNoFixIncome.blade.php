@@ -1,18 +1,26 @@
 <div class="form-group text-center">
-    <label>Affidavit Of No Fix Income Information:</label>
+    <label>Affidavit Of No Income Information:</label>
 </div>
 
 <div class="form-group row">
     <div class="col-sm-6">
         <input name="document_name" id="document_name" type="text"
             class="form-control form-control-user @error('document_name')is-invalid @enderror"
-            placeholder="Current Name: {{ $additional_info->aonfi_name }}" value="{{ old('document_name', $additional_info->aonfi_name) }}" disabled>
+            placeholder="Current Name: {{ $additional_info->name }}" value="{{ old('document_name', $additional_info->name) }}" disabled>
     </div>
 
     <div class="col-sm-6">
-        <input name="document_age" id="document_age" type="number"
-            class="form-control form-control-user @error('document_age')is-invalid @enderror"
-            placeholder="Current Age: {{ $additional_info->aonfi_age }}" value="{{ old('document_age', $additional_info->aonfi_age) }}" disabled>
+        <select name="document_civil_status" id="document_civil_status" class="form-control @error('document_civil_status')is-invalid @enderror" disabled>
+            <option value="">-- Select Civil Status --</option>
+            <option value="Single" {{ old('document_civil_status', $additional_info->civil_status) == 'Single' ? 'selected' : '' }}>Single</option>
+            <option value="Married" {{ old('document_civil_status', $additional_info->civil_status) == 'Married' ? 'selected' : '' }}>Married</option>
+            <option value="Divorced" {{ old('document_civil_status', $additional_info->civil_status) == 'Divorced' ? 'selected' : '' }}>Divorced</option>
+            <option value="Widowed" {{ old('document_civil_status', $additional_info->civil_status) == 'Widowed' ? 'selected' : '' }}>Widowed</option>
+            <option value="Separated" {{ old('document_civil_status', $additional_info->civil_status) == 'Separated' ? 'selected' : '' }}>Separated</option>
+        </select>
+        @error('document_civil_status')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
     </div>
 </div>
 
@@ -120,20 +128,37 @@
 </div>
 
 <div class="form-group">
-    <label for="source_of_income">Source of Income:</label>
-    <input name="source_of_income" id="source_of_income" type="text"
-        class="form-control form-control-user @error('source_of_income')is-invalid @enderror"
-        placeholder="Current Source of Income: {{ $additional_info->source_income }}" value="{{ old('source_of_income', $additional_info->source_income) }}" disabled>
-    @error('source_of_income')
+    <input name="year_of_no_income" id="year_of_no_income" type="number" min="1900" max="2100" pattern="\d{4}"
+        class="form-control form-control-user @error('year_of_no_income')is-invalid @enderror"
+        placeholder="Current year when you last had income: {{ $additional_info->year_of_no_income }}" value="{{ old('year_of_no_income', $additional_info->year_of_no_income) }}" disabled>
+    @error('year_of_no_income')
     <span class="invalid-feedback">{{ $message }}</span>
     @enderror
 </div>
 
 <div class="form-group">
-    <label for="certificate_of_indigency">Certificate of Indigency: <a href="{{ asset($additional_info->indigency) }}" target="_blank">Current</a></label>
-    <input type="file" name="certificate_of_indigency" id="certificate_of_indigency" accept=".pdf"
-        class="form-control @error('certificate_of_indigency')is-invalid @enderror" disabled>
-    @error('certificate_of_indigency')
+    <label for="certificate_of_residency">Certificate of Residency: <a href="{{ asset($additional_info->certificate_of_residency) }}" target="_blank">Current</a></label>
+    <input name="certificate_of_residency" id="certificate_of_residency" type="file" accept=".pdf"
+        class="form-control @error('certificate_of_residency')is-invalid @enderror" disabled>
+    @error('certificate_of_residency')
     <span class="invalid-feedback">{{ $message }}</span>
     @enderror
+</div>
+
+<div class="form-group row">
+    <div class="col-sm-6">
+        <label for="valid_id_front">Valid ID (Front): <a href="{{ asset($additional_info->valid_id_front) }}" target="_blank">Current</a></label>
+        <input name="valid_id_front" id="valid-id-front" type="file" accept="image/jpeg, image/jpg, image/png" class="form-control @error('valid_id_front')is-invalid @enderror" disabled>
+        @error('valid_id_front')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
+    </div>
+
+    <div class="col-sm-6">
+        <label for="valid_id_back">Valid ID (Back): <a href="{{ asset($additional_info->valid_id_back) }}" target="_blank">Current</a></label>
+        <input name="valid_id_back" id="valid-id-back" type="file" accept="image/jpeg, image/jpg, image/png" class="form-control @error('valid_id_back')is-invalid @enderror" disabled>
+        @error('valid_id_back')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
+    </div>
 </div>
