@@ -3336,6 +3336,13 @@
   .indent {
     text-indent: 3em;
   }
+  .double-indent {
+    text-indent: 6em;
+  }
+
+  .mt-0 {
+    margin-top: 0 !important;
+  }
 
   @media (max-width: 420px) {
     .ordinance .btn-ordinance-back span {

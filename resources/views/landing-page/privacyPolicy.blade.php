@@ -26,15 +26,11 @@
             </header>
 
             <div class="p-5 card shadow" id="clientDetailsForm">
-            <p>Welcome to PedroAID!</p>
-                <p class="indent">Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque facere tempora esse, nostrum et fugit eius debitis obcaecati deserunt tenetur dignissimos facilis maiores iure hic mollitia sequi quas, in laboriosam.</p>
-                <p class="indent">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Culpa modi id quaerat nisi ab illo eius asperiores, dolorum quis exercitationem illum, nemo, molestiae quae! Est, rem molestiae. Doloremque, nihil repudiandae!</p>
-                <p class="indent">Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam cupiditate, nobis laudantium itaque magnam tempora eaque sed nulla repellendus inventore, laboriosam dolorem, perspiciatis dignissimos facilis numquam dolor reprehenderit nam laborum.</p>
-                <p class="indent">Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime, exercitationem. Nulla, nemo vero? Excepturi earum saepe reprehenderit minima magni, cupiditate ducimus eum odio. Doloribus qui aliquam provident quos perspiciatis facere.</p>
-                <p class="indent">Lorem ipsum dolor sit amet consectetur, adipisicing elit. At facere minus maiores. Ut soluta amet aspernatur nobis accusamus veniam perspiciatis earum at eveniet consequuntur? Veritatis eveniet quasi molestias soluta quia.</p>
-                <p class="indent">Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio commodi ab exercitationem fugit nam officia velit rem quisquam, asperiores laborum magnam nisi! Sit velit dignissimos in quae nemo similique quam!</p>
-                <p class="indent">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Praesentium sint, distinctio fugit eveniet necessitatibus itaque eligendi assumenda, aperiam eum dignissimos odit dolore, quibusdam consequatur adipisci quasi nisi hic repellendus cumque.</p>
-                <p class="indent">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ducimus deleniti impedit velit perspiciatis, ipsa molestias tempore cupiditate rerum distinctio voluptate commodi iure labore. Quia, repudiandae temporibus. Rerum deleniti itaque reprehenderit!</p>
+                <p class="indent">In accordance with the Data Privacy Act of 2012 or RA 10173, PedroAID ensures the utmost confidentiality, careful usage, and limited disclosure of all personal information collected through our legal office portal.</p>
+                <p class="indent">We collect and handle your personal information in accordance with PedroAID's Privacy Policy, unless explicitly stated otherwise. Personal information may encompass details such as your name, civil status, address, contact number, email address, images, files.</p>
+
+                <p><strong>Complaints and Other Concerns</strong></p>
+                <p class="indent">If you have any questions, concerns, or requests regarding this Privacy Policy or our privacy practices, you may call us at <strong>8082020305</strong> via phone, <strong>09205001415</strong> via mobile, or <strong>santosritch@gmail.com</strong> via email.</p>
             </div>
         </div>
     </section>

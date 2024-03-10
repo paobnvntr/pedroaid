@@ -252,8 +252,12 @@
 						</h2>
 						<div id="faq-content-1" class="accordion-collapse collapse" data-bs-parent="#faqlist1">
 							<div class="accordion-body">
-								PedroAID stands for Pedro Appointment, Inquiry, and Document Request System. 
-								It is an online help center portal specifically designed to address the legal needs of the citizens of San Pedro City, Laguna.
+								Welcome to PedroAID, your trusted companion for all legal matters! PedroAID, which stands for Pedro Appointment, Inquiry, and Document Request System, is your go-to online help center portal, tailored to cater to the diverse legal needs of individuals far and wide.
+								<br><br>
+								Picture PedroAID as your virtual legal advisor, ready to assist you at every step of your journey. Whether you're inquiring about legal procedures, scheduling appointments for consultations, or requesting essential documents, PedroAID is here to streamline the process for you.
+								Based in the vibrant city of San Pedro, Laguna, PedroAID extends its services to anyone seeking reliable legal assistance, irrespective of geographical boundaries. Our mission is to empower individuals with easy access to legal support, ensuring that everyone can navigate the complexities of the legal landscape with confidence.
+								<br><br>
+								Join us at PedroAID and experience the convenience of a comprehensive legal assistance platform designed with your needs in mind. Let's embark on this legal journey together, where solutions are just a click away!
 							</div>
 						</div>
 					</div>
@@ -267,9 +271,11 @@
 						</h2>
 						<div id="faq-content-2" class="accordion-collapse collapse" data-bs-parent="#faqlist1">
 							<div class="accordion-body">
-							PedroAID is committed to providing free legal office services to the residents of San Pedro City, Laguna. 
-							All services offered through the portal are completely free of charge. 
-							We believe in ensuring access to legal assistance without financial barriers.
+								PedroAID stands firm in its dedication to offering complimentary legal office services exclusively to the esteemed residents of San Pedro City, Laguna. Here at PedroAID, every service provided through our portal comes at absolutely no cost to you.
+								<br><br>
+								Why? Because we firmly believe in breaking down financial barriers and ensuring that everyone, regardless of economic status, has access to essential legal assistance. Your rights and well-being matter to us, and we're committed to providing the support you need, completely free of charge.
+								<br><br>
+								So, rest assured, when you turn to PedroAID for your legal inquiries, appointments, and document requests, you're not just receiving top-notch assistance – you're accessing it with the peace of mind that it won't cost you a single cent.
 							</div>
 						</div>
 					</div>
@@ -283,7 +289,18 @@
 						</h2>
 						<div id="faq-content-3" class="accordion-collapse collapse" data-bs-parent="#faqlist1">
 							<div class="accordion-body">
-								Di ko pa alam ilalagay
+								When it comes to certain legal documents, ensuring you have the necessary paperwork in order is crucial. Here's a breakdown of the documents required for various legal processes:
+								<br><br>
+								<strong>Affidavit of Loss</strong>: A valid ID is required. <br>
+								<strong>Affidavit of Guardianship</strong>: A valid ID is required. <br>
+								<strong>Affidavit of No Income</strong>: Prepare a Certificate of Indigency along with a valid ID. <br>
+								<strong>Affidavit of No Fixed Income</strong>: You'll need a Certificate of Residency and a valid ID. <br>
+								<strong>Extra Judicial</strong>: Ensure you have the title of the property and the valid ID of the spouse (if applicable). <br>
+								<strong>Deed of Sale</strong>: Gather the property document, vendor's valid ID, vendee's valid ID, and witness's valid ID. <br>
+								<strong>Deed of Donation</strong>: Make sure to have the donor's valid ID and the donee's valid ID. <br>
+								<strong>Other Documents</strong>: For any other legal documents, a valid ID is typically required. 
+								<br><br>
+								Having these documents ready beforehand can streamline the legal process and ensure a smooth transaction.
 							</div>
 						</div>
 					</div>
@@ -294,14 +311,15 @@
 						<h2 class="accordion-header">
 							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
 								data-bs-target="#faq2-content-1">
-								Can I check the status of my appointment or request?
+								Can I check the status of my appointment, inquiry, or request?
 							</button>
 						</h2>
 						<div id="faq2-content-1" class="accordion-collapse collapse" data-bs-parent="#faqlist1">
 							<div class="accordion-body">
-								Yes, you can easily track the status of your appointment or inquiry through the AID Tracker.
-								Provide the Tracking ID and the email address associated with your appointment or request, as found in the email confirmation sent to you. 
-								The AID Tracker will provide real-time updates and notifications regarding the status of your requests, ensuring you stay informed throughout the process.
+							With our innovative AID Tracker, monitoring the status of your appointment, inquiry, or document request has never been easier.
+							Simply provide the Tracking ID and the email address associated with your appointment or request, as provided in the confirmation email sent to you. Once entered, our AID Tracker springs into action, delivering real-time updates and notifications straight to your fingertips.
+							<br><br>
+							Stay in the loop every step of the way as the AID Tracker keeps you informed about the progress of your requests, ensuring transparency and peace of mind throughout your PedroAID journey.
 							</div>
 						</div>
 					</div>
@@ -315,7 +333,7 @@
 						</h2>
 						<div id="faq2-content-2" class="accordion-collapse collapse" data-bs-parent="#faqlist1">
 							<div class="accordion-body">
-							While you can access the portal 24/7 to browse information, schedule appointments, and submit request & inquiries, please note that customer support hours may vary. 
+								At PedroAID, convenience is key. That's why our portal is at your service 24/7. Whether you're seeking information, scheduling appointments, or submitting requests and inquiries, you have unrestricted access whenever it suits you.
 							</div>
 						</div>
 					</div>
@@ -329,9 +347,9 @@
 						</h2>
 						<div id="faq2-content-3" class="accordion-collapse collapse" data-bs-parent="#faqlist1">
 							<div class="accordion-body">
-							Customer support is typically available during the working hours of the legal office. 
-							However, to provide assistance during non-office hours, we have a helpful chatbot that you can utilize.
-							We aim to ensure that you have access to assistance even during times when the legal office is not actively staffed.
+							At PedroAID, we understand that your legal needs don't always align with traditional office hours. While our customer support is available during the working hours of the legal office, we recognize the importance of providing assistance even during non-office hours.
+							<br><br>
+							That's why we've introduced a friendly and helpful chatbot to bridge the gap. Our chatbot is here to assist you whenever you need support, even outside regular office hours. Whether it's late at night or early in the morning, you can rely on our chatbot to provide guidance and answer your queries promptly.
 							</div>
 						</div>
 					</div>

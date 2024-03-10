@@ -23,9 +23,9 @@ return new class extends Migration
         // Create a default super admin account
         $defaultSuperAdmin = [
             'name' => 'Super Admin',
-            'username' => 'SuperAdmin',
-            'email' => 'pedroaid@admin.gov.ph',
-            'password' => Hash::make('admin123'), // Hash the password
+            'username' => 'Super Admin',
+            'email' => 'sanpedroaid@gmail.com',
+            'password' => Hash::make('@PedroAID_2024'), // Hash the password
             'level' => 'Super Admin',
             'transaction_level' => null,
             'profile_picture' => 'uploads/profile/superadmin/default_superadmin.jpg',
