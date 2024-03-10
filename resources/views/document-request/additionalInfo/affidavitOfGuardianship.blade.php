@@ -129,21 +129,6 @@
 
 <div class="form-group row">
     <div class="col-sm-6">
-        <input name="minor_name" id="minor_name" type="text"
-            class="form-control form-control-user @error('minor_name')is-invalid @enderror"
-            placeholder="Minor's Full Name (e.g. Maria Dela Cruz)" value="{{ old('minor_name') }}">
-    </div>
-
-    <div class="col-sm-6">
-        <input name="years_in_care" id="years_in_care" type="number" min="0" class="form-control @error('years_in_care') is-invalid @enderror" placeholder="Years in Care">
-        @error('years_in_care')
-        <span class="invalid-feedback">{{ $message }}</span>
-        @enderror
-    </div>
-</div>
-
-<div class="form-group row">
-    <div class="col-sm-6">
         <label for="valid_id_front">Valid ID (Front):</label>
         <input name="valid_id_front" id="valid_id_front" type="file" accept="image/jpeg, image/jpg, image/png" class="form-control @error('valid_id_front')is-invalid @enderror">
         @error('valid_id_front')
@@ -155,6 +140,29 @@
         <label for="valid_id_back">Valid ID (Back):</label>
         <input name="valid_id_back" id="valid_id_back" type="file" accept="image/jpeg, image/jpg, image/png" class="form-control @error('valid_id_back')is-invalid @enderror">
         @error('valid_id_back')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
+    </div>
+</div>
+
+<!-- Information for the Minor -->
+<hr>
+
+<div class="form-group text-center">
+    <label>Affidavit Of Guardianship Information (Minor):</label>
+</div>
+
+<div class="form-group row">
+    <div class="col-sm-6">
+        <input name="minor_name" id="minor_name" type="text"
+            class="form-control form-control-user @error('minor_name')is-invalid @enderror"
+            placeholder="Minor's Full Name (e.g. Maria Dela Cruz)" value="{{ old('minor_name') }}">
+    </div>
+
+    <div class="col-sm-6">
+        <input name="years_in_care" id="years_in_care" type="number" min="0" value="{{ old('years_in_care') }}"
+        class="form-control @error('years_in_care') is-invalid @enderror" placeholder="Years in Care">
+        @error('years_in_care')
         <span class="invalid-feedback">{{ $message }}</span>
         @enderror
     </div>

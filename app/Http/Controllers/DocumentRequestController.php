@@ -1225,7 +1225,7 @@ class DocumentRequestController extends Controller
         } else if ($documentRequest->document_type == 'Affidavit of Guardianship') {
             $additional_info = AffidavitOfGuardianship::where('documentRequest_id', $id)->get()->first();
 
-            $document_address = explode(', ', $additional_info->guardian_address);
+            $document_address = explode(', ', $additional_info->address);
             $document_city = $document_address[2];
             $document_city = trim($document_city);
     
@@ -1251,34 +1251,6 @@ class DocumentRequestController extends Controller
     
                 $document_other_street = $document_address[0];
                 $document_other_street = trim($document_other_street);
-            }
-
-            $document_address2 = explode(', ', $additional_info->minor_address);
-            $document_city_2 = $document_address2[2];
-            $document_city_2 = trim($document_city_2);
-    
-            $document_final_barangay_2 = '';
-            $document_street_2 = '';
-            $document_other_city_2 = '';
-            $document_other_barangay_2 = '';
-            $document_other_street_2 = '';
-    
-            if($document_city_2 == 'San Pedro City') {
-                $document_barangay_2 = $document_address2[1];
-                $trim_document_barangay_2 = explode('. ', $document_barangay_2);
-                $document_final_barangay_2 = $trim_document_barangay_2[1];
-                $document_final_barangay_2 = trim($document_final_barangay_2);
-        
-                $document_street_2 = $document_address2[0];
-                $document_street_2 = trim($document_street_2);
-            } else {
-                $document_other_city_2 = $document_city_2;
-                
-                $document_other_barangay_2 = $document_address2[1];
-                $document_other_barangay_2 = trim($document_other_barangay_2);
-
-                $document_other_street_2 = $document_address2[0];
-                $document_other_street_2 = trim($document_other_street_2);
             }
         } else if ($documentRequest->document_type == 'Affidavit of No income') {
             $additional_info = AffidavitOfNoIncome::where('documentRequest_id', $id)->get()->first();
@@ -1760,10 +1732,9 @@ class DocumentRequestController extends Controller
                 } else if($request->document_type == 'Affidavit of Guardianship') {
 
                     $document_address = $this->generateEditDocumentAddress($request);
-                    $document_address2 = $this->generateEditDocument2Address($request);
 
                     if($this->shouldUpdateAffidavitOfGuardianship($request, $id)) {
-                        $updateAffidavitOfGuardianshipDetails = $this->updateAffidavitOfGuardianship($request, $document_address, $document_address2, $id);
+                        $updateAffidavitOfGuardianshipDetails = $this->updateAffidavitOfGuardianship($request, $document_address, $id);
 
                         if($updateDocumentRequestDetails && $updateAffidavitOfGuardianshipDetails) {
                             $this->logDocumentRequestEditSuccess($user, $id);
@@ -1942,20 +1913,20 @@ class DocumentRequestController extends Controller
                             return $this->failedEditRedirect($id);
                         }
             
-                        if (file_exists(public_path($additionalInfoDetails->cedula))) {
-                            unlink(public_path($additionalInfoDetails->cedula));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
                         AffidavitOfLoss::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Affidavit of Guardianship') {
             
                         $additionalInfoDetails = AffidavitOfGuardianship::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->guardian_brgy_clearance))) {
-                            unlink(public_path($additionalInfoDetails->guardian_brgy_clearance));
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
                         } else {
                             return $this->failedEditRedirect($id);
                         }
@@ -2082,20 +2053,20 @@ class DocumentRequestController extends Controller
                             return $this->failedEditRedirect($id);
                         }
             
-                        if (file_exists(public_path($additionalInfoDetails->cedula))) {
-                            unlink(public_path($additionalInfoDetails->cedula));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
                         AffidavitOfLoss::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Affidavit of Guardianship') {
             
                         $additionalInfoDetails = AffidavitOfGuardianship::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->guardian_brgy_clearance))) {
-                            unlink(public_path($additionalInfoDetails->guardian_brgy_clearance));
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
                         } else {
                             return $this->failedEditRedirect($id);
                         }
@@ -2222,20 +2193,20 @@ class DocumentRequestController extends Controller
                             return $this->failedEditRedirect($id);
                         }
             
-                        if (file_exists(public_path($additionalInfoDetails->cedula))) {
-                            unlink(public_path($additionalInfoDetails->cedula));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
                         AffidavitOfLoss::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Affidavit of Guardianship') {
             
                         $additionalInfoDetails = AffidavitOfGuardianship::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->guardian_brgy_clearance))) {
-                            unlink(public_path($additionalInfoDetails->guardian_brgy_clearance));
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
                         } else {
                             return $this->failedEditRedirect($id);
                         }
@@ -2361,20 +2332,20 @@ class DocumentRequestController extends Controller
                             return $this->failedEditRedirect($id);
                         }
             
-                        if (file_exists(public_path($additionalInfoDetails->cedula))) {
-                            unlink(public_path($additionalInfoDetails->cedula));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
                         AffidavitOfLoss::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Affidavit of Guardianship') {
             
                         $additionalInfoDetails = AffidavitOfGuardianship::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->guardian_brgy_clearance))) {
-                            unlink(public_path($additionalInfoDetails->guardian_brgy_clearance));
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
                         } else {
                             return $this->failedEditRedirect($id);
                         }
@@ -2500,20 +2471,20 @@ class DocumentRequestController extends Controller
                             return $this->failedEditRedirect($id);
                         }
             
-                        if (file_exists(public_path($additionalInfoDetails->cedula))) {
-                            unlink(public_path($additionalInfoDetails->cedula));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
                         AffidavitOfLoss::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Affidavit of Guardianship') {
             
                         $additionalInfoDetails = AffidavitOfGuardianship::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->guardian_brgy_clearance))) {
-                            unlink(public_path($additionalInfoDetails->guardian_brgy_clearance));
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
                         } else {
                             return $this->failedEditRedirect($id);
                         }
@@ -2643,20 +2614,20 @@ class DocumentRequestController extends Controller
                             return $this->failedEditRedirect($id);
                         }
             
-                        if (file_exists(public_path($additionalInfoDetails->cedula))) {
-                            unlink(public_path($additionalInfoDetails->cedula));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
                         AffidavitOfLoss::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Affidavit of Guardianship') {
             
                         $additionalInfoDetails = AffidavitOfGuardianship::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->guardian_brgy_clearance))) {
-                            unlink(public_path($additionalInfoDetails->guardian_brgy_clearance));
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+            
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
                         } else {
                             return $this->failedEditRedirect($id);
                         }
@@ -2779,24 +2750,24 @@ class DocumentRequestController extends Controller
                             return $this->failedEditRedirect($id);
                         }
             
-                        if (file_exists(public_path($additionalInfoDetails->cedula))) {
-                            unlink(public_path($additionalInfoDetails->cedula));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
                         AffidavitOfLoss::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Affidavit of Guardianship') {
             
                         $additionalInfoDetails = AffidavitOfGuardianship::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->guardian_brgy_clearance))) {
-                            unlink(public_path($additionalInfoDetails->guardian_brgy_clearance));
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
                         } else {
                             return $this->failedEditRedirect($id);
                         }
             
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+                        
                         AffidavitOfGuardianship::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Affidavit of No income') {
@@ -2918,20 +2889,20 @@ class DocumentRequestController extends Controller
                             return $this->failedEditRedirect($id);
                         }
             
-                        if (file_exists(public_path($additionalInfoDetails->cedula))) {
-                            unlink(public_path($additionalInfoDetails->cedula));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
                         AffidavitOfLoss::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Affidavit of Guardianship') {
             
                         $additionalInfoDetails = AffidavitOfGuardianship::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->guardian_brgy_clearance))) {
-                            unlink(public_path($additionalInfoDetails->guardian_brgy_clearance));
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->valid_id_back));
                         } else {
                             return $this->failedEditRedirect($id);
                         }
@@ -3057,9 +3028,8 @@ class DocumentRequestController extends Controller
         } else if ($request->document_type == 'Affidavit of Guardianship' && $this->shouldUpdateAffidavitOfGuardianship($request, $id)) {
 
             $document_address = $this->generateEditDocumentAddress($request);
-            $document_address2 = $this->generateEditDocument2Address($request);
 
-            $updateAffidavitOfGuardianshipDetails = $this->updateAffidavitOfGuardianship($request, $document_address, $document_address2, $id);
+            $updateAffidavitOfGuardianshipDetails = $this->updateAffidavitOfGuardianship($request, $document_address, $id);
 
             if($updateAffidavitOfGuardianshipDetails) {
                 $this->logDocumentRequestEditSuccess($user, $id);
@@ -3199,15 +3169,12 @@ class DocumentRequestController extends Controller
         $affidavitOfGuardianshipInfo = AffidavitOfGuardianship::where('documentRequest_id', $id)->get()->first();
 
         return $request->guardian_name != $affidavitOfGuardianshipInfo->guardian_name ||
-            $request->guardian_age != $affidavitOfGuardianshipInfo->guardian_age ||
-            $this->shouldUpdateDocumentAddress($request, $affidavitOfGuardianshipInfo->guardian_address) ||
-            $request->guardian_occupation != $affidavitOfGuardianshipInfo->guardian_occupation ||
-            $request->barangay_clearance != null ||
-            $request->relationship != $affidavitOfGuardianshipInfo->guardian_relationship ||
+            $request->document_civil_status != $affidavitOfGuardianshipInfo->civil_status ||
+            $this->shouldUpdateDocumentAddress($request, $affidavitOfGuardianshipInfo->address) ||
+            $request->valid_id_front != null ||
+            $request->valid_id_back != null ||
             $request->minor_name != $affidavitOfGuardianshipInfo->minor_name ||
-            $request->minor_age != $affidavitOfGuardianshipInfo->minor_age ||
-            $this->shouldUpdateDocument2Address($request, $affidavitOfGuardianshipInfo->minor_address) ||
-            $request->minor_relationship != $affidavitOfGuardianshipInfo->minor_relationship;
+            $request->years_in_care != $affidavitOfGuardianshipInfo->years_in_care;
     }
 
     private function shouldUpdateAffidavitOfNoIncome(Request $request, $id) {
@@ -3379,6 +3346,26 @@ class DocumentRequestController extends Controller
         return $filePath;
     }
 
+    private function uploadEditValidIdFrontAOG(Request $request) {
+        $file = $request->file('valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/affidavitOfGuardianship/' . $fileName;
+        $file->move('uploads/document-request/affidavitOfGuardianship/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditValidIdBackAOG(Request $request) {
+        $file = $request->file('valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/affidavitOfGuardianship/' . $fileName;
+        $file->move('uploads/document-request/affidavitOfGuardianship/', $fileName);
+    
+        return $filePath;
+    }
+
     private function uploadEditValidIdFrontOther(Request $request) {
         $file = $request->file('valid_id_front');
         $originalFileName = $file->getClientOriginalName();
@@ -3395,26 +3382,6 @@ class DocumentRequestController extends Controller
         $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
         $filePath = 'uploads/document-request/otherDocument/' . $fileName;
         $file->move('uploads/document-request/otherDocument/', $fileName);
-    
-        return $filePath;
-    }
-
-    private function uploadEditCedula(Request $request) {
-        $file = $request->file('cedula');
-        $originalFileName = $file->getClientOriginalName();
-        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-        $filePath = 'uploads/document-request/affidavitOfLoss/' . $fileName;
-        $file->move('uploads/document-request/affidavitOfLoss/', $fileName);
-    
-        return $filePath;
-    }
-
-    private function uploadEditBarangayClearanceAOG(Request $request) {
-        $file = $request->file('barangay_clearance');
-        $originalFileName = $file->getClientOriginalName();
-        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-        $filePath = 'uploads/document-request/affidavitOfGuardianship/' . $fileName;
-        $file->move('uploads/document-request/affidavitOfGuardianship/', $fileName);
     
         return $filePath;
     }
@@ -3538,30 +3505,36 @@ class DocumentRequestController extends Controller
     }
     
 
-    private function updateAffidavitOfGuardianship(Request $request, $address, $address2, $documentRequestID) {
+    private function updateAffidavitOfGuardianship(Request $request, $address, $documentRequestID) {
         $documentRequest = AffidavitOfGuardianship::where('documentRequest_id', $documentRequestID)->first();
 
         $data = [
             'guardian_name' => trim($request->guardian_name),
-            'guardian_age' => $request->guardian_age,
-            'guardian_address' => $address,
-            'guardian_occupation' => trim($request->guardian_occupation),
-            'guardian_relationship' => trim($request->relationship),
+            'civil_status' => $request->document_civil_status,
+            'address' => $address,
             'minor_name' => trim($request->minor_name),
-            'minor_age' => $request->minor_age,
-            'minor_address' => $address2,
-            'minor_relationship' => trim($request->minor_relationship),
+            'years_in_care' => $request->years_in_care,
             'updated_at' => Carbon::now('Asia/Manila'),
         ];
 
-        if ($request->hasFile('barangay_clearance')) {
-            $filePath = $documentRequest->guardian_brgy_clearance;
+        if ($request->hasFile('valid_id_front')) {
+            $filePath = $documentRequest->valid_id_front;
             if (file_exists(public_path($filePath))) {
                 unlink(public_path($filePath));
             }
 
-            $BarangayClearancePath = $this->uploadEditBarangayClearanceAOG($request);
-            $data['guardian_brgy_clearance'] = $BarangayClearancePath;
+            $validIDFrontFilePath = $this->uploadEditValidIdFrontAOG($request);
+            $data['valid_id_front'] = $validIDFrontFilePath;
+        }
+
+        if ($request->hasFile('valid_id_back')) {
+            $filePath = $documentRequest->valid_id_back;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $validIDBackFilePath = $this->uploadEditValidIdBackAOG($request);
+            $data['valid_id_back'] = $validIDBackFilePath;
         }
     
         return AffidavitOfGuardianship::where('documentRequest_id', $documentRequestID)->update($data);

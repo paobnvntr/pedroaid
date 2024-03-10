@@ -451,10 +451,8 @@
             `;
 
             additionalInfoAddress();
-            additionalInfoAddress2();
 
             useSameAddress();
-            useSameAddress2();
 
         } else if (originalDocumentType === 'Affidavit of No income') {
             additionalInfo.innerHTML = `
@@ -587,7 +585,7 @@
 
             } else if(originalDocumentType === 'Affidavit of Guardianship') {
                 const guardianName = document.getElementById('guardian_name');
-                const guardianAge = document.getElementById('guardian_age');
+                const guardianCivilStatus = document.getElementById('document_civil_status');
                 const useSameAddress = document.getElementById('use_same_address');
                 const guardianSanPedroCityRadio = document.getElementById('document-san-pedro-city');
                 const guardianOtherCityRadio = document.getElementById('document-other-city');
@@ -602,56 +600,28 @@
                 const guardianOtherBarangay = document.getElementById('document-other-barangay');
                 const guardianOtherStreet = document.getElementById('document-other-street');
 
-                const guardianOccupation = document.getElementById('guardian_occupation');
-                const guardianBrgyClearance = document.getElementById('barangay_clearance');
-                const guardianRelationship = document.getElementById('relationship');
+                const validIDFront = document.getElementById('valid-id-front');
+                const validIDBack = document.getElementById('valid-id-back');
 
                 const minorName = document.getElementById('minor_name');
-                const minorAge = document.getElementById('minor_age');
-                const useSameAddress2 = document.getElementById('use_same_address_2');
-                const minorSanPedroCityRadio = document.getElementById('document-san-pedro-city-2');
-                const minorOtherCityRadio = document.getElementById('document-other-city-2');
-
-                const minorBarangayGroup = document.getElementById('document-barangay-group-2');
-                const minorStreetGroup = document.getElementById('document-street-group-2');
-                const minorBarangay = document.getElementById('document-barangay-2');
-                const minorStreet = document.getElementById('document-street-2');
-
-                const minorOtherAddressGroup = document.getElementById('document-other-address-group-2');
-                const minorOtherCityInput = document.getElementById('document-other-city-input-2');
-                const minorOtherBarangay = document.getElementById('document-other-barangay-2');
-                const minorOtherStreet = document.getElementById('document-other-street-2');
-
-                const minorRelationship = document.getElementById('minor_relationship');
+                const yearsInCare = document.getElementById('years_in_care');
 
                 guardianName.disabled = false;
-                guardianAge.disabled = false;
+                guardianCivilStatus.disabled = false;
                 useSameAddress.disabled = false;
                 guardianSanPedroCityRadio.disabled = false;
                 guardianOtherCityRadio.disabled = false;
-                guardianOccupation.disabled = false;
-                guardianBrgyClearance.disabled = false;
-                guardianRelationship.disabled = false;
+                validIDFront.disabled = false;
+                validIDBack.disabled = false;
 
                 minorName.disabled = false;
-                minorAge.disabled = false;
-                useSameAddress2.disabled = false;
-                minorSanPedroCityRadio.disabled = false;
-                minorOtherCityRadio.disabled = false;
-                minorRelationship.disabled = false;
+                yearsInCare.disabled = false;
 
                 if(guardianSanPedroCityRadio.checked) {
                     guardianBarangayGroup.classList.remove('d-none');
                     guardianStreetGroup.classList.remove('d-none');
                 } else if (guardianOtherCityRadio.checked) {
                     guardianOtherAddressGroup.classList.remove('d-none');
-                }
-
-                if(minorSanPedroCityRadio.checked) {
-                    minorBarangayGroup.classList.remove('d-none');
-                    minorStreetGroup.classList.remove('d-none');
-                } else if (minorOtherCityRadio.checked) {
-                    minorOtherAddressGroup.classList.remove('d-none');
                 }
 
             } else if(originalDocumentType === 'Affidavit of No income') {
@@ -844,7 +814,6 @@
                     `;
 
                     additionalInfoAddress();
-                    additionalInfoAddress2();
 
                 } else if(documentType.value === 'Affidavit of No income') {
                     additionalInfo.innerHTML = `
@@ -1018,7 +987,7 @@
                 generateAdditionalInfo(originalDocumentType);
 
                 const guardianName = document.getElementById('guardian_name');
-                const guardianAge = document.getElementById('guardian_age');
+                const guardianCivilStatus = document.getElementById('document_civil_status');
                 const guardianSanPedroCityRadio = document.getElementById('document-san-pedro-city');
                 const guardianOtherCityRadio = document.getElementById('document-other-city');
 
@@ -1032,71 +1001,41 @@
                 const guardianOtherBarangay = document.getElementById('document-other-barangay');
                 const guardianOtherStreet = document.getElementById('document-other-street');
 
-                const guardianOccupation = document.getElementById('guardian_occupation');
-                const guardianBrgyClearance = document.getElementById('barangay_clearance');
-                const guardianRelationship = document.getElementById('relationship');
+                const validIDFront = document.getElementById('valid-id-front');
+                const validIDBack = document.getElementById('valid-id-back');
 
                 const minorName = document.getElementById('minor_name');
-                const minorAge = document.getElementById('minor_age');
-                const minorSanPedroCityRadio = document.getElementById('document-san-pedro-city-2');
-                const minorOtherCityRadio = document.getElementById('document-other-city-2');
-
-                const minorBarangayGroup = document.getElementById('document-barangay-group-2');
-                const minorStreetGroup = document.getElementById('document-street-group-2');
-                const minorBarangay = document.getElementById('document-barangay-2');
-                const minorStreet = document.getElementById('document-street-2');
-
-                const minorOtherAddressGroup = document.getElementById('document-other-address-group-2');
-                const minorOtherCityInput = document.getElementById('document-other-city-input-2');
-                const minorOtherBarangay = document.getElementById('document-other-barangay-2');
-                const minorOtherStreet = document.getElementById('document-other-street-2');
-
-                const minorRelationship = document.getElementById('minor_relationship');
+                const yearsInCare = document.getElementById('years_in_care');
 
                 const originalGuardianName = "{{ $additional_info->guardian_name }}";
-                const originalGuardianAge = "{{ $additional_info->guardian_age }}";
+                const originalGuardianCivilStatus = "{{ $additional_info->civil_status }}";
+
                 const originalGuardianCity = "{{ $document_city }}";
                 const originalGuardianBarangay = "{{ $document_final_barangay }}";
                 const originalGuardianStreet = "{{ $document_street }}";
                 const originalGuardianOtherCity = "{{ $document_other_city }}";
                 const originalGuardianOtherBarangay = "{{ $document_other_barangay }}";
                 const originalGuardianOtherStreet = "{{ $document_other_street }}";
-                const originalGuardianOccupation = "{{ $additional_info->guardian_occupation }}";
-                const originalGuardianRelationship = "{{ $additional_info->guardian_relationship }}";
 
                 const originalMinorName = "{{ $additional_info->minor_name }}";
-                const originalMinorAge = "{{ $additional_info->minor_age }}";
-                const originalMinorCity = "{{ $document_city_2 }}";
-                const originalMinorBarangay = "{{ $document_final_barangay_2 }}";
-                const originalMinorStreet = "{{ $document_street_2 }}";
-                const originalMinorOtherCity = "{{ $document_other_city_2 }}";
-                const originalMinorOtherBarangay = "{{ $document_other_barangay_2 }}";
-                const originalMinorOtherStreet = "{{ $document_other_street_2 }}";
-                const originalMinorRelationship = "{{ $additional_info->minor_relationship }}";
+                const originalYearsInCare = "{{ $additional_info->years_in_care }}";
 
                 guardianName.disabled = true;
-                guardianAge.disabled = true;
+                guardianCivilStatus.disabled = true;
                 guardianSanPedroCityRadio.disabled = true;
                 guardianOtherCityRadio.disabled = true;
-                guardianOccupation.disabled = true;
-                guardianBrgyClearance.disabled = true;
-                guardianRelationship.disabled = true;
+                validIDFront.disabled = true;
+                validIDBack.disabled = true;
 
                 minorName.disabled = true;
-                minorAge.disabled = true;
-                minorSanPedroCityRadio.disabled = true;
-                minorOtherCityRadio.disabled = true;
-                minorRelationship.disabled = true;
+                yearsInCare.disabled = true;
 
                 guardianName.value = originalGuardianName;
-                guardianAge.value = originalGuardianAge;
-                guardianOccupation.value = originalGuardianOccupation;
-                guardianBrgyClearance.value = "";
-                guardianRelationship.value = originalGuardianRelationship;
-
+                guardianCivilStatus.value = originalGuardianCivilStatus;
                 minorName.value = originalMinorName;
-                minorAge.value = originalMinorAge;
-                minorRelationship.value = originalMinorRelationship;
+                yearsInCare.value = originalYearsInCare;
+                validIDFront.value = "";
+                validIDBack.value = "";
 
                 if(originalGuardianCity === 'San Pedro City') {
                     guardianSanPedroCityRadio.checked = true;
@@ -1116,31 +1055,9 @@
                     guardianStreet.value = originalGuardianStreet;
                 }
 
-                if(originalMinorCity === 'San Pedro City') {
-                    minorSanPedroCityRadio.checked = true;
-                    minorOtherCityRadio.checked = false;
-                    minorBarangay.value = originalMinorBarangay;
-                    minorStreet.value = originalMinorStreet;
-                    minorOtherCityInput.value = originalMinorOtherCity;
-                    minorOtherBarangay.value = originalMinorOtherBarangay;
-                    minorOtherStreet.value = originalMinorOtherStreet;
-                } else {
-                    minorSanPedroCityRadio.checked = false;
-                    minorOtherCityRadio.checked = true;
-                    minorOtherCityInput.value = originalMinorOtherCity;
-                    minorOtherBarangay.value = originalMinorOtherBarangay;
-                    minorOtherStreet.value = originalMinorOtherStreet;
-                    minorBarangay.value = originalMinorBarangay;
-                    minorStreet.value = originalMinorStreet;
-                }
-
                 guardianBarangayGroup.classList.add('d-none');
                 guardianStreetGroup.classList.add('d-none');
                 guardianOtherAddressGroup.classList.add('d-none');
-
-                minorBarangayGroup.classList.add('d-none');
-                minorStreetGroup.classList.add('d-none');
-                minorOtherAddressGroup.classList.add('d-none');
 
                 const errorElements = document.querySelectorAll('.invalid-feedback');
                 errorElements.forEach(errorElement => {
