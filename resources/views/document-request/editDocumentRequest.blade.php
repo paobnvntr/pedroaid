@@ -548,7 +548,7 @@
 
             if(originalDocumentType === 'Affidavit of Loss') {
                 const documentName = document.getElementById('document_name');
-                const documentAge = document.getElementById('document_age');
+                const documentCivilStatus = document.getElementById('document_civil_status');
                 const useSameAddress = document.getElementById('use_same_address');
                 const documentSanPedroCityRadio = document.getElementById('document-san-pedro-city');
                 const documentOtherCityRadio = document.getElementById('document-other-city');
@@ -563,18 +563,20 @@
                 const documentOtherBarangay = document.getElementById('document-other-barangay');
                 const documentOtherStreet = document.getElementById('document-other-street');
 
+                const itemLost = document.getElementById('item_lost');
+                const reasonOfLoss = document.getElementById('reason_of_loss');
                 const validIDFront = document.getElementById('valid-id-front');
                 const validIDBack = document.getElementById('valid-id-back');
-                const cedula = document.getElementById('cedula');
 
                 documentName.disabled = false;
-                documentAge.disabled = false;
+                documentCivilStatus.disabled = false;
                 useSameAddress.disabled = false;
                 documentSanPedroCityRadio.disabled = false;
                 documentOtherCityRadio.disabled = false;
+                itemLost.disabled = false;
+                reasonOfLoss.disabled = false;
                 validIDFront.disabled = false;
                 validIDBack.disabled = false;
-                cedula.disabled = false;
 
                 if(documentSanPedroCityRadio.checked) {
                     documentBarangayGroup.classList.remove('d-none');
@@ -933,7 +935,7 @@
                 generateAdditionalInfo(originalDocumentType);
 
                 const documentName = document.getElementById('document_name');
-                const documentAge = document.getElementById('document_age');
+                const documentCivilStatus = document.getElementById('document_civil_status');
                 const documentSanPedroCityRadio = document.getElementById('document-san-pedro-city');
                 const documentOtherCityRadio = document.getElementById('document-other-city');
 
@@ -947,32 +949,38 @@
                 const documentOtherBarangay = document.getElementById('document-other-barangay');
                 const documentOtherStreet = document.getElementById('document-other-street');
 
+                const itemLost = document.getElementById('item_lost');
+                const reasonOfLoss = document.getElementById('reason_of_loss');
                 const validIDFront = document.getElementById('valid-id-front');
                 const validIDBack = document.getElementById('valid-id-back');
-                const cedula = document.getElementById('cedula');
 
-                const originalDocumentName = "{{ $additional_info->aol_name }}";
-                const originalDocumentAge = "{{ $additional_info->aol_age }}";
+                const originalDocumentName = "{{ $additional_info->name }}";
+                const originalDocumentCivilStatus = "{{ $additional_info->civil_status }}";
                 const originalDocumentCity = "{{ $document_city }}";
                 const originalDocumentBarangay = "{{ $document_final_barangay }}";
                 const originalDocumentStreet = "{{ $document_street }}";
                 const originalDocumentOtherCity = "{{ $document_other_city }}";
                 const originalDocumentOtherBarangay = "{{ $document_other_barangay }}";
                 const originalDocumentOtherStreet = "{{ $document_other_street }}";
+                const originalItemLost = "{{ $additional_info->item_lost }}";
+                const originalReasonOfLoss = "{{ $additional_info->reason_of_loss }}";
 
                 documentName.disabled = true;
-                documentAge.disabled = true;
+                documentCivilStatus.disabled = true;
                 documentSanPedroCityRadio.disabled = true;
                 documentOtherCityRadio.disabled = true;
+                itemLost.disabled = true;
+                reasonOfLoss.disabled = true;
                 validIDFront.disabled = true;
                 validIDBack.disabled = true;
-                cedula.disabled = true;
 
                 documentName.value = originalDocumentName;
                 documentAge.value = originalDocumentAge;
+                documentCivilStatus.value = originalDocumentCivilStatus;
+                itemLost.value = originalItemLost;
+                reasonOfLoss.value = originalReasonOfLoss;
                 validIDFront.value = "";
                 validIDBack.value = "";
-                cedula.value = "";
 
                 if (originalDocumentCity === 'San Pedro City') {
                     documentSanPedroCityRadio.checked = true;
@@ -1625,7 +1633,13 @@
                 });
 
                 for (const [key, value] of Object.entries(data.errors)) {
-                    const input = document.querySelector(`[name="${key}"]`);
+                    let modifiedKey = key;
+                    if (key.includes('.')) {
+                        modifiedKey = key.replace(/\./, '[') + ']'; // Replace dot with '[' and add ']'
+                    }
+
+                    console.log(`${modifiedKey}: ${value}`);
+                    const input = document.querySelector(`[name="${modifiedKey}"]`);
                     const error = document.createElement('div');
                     error.classList.add('invalid-feedback');
                     error.textContent = value;

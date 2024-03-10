@@ -598,7 +598,7 @@
                         modifiedKey = key.replace(/\./, '[') + ']'; // Replace dot with '[' and add ']'
                     }
 
-                    console.log(`${modifiedKey}: ${value}`);
+                    // console.log(`${modifiedKey}: ${value}`);
                     const input = document.querySelector(`[name="${modifiedKey}"]`);
                     const error = document.createElement('div');
                     error.classList.add('invalid-feedback');

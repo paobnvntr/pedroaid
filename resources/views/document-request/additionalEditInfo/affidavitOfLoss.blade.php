@@ -6,13 +6,21 @@
     <div class="col-sm-6">
         <input name="document_name" id="document_name" type="text"
             class="form-control form-control-user @error('document_name')is-invalid @enderror"
-            placeholder="Current Name: {{ $additional_info->aol_name }}" value="{{ old('document_name', $additional_info->aol_name) }}" disabled>
+            placeholder="Current Name: {{ $additional_info->name }}" value="{{ old('document_name', $additional_info->name) }}" disabled>
     </div>
 
     <div class="col-sm-6">
-        <input name="document_age" id="document_age" type="number"
-            class="form-control form-control-user @error('document_age')is-invalid @enderror"
-            placeholder="Current Age: {{ $additional_info->aol_age }}" value="{{ old('document_age', $additional_info->aol_age) }}" disabled>
+        <select name="document_civil_status" id="document_civil_status" class="form-control @error('document_civil_status')is-invalid @enderror" disabled>
+            <option value="">-- Select Civil Status --</option>
+            <option value="Single" {{ old('document_civil_status', $additional_info->civil_status) == 'Single' ? 'selected' : '' }}>Single</option>
+            <option value="Married" {{ old('document_civil_status', $additional_info->civil_status) == 'Married' ? 'selected' : '' }}>Married</option>
+            <option value="Divorced" {{ old('document_civil_status', $additional_info->civil_status) == 'Divorced' ? 'selected' : '' }}>Divorced</option>
+            <option value="Widowed" {{ old('document_civil_status', $additional_info->civil_status) == 'Widowed' ? 'selected' : '' }}>Widowed</option>
+            <option value="Separated" {{ old('document_civil_status', $additional_info->civil_status) == 'Separated' ? 'selected' : '' }}>Separated</option>
+        </select>
+        @error('document_civil_status')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
     </div>
 </div>
 
@@ -119,6 +127,25 @@
     @enderror
 </div>
 
+<div class="form-group row">
+    <div class="col-sm-6">
+        <input name="item_lost" id="item_lost" type="text" class="form-control form-control-user
+        @error('item_lost')is-invalid @enderror" value="{{ old('item_lost', $additional_info->item_lost) }}"
+        placeholder="Current Item Lost: {{ $additional_info->item_lost }}" disabled>
+        @error('item_lost')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
+    </div>
+
+    <div class="col-sm-6">
+        <input name="reason_of_loss" id="reason_of_loss" type="text" class="form-control form-control-user
+        @error('reason_of_loss')is-invalid @enderror" value="{{ old('reason_of_loss', $additional_info->reason_of_loss) }}"
+        placeholder="Current Reason Why That Item Got Lost: {{ $additional_info->reason_of_loss }}" disabled>
+        @error('reason_of_loss')
+        <span class="invalid-feedback">{{ $message }}</span>
+        @enderror
+    </div>
+</div>
 
 <div class="form-group row">
     <div class="col-sm-6">
@@ -136,12 +163,4 @@
         <span class="invalid-feedback">{{ $message }}</span>
         @enderror
     </div>
-</div>
-
-<div class="form-group">
-    <label for="cedula">Cedula: <a href="{{ asset($additional_info->cedula) }}" target="_blank">Current</a></label>
-    <input name="cedula" id="cedula" type="file" accept=".pdf" class="form-control @error('cedula')is-invalid @enderror" disabled>
-    @error('cedula')
-    <span class="invalid-feedback">{{ $message }}</span>
-    @enderror
 </div>

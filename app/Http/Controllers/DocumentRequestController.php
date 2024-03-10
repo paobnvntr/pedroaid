@@ -1195,7 +1195,7 @@ class DocumentRequestController extends Controller
         if($documentRequest->document_type == 'Affidavit of Loss') {
             $additional_info = AffidavitOfLoss::where('documentRequest_id', $id)->get()->first();
 
-            $document_address = explode(', ', $additional_info->aol_address);
+            $document_address = explode(', ', $additional_info->address);
             $document_city = $document_address[2];
             $document_city = trim($document_city);
     
@@ -1424,16 +1424,16 @@ class DocumentRequestController extends Controller
             'document_type' => 'required',
 
             'document_name' => 'required_if:document_type,Affidavit of Loss,Affidavit of No income,Affidavit of No fix income',
-            'document_age' => 'required_if:document_type,Affidavit of Loss,Affidavit of No income,Affidavit of No fix income|gte:18',
+            'document_civil_status' => 'required_if:document_type,Affidavit of Loss,Affidavit of Guardianship,Affidavit of No income,Affidavit of No fix income,Deed of Sale',
 
-            'document_city' => 'required_if:document_type,Affidavit of Loss,Affidavit of Guardianship,Affidavit of No Income,Affidavit of No fix income,Deed of Donation',
+            'document_city' => 'required_if:document_type,Affidavit of Loss,Affidavit of Guardianship,Affidavit of No income,Affidavit of No fix income,Deed of Sale,Deed of Donation',
             'document_barangay' => 'required_if:document_city,San Pedro City',
             'document_street' => 'required_if:document_city,San Pedro City',
             'document_other_city' => 'required_if:document_city,Other City',
             'document_other_barangay' => 'required_if:document_city,Other City',
             'document_other_street' => 'required_if:document_city,Other City',
 
-            'document_city_2' => 'required_if:document_type,Affidavit of Guardianship,Deed of Donation',
+            'document_city_2' => 'required_if:document_type,Deed of Donation',
             'document_barangay_2' => 'required_if:document_city_2,San Pedro City',
             'document_street_2' => 'required_if:document_city_2,San Pedro City',
             'document_other_city_2' => 'required_if:document_city_2,Other City',
@@ -1442,42 +1442,58 @@ class DocumentRequestController extends Controller
 
             'valid_id_front' => 'image|mimes:jpg,jpeg,png',
             'valid_id_back' => 'image|mimes:jpg,jpeg,png',
-            'cedula' => 'mimes:pdf',
+
+            'item_lost' => 'required_if:document_type,Affidavit of Loss',
+            'reason_of_loss' => 'required_if:document_type,Affidavit of Loss',
 
             'guardian_name' => 'required_if:document_type,Affidavit of Guardianship',
-            'guardian_age' => 'required_if:document_type,Affidavit of Guardianship|gte:18',
-            'guardian_occupation' => 'required_if:document_type,Affidavit of Guardianship',
-            'barangay_clearance' => 'mimes:pdf',
-            'relationship' => 'required_if:document_type,Affidavit of Guardianship',
+            'years_in_care' => 'required_if:document_type,Affidavit of Guardianship',
             'minor_name' => 'required_if:document_type,Affidavit of Guardianship',
-            'minor_age' => 'required_if:document_type,Affidavit of Guardianship|lt:18',
-            'minor_relationship' => 'required_if:document_type,Affidavit of Guardianship',
 
+            'year_of_no_income' => 'required_if:document_type,Affidavit of No income',
             'certificate_of_indigency' => 'mimes:pdf',
-            'previous_employer_name' => 'required_with:previous_employer_contact',
-            'previous_employer_contact' => 'required_with:previous_employer_name',
-            'business_name' => 'required_if:document_type,Affidavit of No income',
-            'registration_number' => 'required_if:document_type,Affidavit of No income',
-            'business_address' => 'required_if:document_type,Affidavit of No income',
-            'business_period' => 'required_if:document_type,Affidavit of No income',
-            'no_income_period' => 'required_if:document_type,Affidavit of No income',
 
-            'source_of_income' => 'required_if:document_type,Affidavit of No fix income',
+            'certificate_of_residency' => 'mimes:pdf',
 
-            'death_certificate' => 'mimes:pdf',
-            'heirship_documents' => 'mimes:pdf',
-            'inventory_of_estate' => 'mimes:pdf',
-            'tax_clearance' => 'mimes:pdf',
-            'deed_of_extrajudicial_settlement' => 'mimes:pdf',
+            'tile_property' => 'mimes:pdf',
+            'title_holder' => 'required_if:document_type,Extra Judicial',
+            'surviving_spouse' => [
+                Rule::requiredIf(function () use ($request) {
+                    return $request->input('document_type') === 'Extra Judicial' &&
+                            !$request->input('deceased_spouse') && empty($request->input('surviving_spouse'));
+                }),
+            ],            
+            'spouse_valid_id_front' => [
+                'image',
+                'mimes:jpg,jpeg,png'
+            ],
+            'spouse_valid_id_back' => [
+                'image',
+                'mimes:jpg,jpeg,png',
+            ],
+            'surviving_heir.*' => 'required_if:deceased_spouse,on', 
 
-            'party1_name' => 'required_if:document_type,Deed of Sale',
-            'party2_name' => 'required_if:document_type,Deed of Sale',
-            'property_details' => 'required_if:document_type,Deed of Sale',
+            'name_of_vendor' => 'required_if:document_type,Deed of Sale',
+            'property_document' => 'mimes:pdf',
+            'property_price' => 'required_if:document_type,Deed of Sale',
+            'vendor_valid_id_front' => 'image|mimes:jpg,jpeg,png',
+            'vendor_valid_id_back' => 'image|mimes:jpg,jpeg,png',
+            'name_of_vendee' => 'required_if:document_type,Deed of Sale',
+            'vendee_valid_id_front' => 'image|mimes:jpg,jpeg,png',
+            'vendee_valid_id_back' => 'image|mimes:jpg,jpeg,png',
+            'name_of_witness' => 'required_if:document_type,Deed of Sale',
+            'witness_valid_id_front' => 'image|mimes:jpg,jpeg,png',
+            'witness_valid_id_back' => 'image|mimes:jpg,jpeg,png',
 
             'donor_name' => 'required_if:document_type,Deed of Donation',
-            'donor_age' => 'required_if:document_type,Deed of Donation',
+            'donor_civil_status' => 'required_if:document_type,Deed of Donation',
+            'donor_valid_id_front' => 'image|mimes:jpg,jpeg,png',
+            'donor_valid_id_back' => 'image|mimes:jpg,jpeg,png',
             'donee_name' => 'required_if:document_type,Deed of Donation',
-            'donee_age' => 'required_if:document_type,Deed of Donation',
+            'donee_civil_status' => 'required_if:document_type,Deed of Donation',
+            'donee_valid_id_front' => 'image|mimes:jpg,jpeg,png',
+            'donee_valid_id_back' => 'image|mimes:jpg,jpeg,png',
+            'property_description' => 'required_if:document_type,Deed of Donation',
         ],
         [
             'barangay.required_if' => 'The barangay field is required.',
@@ -1487,7 +1503,7 @@ class DocumentRequestController extends Controller
             'other_street.required_if' => 'The street field is required.',
 
             'document_name.required_if' => 'The name field is required.',
-            'document_age.required_if' => 'The age field is required.',
+            'document_civil_status.required_if' => 'The civil status field is required.',
             
             'document_city.required_if' => 'The city field is required.',
             'document_barangay.required_if' => 'The barangay field is required.',
@@ -1503,34 +1519,31 @@ class DocumentRequestController extends Controller
             'document_other_barangay_2.required_if' => 'The barangay field is required.',
             'document_other_street_2.required_if' => 'The street field is required.',
 
-            'guardian_name.required_if' => 'The name field is required.',
-            'guardian_age.required_if' => 'The age field is required.',
-            'guardian_occupation.required_if' => 'The occupation field is required.',
-            'relationship.required_if' => 'The relationship field is required.',
-            'minor_name.required_if' => 'The name field is required.',
-            'minor_age.required_if' => 'The age field is required.',
-            'minor_relationship.required_if' => 'The relationship field is required.',
+            'item_lost.required_if' => 'The item lost field is required.',
+            'reason_of_loss.required_if' => 'The reason of loss field is required.',
 
-            'previous_employer_name.required_with' => 'The previous employer name field is required.',
-            'previous_employer_contact.required_with' => 'The previous employer contact field is required.',
-            'business_name.required_if' => 'The business name field is required.',
-            'registration_number.required_if' => 'The registration number field is required.',
-            'business_address.required_if' => 'The business address field is required.',
-            'business_period.required_if' => 'The business period field is required.',
-            'no_income_period.required_if' => 'The no income period field is required.',
+            'guardian_name.required_if' => 'The guardian name field is required.',
+            'minor_name.required_if' => 'The minor name field is required.',
+            'years_in_care.required_if' => 'The years in care field is required.',
 
-            'source_of_income.required_if' => 'The source of income field is required.',
+            'year_of_no_income.required_if' => 'The year of no income field is required.',
 
-            'party1_name.required_if' => 'The name field is required.',
-            'party2_name.required_if' => 'The name field is required.',
-            'property_details.required_if' => 'The details field is required.',
+            'title_holder.required_if' => 'The title holder field is required.',
+            'surviving_spouse.required_if' => 'The surviving spouse field is required.',
+            'surviving_heir.*.required_if' => 'The name of surviving heir field is required.',
+
+            'name_of_vendor.required_if' => 'The name of vendor field is required.',
+            'property_price.required_if' => 'The property price field is required.',
+            'name_of_vendee.required_if' => 'The name of vendee field is required.',
+            'name_of_witness.required_if' => 'The name of witness field is required.',
 
             'donor_name.required_if' => 'The name field is required.',
-            'donor_age.required_if' => 'The age field is required.',
+            'donor_civil_status.required_if' => 'The civil status field is required.',
             'donor_address.required_if' => 'The address field is required.',
             'donee_name.required_if' => 'The name field is required.',
-            'donee_age.required_if' => 'The age field is required.',
+            'donee_civil_status.required_if' => 'The civil status field is required.',
             'donee_address.required_if' => 'The address field is required.',
+            'property_description.required_if' => 'The property description field is required.',
         ]);
 
         if ($validator->fails()) {
@@ -1555,60 +1568,86 @@ class DocumentRequestController extends Controller
             'document_type' => 'required',
 
             'document_name' => 'required_if:document_type,Affidavit of Loss,Affidavit of No income,Affidavit of No fix income',
-            'document_age' => 'required_if:document_type,Affidavit of Loss,Affidavit of No income,Affidavit of No fix income|gte:18',
+            'document_civil_status' => 'required_if:document_type,Affidavit of Loss,Affidavit of Guardianship,Affidavit of No income,Affidavit of No fix income,Deed of Sale',
 
-            'document_city' => 'required_if:document_type,Affidavit of Loss,Affidavit of Guardianship,Affidavit of No Income,Affidavit of No fix income,Deed of Donation',
+            'document_city' => 'required_if:document_type,Affidavit of Loss,Affidavit of Guardianship,Affidavit of No income,Affidavit of No fix income,Deed of Sale,Deed of Donation',
             'document_barangay' => 'required_if:document_city,San Pedro City',
             'document_street' => 'required_if:document_city,San Pedro City',
             'document_other_city' => 'required_if:document_city,Other City',
             'document_other_barangay' => 'required_if:document_city,Other City',
             'document_other_street' => 'required_if:document_city,Other City',
 
-            'document_city_2' => 'required_if:document_type,Affidavit of Guardianship,Deed of Donation',
+            'document_city_2' => 'required_if:document_type,Deed of Donation',
             'document_barangay_2' => 'required_if:document_city_2,San Pedro City',
             'document_street_2' => 'required_if:document_city_2,San Pedro City',
             'document_other_city_2' => 'required_if:document_city_2,Other City',
             'document_other_barangay_2' => 'required_if:document_city_2,Other City',
             'document_other_street_2' => 'required_if:document_city_2,Other City',
 
-            'valid_id_front' => 'required_if:document_type,Affidavit of Loss,Other Document|image|mimes:jpg,jpeg,png',
-            'valid_id_back' => 'required_if:document_type,Affidavit of Loss,Other Document|image|mimes:jpg,jpeg,png',
-            'cedula' => 'required_if:document_type,Affidavit of Loss|mimes:pdf',
+            'valid_id_front' => 'required_if:document_type,Affidavit of Loss,Affidavit of Guardianship,Affidavit of No income,Affidavit of No fix income,Other Document|image|mimes:jpg,jpeg,png',
+            'valid_id_back' => 'required_if:document_type,Affidavit of Loss,Affidavit of Guardianship,Affidavit of No income,Affidavit of No fix income,Other Document|image|mimes:jpg,jpeg,png',
+
+            'item_lost' => 'required_if:document_type,Affidavit of Loss',
+            'reason_of_loss' => 'required_if:document_type,Affidavit of Loss',
 
             'guardian_name' => 'required_if:document_type,Affidavit of Guardianship',
-            'guardian_age' => 'required_if:document_type,Affidavit of Guardianship|gte:18',
-            'guardian_occupation' => 'required_if:document_type,Affidavit of Guardianship',
-            'barangay_clearance' => 'required_if:document_type,Affidavit of Guardianship|mimes:pdf',
-            'relationship' => 'required_if:document_type,Affidavit of Guardianship',
             'minor_name' => 'required_if:document_type,Affidavit of Guardianship',
-            'minor_age' => 'required_if:document_type,Affidavit of Guardianship|lt:18',
-            'minor_relationship' => 'required_if:document_type,Affidavit of Guardianship',
+            'years_in_care' => 'required_if:document_type,Affidavit of Guardianship',
+            
+            'year_of_no_income' => 'required_if:document_type,Affidavit of No income,Affidavit of No fix income|regex:/^\d{4}$/',
+            'certificate_of_indigency' => 'required_if:document_type,Affidavit of No income|mimes:pdf',
 
-            'certificate_of_indigency' => 'required_if:document_type,Affidavit of No income,Affidavit of No fix income|mimes:pdf',
-            'previous_employer_name' => 'required_with:previous_employer_contact',
-            'previous_employer_contact' => 'required_with:previous_employer_name',
-            'business_name' => 'required_if:document_type,Affidavit of No income',
-            'registration_number' => 'required_if:document_type,Affidavit of No income',
-            'business_address' => 'required_if:document_type,Affidavit of No income',
-            'business_period' => 'required_if:document_type,Affidavit of No income',
-            'no_income_period' => 'required_if:document_type,Affidavit of No income',
+            'certificate_of_residency' => 'required_if:document_type,Affidavit of No fix income|mimes:pdf',
 
-            'source_of_income' => 'required_if:document_type,Affidavit of No fix income',
+            'title_of_property' => 'required_if:document_type,Extra Judicial',
+            'title_holder' => 'required_if:document_type,Extra Judicial',
+            'surviving_spouse' => [
+                Rule::requiredIf(function () use ($request) {
+                    return $request->input('document_type') === 'Extra Judicial' &&
+                            !$request->input('deceased_spouse') && empty($request->input('surviving_spouse'));
+                }),
+            ],            
+            'spouse_valid_id_front' => [
+                'image',
+                'mimes:jpg,jpeg,png',
+                Rule::requiredIf(function () use ($request) {
+                    // Check if the checkbox is checked
+                    return $request->input('document_type') === 'Extra Judicial' &&
+                            !$request->input('deceased_spouse');
+                }),
+            ],
+            'spouse_valid_id_back' => [
+                'image',
+                'mimes:jpg,jpeg,png',
+                Rule::requiredIf(function () use ($request) {
+                    // Check if the checkbox is checked
+                    return $request->input('document_type') === 'Extra Judicial' &&
+                            !$request->input('deceased_spouse');
+                }),
+            ],
+            'surviving_heir.*' => 'required_if:deceased_spouse,on', 
 
-            'death_certificate' => 'required_if:document_type,Extra Judicial|mimes:pdf',
-            'heirship_documents' => 'required_if:document_type,Extra Judicial|mimes:pdf',
-            'inventory_of_estate' => 'required_if:document_type,Extra Judicial|mimes:pdf',
-            'tax_clearance' => 'required_if:document_type,Extra Judicial|mimes:pdf',
-            'deed_of_extrajudicial_settlement' => 'required_if:document_type,Extra Judicial|mimes:pdf',
-
-            'party1_name' => 'required_if:document_type,Deed of Sale',
-            'party2_name' => 'required_if:document_type,Deed of Sale',
-            'property_details' => 'required_if:document_type,Deed of Sale',
+            'name_of_vendor' => 'required_if:document_type,Deed of Sale',
+            'property_document' => 'required_if:document_type,Deed of Sale|mimes:pdf',
+            'property_price' => 'required_if:document_type,Deed of Sale',
+            'vendor_valid_id_front' => 'required_if:document_type,Deed of Sale|image|mimes:jpg,jpeg,png',
+            'vendor_valid_id_back' => 'required_if:document_type,Deed of Sale|image|mimes:jpg,jpeg,png',
+            'name_of_vendee' => 'required_if:document_type,Deed of Sale',
+            'vendee_valid_id_front' => 'required_if:document_type,Deed of Sale|image|mimes:jpg,jpeg,png',
+            'vendee_valid_id_back' => 'required_if:document_type,Deed of Sale|image|mimes:jpg,jpeg,png',
+            'name_of_witness' => 'required_if:document_type,Deed of Sale',
+            'witness_valid_id_front' => 'required_if:document_type,Deed of Sale|image|mimes:jpg,jpeg,png',
+            'witness_valid_id_back' => 'required_if:document_type,Deed of Sale|image|mimes:jpg,jpeg,png',
 
             'donor_name' => 'required_if:document_type,Deed of Donation',
-            'donor_age' => 'required_if:document_type,Deed of Donation',
+            'donor_civil_status' => 'required_if:document_type,Deed of Donation',
+            'donor_valid_id_front' => 'required_if:document_type,Deed of Donation|image|mimes:jpg,jpeg,png',
+            'donor_valid_id_back' => 'required_if:document_type,Deed of Donation|image|mimes:jpg,jpeg,png',
             'donee_name' => 'required_if:document_type,Deed of Donation',
-            'donee_age' => 'required_if:document_type,Deed of Donation',
+            'donee_civil_status' => 'required_if:document_type,Deed of Donation',
+            'donee_valid_id_front' => 'required_if:document_type,Deed of Donation|image|mimes:jpg,jpeg,png',
+            'donee_valid_id_back' => 'required_if:document_type,Deed of Donation|image|mimes:jpg,jpeg,png',
+            'property_description' => 'required_if:document_type,Deed of Donation',
         ],
         [
             'barangay.required_if' => 'The barangay field is required.',
@@ -1618,7 +1657,7 @@ class DocumentRequestController extends Controller
             'other_street.required_if' => 'The street field is required.',
 
             'document_name.required_if' => 'The name field is required.',
-            'document_age.required_if' => 'The age field is required.',
+            'document_civil_status.required_if' => 'The civil status field is required.',
             
             'document_city.required_if' => 'The city field is required.',
             'document_barangay.required_if' => 'The barangay field is required.',
@@ -1636,44 +1675,47 @@ class DocumentRequestController extends Controller
 
             'valid_id_front.required_if' => 'The valid ID front field is required.',
             'valid_id_back.required_if' => 'The valid ID back field is required.',
-            'cedula.required_if' => 'The cedula field is required.',
+            'item_lost.required_if' => 'The item lost field is required.',
+            'reason_of_loss.required_if' => 'The reason of loss field is required.',
 
-            'guardian_name.required_if' => 'The name field is required.',
-            'guardian_age.required_if' => 'The age field is required.',
-            'guardian_occupation.required_if' => 'The occupation field is required.',
-            'barangay_clearance.required_if' => 'The barangay clearance field is required.',
-            'relationship.required_if' => 'The relationship field is required.',
-            'minor_name.required_if' => 'The name field is required.',
-            'minor_age.required_if' => 'The age field is required.',
-            'minor_relationship.required_if' => 'The relationship field is required.',
+            'guardian_name.required_if' => 'The guardian name field is required.',
+            'minor_name.required_if' => 'The minor name field is required.',
+            'years_in_care.required_if' => 'The years in care field is required.',
 
             'certificate_of_indigency.required_if' => 'The certificate of indigency field is required.',
-            'previous_employer_name.required_with' => 'The previous employer name field is required.',
-            'previous_employer_contact.required_with' => 'The previous employer contact field is required.',
-            'business_name.required_if' => 'The business name field is required.',
-            'registration_number.required_if' => 'The registration number field is required.',
-            'business_address.required_if' => 'The business address field is required.',
-            'business_period.required_if' => 'The business period field is required.',
-            'no_income_period.required_if' => 'The no income period field is required.',
+            'year_of_no_income.required_if' => 'The year of no income field is required.',
+            'certificate_of_residency.required_if' => 'The certificate of residency field is required.',
 
-            'source_of_income.required_if' => 'The source of income field is required.',
+            'title_of_property.required_if' => 'The title of property field is required.',
+            'title_holder.required_if' => 'The title holder field is required.',
+            'surviving_spouse.required_if' => 'The surviving spouse field is required.',
+            'spouse_valid_id_front.required_if' => 'The spouse valid ID front field is required.',
+            'spouse_valid_id_back.required_if' => 'The spouse valid ID back field is required.',
+            'surviving_heir.*.required_if' => 'The name of surviving heir field is required.',
 
-            'death_certificate.required_if' => 'The death certificate field is required.',
-            'heirship_documents.required_if' => 'The heirship documents field is required.',
-            'inventory_of_estate.required_if' => 'The inventory of estate field is required.',
-            'tax_clearance.required_if' => 'The tax clearance field is required.',
-            'deed_of_extrajudicial_settlement.required_if' => 'The deed of extrajudicial settlement field is required.',
-
-            'party1_name.required_if' => 'The name field is required.',
-            'party2_name.required_if' => 'The name field is required.',
-            'property_details.required_if' => 'The details field is required.',
+            'name_of_vendor.required_if' => 'The name of vendor field is required.',
+            'property_document.required_if' => 'The property document field is required.',
+            'property_price.required_if' => 'The property price field is required.',
+            'vendor_valid_id_front.required_if' => 'The vendor valid ID front field is required.',
+            'vendor_valid_id_back.required_if' => 'The vendor valid ID back field is required.',
+            'name_of_vendee.required_if' => 'The name of vendee field is required.',
+            'vendee_valid_id_front.required_if' => 'The vendee valid ID front field is required.',
+            'vendee_valid_id_back.required_if' => 'The vendee valid ID back field is required.',
+            'name_of_witness.required_if' => 'The name of witness field is required.',
+            'witness_valid_id_front.required_if' => 'The witness valid ID front field is required.',
+            'witness_valid_id_back.required_if' => 'The witness valid ID back field is required.',
 
             'donor_name.required_if' => 'The name field is required.',
-            'donor_age.required_if' => 'The age field is required.',
+            'donor_civil_status.required_if' => 'The civil status field is required.',
             'donor_address.required_if' => 'The address field is required.',
+            'donor_valid_id_front.required_if' => 'The valid ID front field is required.',
+            'donor_valid_id_back.required_if' => 'The valid ID back field is required.',
             'donee_name.required_if' => 'The name field is required.',
-            'donee_age.required_if' => 'The age field is required.',
+            'donee_civil_status.required_if' => 'The civil status field is required.',
             'donee_address.required_if' => 'The address field is required.',
+            'donee_valid_id_front.required_if' => 'The valid ID front field is required.',
+            'donee_valid_id_back.required_if' => 'The valid ID back field is required.',
+            'property_description.required_if' => 'The property description field is required.',
         ]);
 
         if ($validator->fails()) {
@@ -2009,11 +2051,10 @@ class DocumentRequestController extends Controller
                     }
 
                     $documentAddress = $this->generateEditDocumentAddress($request);
-                    $validIdFrontFilePath = $this->uploadEditValidIdFront($request);
-                    $validIdBackFilePath = $this->uploadEditValidIdBack($request);
-                    $cedulaFilePath = $this->uploadEditCedula($request);
+                    $validIdFrontFilePath = $this->uploadEditValidIdFrontAOL($request);
+                    $validIdBackFilePath = $this->uploadEditValidIdBackAOL($request);
     
-                    $createAffidavitOfLoss = $this->createAffidavitOfLoss($request, $documentAddress, $validIdFrontFilePath, $validIdBackFilePath, $cedulaFilePath, $id);
+                    $createAffidavitOfLoss = $this->createAffidavitOfLoss($request, $documentAddress, $validIdFrontFilePath, $validIdBackFilePath, $id);
 
                     if($updateDocumentRequestDetails && $createAffidavitOfLoss) {
                         $this->logDocumentRequestEditSuccess($user, $id);
@@ -3145,12 +3186,13 @@ class DocumentRequestController extends Controller
     private function shouldUpdateAffidavitOfLoss(Request $request, $id) {
         $affidavitOfLossInfo = AffidavitOfLoss::where('documentRequest_id', $id)->get()->first();
         
-        return $request->document_name != $affidavitOfLossInfo->aol_name ||
-            $request->document_age != $affidavitOfLossInfo->aol_age ||
-            $this->shouldUpdateDocumentAddress($request, $affidavitOfLossInfo->aol_address) ||
+        return $request->document_name != $affidavitOfLossInfo->name ||
+            $request->document_civil_status != $affidavitOfLossInfo->civil_status ||
+            $this->shouldUpdateDocumentAddress($request, $affidavitOfLossInfo->address) ||
+            $request->item_lost != $affidavitOfLossInfo->item_lost ||
+            $request->reason_of_loss != $affidavitOfLossInfo->reason_of_loss ||
             $request->valid_id_front != null ||
-            $request->valid_id_back != null ||
-            $request->cedula != null;
+            $request->valid_id_back != null;
     }
 
     private function shouldUpdateAffidavitOfGuardianship(Request $request, $id) {
@@ -3317,7 +3359,7 @@ class DocumentRequestController extends Controller
         return trim($street) . ', Brgy. ' . trim($barangay) . ', ' . trim($city);
     }
 
-    private function uploadEditValidIdFront(Request $request) {
+    private function uploadEditValidIdFrontAOL(Request $request) {
         $file = $request->file('valid_id_front');
         $originalFileName = $file->getClientOriginalName();
         $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
@@ -3327,7 +3369,7 @@ class DocumentRequestController extends Controller
         return $filePath;
     }
 
-    private function uploadEditValidIdBack(Request $request) {
+    private function uploadEditValidIdBackAOL(Request $request) {
         $file = $request->file('valid_id_back');
         $originalFileName = $file->getClientOriginalName();
         $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
@@ -3464,9 +3506,11 @@ class DocumentRequestController extends Controller
         $documentRequest = AffidavitOfLoss::where('documentRequest_id', $documentRequestID)->first();
     
         $data = [
-            'aol_name' => trim($request->document_name),
-            'aol_age' => $request->document_age,
-            'aol_address' => $address,
+            'name' => trim($request->document_name),
+            'civil_status' => $request->document_civil_status,
+            'address' => $address,
+            'item_lost' => trim($request->item_lost),
+            'reason_of_loss' => trim($request->reason_of_loss),
             'updated_at' => Carbon::now('Asia/Manila'),
         ];
     
@@ -3476,7 +3520,7 @@ class DocumentRequestController extends Controller
                 unlink(public_path($filePath));
             }
 
-            $validIDFrontFilePath = $this->uploadEditValidIdFront($request);
+            $validIDFrontFilePath = $this->uploadEditValidIdFrontAOL($request);
             $data['valid_id_front'] = $validIDFrontFilePath;
         }
     
@@ -3486,18 +3530,8 @@ class DocumentRequestController extends Controller
                 unlink(public_path($filePath));
             }
 
-            $validIDBackFilePath = $this->uploadEditValidIdBack($request);
+            $validIDBackFilePath = $this->uploadEditValidIdBackAOL($request);
             $data['valid_id_back'] = $validIDBackFilePath;
-        }
-    
-        if ($request->hasFile('cedula')) {
-            $filePath = $documentRequest->cedula;
-            if (file_exists(public_path($filePath))) {
-                unlink(public_path($filePath));
-            }
-
-            $cedulaFilePath = $this->uploadEditCedula($request);
-            $data['cedula'] = $cedulaFilePath;
         }
     
         return AffidavitOfLoss::where('documentRequest_id', $documentRequestID)->update($data);
