@@ -2048,6 +2048,28 @@ class DocumentRequestController extends Controller
                     } else if($documentRequest->document_type == 'Extra Judicial') {
             
                         $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->title_of_property))) {
+                            unlink(public_path($additionalInfoDetails->title_of_property));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if ($additionalInfoDetails->spouse_valid_id_front != null && file_exists(public_path($additionalInfoDetails->spouse_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->spouse_valid_id_front));
+                        }
+
+                        if ($additionalInfoDetails->spouse_valid_id_back != null && file_exists(public_path($additionalInfoDetails->spouse_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->spouse_valid_id_back));
+                        }
+
+                        $heirsInfo = Heir::where('documentRequest_id', $id)->get();
+
+                        if($heirsInfo->count() > 0) {
+                            foreach($heirsInfo as $heir) {
+                                $heir->delete();
+                            }
+                        }
             
                         ExtraJudicial::where('documentRequest_id', $id)->delete();
             
@@ -2253,6 +2275,28 @@ class DocumentRequestController extends Controller
                     } else if($documentRequest->document_type == 'Extra Judicial') {
             
                         $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->title_of_property))) {
+                            unlink(public_path($additionalInfoDetails->title_of_property));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if ($additionalInfoDetails->spouse_valid_id_front != null && file_exists(public_path($additionalInfoDetails->spouse_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->spouse_valid_id_front));
+                        }
+
+                        if ($additionalInfoDetails->spouse_valid_id_back != null && file_exists(public_path($additionalInfoDetails->spouse_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->spouse_valid_id_back));
+                        }
+
+                        $heirsInfo = Heir::where('documentRequest_id', $id)->get();
+
+                        if($heirsInfo->count() > 0) {
+                            foreach($heirsInfo as $heir) {
+                                $heir->delete();
+                            }
+                        }
             
                         ExtraJudicial::where('documentRequest_id', $id)->delete();
             
@@ -2458,6 +2502,28 @@ class DocumentRequestController extends Controller
                     } else if($documentRequest->document_type == 'Extra Judicial') {
             
                         $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->title_of_property))) {
+                            unlink(public_path($additionalInfoDetails->title_of_property));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if ($additionalInfoDetails->spouse_valid_id_front != null && file_exists(public_path($additionalInfoDetails->spouse_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->spouse_valid_id_front));
+                        }
+
+                        if ($additionalInfoDetails->spouse_valid_id_back != null && file_exists(public_path($additionalInfoDetails->spouse_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->spouse_valid_id_back));
+                        }
+
+                        $heirsInfo = Heir::where('documentRequest_id', $id)->get();
+
+                        if($heirsInfo->count() > 0) {
+                            foreach($heirsInfo as $heir) {
+                                $heir->delete();
+                            }
+                        }
             
                         ExtraJudicial::where('documentRequest_id', $id)->delete();
             
@@ -2664,6 +2730,28 @@ class DocumentRequestController extends Controller
                     } else if($documentRequest->document_type == 'Extra Judicial') {
 
                         $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->title_of_property))) {
+                            unlink(public_path($additionalInfoDetails->title_of_property));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if ($additionalInfoDetails->spouse_valid_id_front != null && file_exists(public_path($additionalInfoDetails->spouse_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->spouse_valid_id_front));
+                        }
+
+                        if ($additionalInfoDetails->spouse_valid_id_back != null && file_exists(public_path($additionalInfoDetails->spouse_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->spouse_valid_id_back));
+                        }
+
+                        $heirsInfo = Heir::where('documentRequest_id', $id)->get();
+
+                        if($heirsInfo->count() > 0) {
+                            foreach($heirsInfo as $heir) {
+                                $heir->delete();
+                            }
+                        }
             
                         ExtraJudicial::where('documentRequest_id', $id)->delete();
             
@@ -2870,6 +2958,28 @@ class DocumentRequestController extends Controller
                     } else if($documentRequest->document_type == 'Extra Judicial') {
 
                         $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->title_of_property))) {
+                            unlink(public_path($additionalInfoDetails->title_of_property));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if ($additionalInfoDetails->spouse_valid_id_front != null && file_exists(public_path($additionalInfoDetails->spouse_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->spouse_valid_id_front));
+                        }
+
+                        if ($additionalInfoDetails->spouse_valid_id_back != null && file_exists(public_path($additionalInfoDetails->spouse_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->spouse_valid_id_back));
+                        }
+
+                        $heirsInfo = Heir::where('documentRequest_id', $id)->get();
+
+                        if($heirsInfo->count() > 0) {
+                            foreach($heirsInfo as $heir) {
+                                $heir->delete();
+                            }
+                        }
             
                         ExtraJudicial::where('documentRequest_id', $id)->delete();
             
@@ -3096,6 +3206,28 @@ class DocumentRequestController extends Controller
                     } else if($documentRequest->document_type == 'Extra Judicial') {
             
                         $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->title_of_property))) {
+                            unlink(public_path($additionalInfoDetails->title_of_property));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if ($additionalInfoDetails->spouse_valid_id_front != null && file_exists(public_path($additionalInfoDetails->spouse_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->spouse_valid_id_front));
+                        }
+
+                        if ($additionalInfoDetails->spouse_valid_id_back != null && file_exists(public_path($additionalInfoDetails->spouse_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->spouse_valid_id_back));
+                        }
+
+                        $heirsInfo = Heir::where('documentRequest_id', $id)->get();
+
+                        if($heirsInfo->count() > 0) {
+                            foreach($heirsInfo as $heir) {
+                                $heir->delete();
+                            }
+                        }
             
                         ExtraJudicial::where('documentRequest_id', $id)->delete();
             
@@ -3307,6 +3439,28 @@ class DocumentRequestController extends Controller
 
                         $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
             
+                        if (file_exists(public_path($additionalInfoDetails->title_of_property))) {
+                            unlink(public_path($additionalInfoDetails->title_of_property));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if ($additionalInfoDetails->spouse_valid_id_front != null && file_exists(public_path($additionalInfoDetails->spouse_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->spouse_valid_id_front));
+                        }
+
+                        if ($additionalInfoDetails->spouse_valid_id_back != null && file_exists(public_path($additionalInfoDetails->spouse_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->spouse_valid_id_back));
+                        }
+
+                        $heirsInfo = Heir::where('documentRequest_id', $id)->get();
+
+                        if($heirsInfo->count() > 0) {
+                            foreach($heirsInfo as $heir) {
+                                $heir->delete();
+                            }
+                        }
+
                         ExtraJudicial::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Deed of Sale') {
