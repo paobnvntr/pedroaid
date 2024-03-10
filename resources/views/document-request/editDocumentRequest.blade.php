@@ -626,6 +626,11 @@
             additionalInfo.innerHTML = `
                 @include('document-request.additionalEditInfo.deedOfSale')
             `;
+
+            additionalInfoAddress();
+
+            useSameAddress();
+            
         } else if (originalDocumentType === 'Deed of Donation') {
             additionalInfo.innerHTML = `
                 @include('document-request.additionalEditInfo.deedOfDonation')
@@ -861,17 +866,66 @@
                 deedOfExtrajudicialSettlement.disabled = false;
 
             } else if(originalDocumentType === 'Deed of Sale') {
-                const nameOfIdentity1 = document.getElementById('party1_name');
-                const nameOfIdentity2 = document.getElementById('party2_name');
-                const propertyDetails = document.getElementById('property_details');
+                const vendorName = document.getElementById('name_of_vendor');
+                const vendorCivilStatus = document.getElementById('document_civil_status');
+                const useSameAddress = document.getElementById('use_same_address');
+                const vendorSanPedroCityRadio = document.getElementById('document-san-pedro-city');
+                const vendorOtherCityRadio = document.getElementById('document-other-city');
 
-                nameOfIdentity1.disabled = false;
-                nameOfIdentity2.disabled = false;
-                propertyDetails.disabled = false;
+                const vendorBarangayGroup = document.getElementById('document-barangay-group');
+                const vendorStreetGroup = document.getElementById('document-street-group');
+                const vendorBarangay = document.getElementById('document-barangay');
+                const vendorStreet = document.getElementById('document-street');
+
+                const vendorOtherAddressGroup = document.getElementById('document-other-address-group');
+                const vendorOtherCityInput = document.getElementById('document-other-city-input');
+                const vendorOtherBarangay = document.getElementById('document-other-barangay');
+                const vendorOtherStreet = document.getElementById('document-other-street');
+
+                const propertyDocument = document.getElementById('property_document');
+                const propertyPrice = document.getElementById('property_price');
+
+                const vendorValidIDFront = document.getElementById('vendor-valid-id-front');
+                const vendorValidIDBack = document.getElementById('vendor-valid-id-back');
+
+                const vendeeName = document.getElementById('name_of_vendee');
+                const vendeeValidIDFront = document.getElementById('vendee-valid-id-front');
+                const vendeeValidIDBack = document.getElementById('vendee-valid-id-back');
+
+                const witnessName = document.getElementById('name_of_witness');
+                const witnessValidIDFront = document.getElementById('witness-valid-id-front');
+                const witnessValidIDBack = document.getElementById('witness-valid-id-back');
+
+                vendorName.disabled = false;
+                vendorCivilStatus.disabled = false;
+                useSameAddress.disabled = false;
+                vendorSanPedroCityRadio.disabled = false;
+                vendorOtherCityRadio.disabled = false;
+
+                propertyDocument.disabled = false;
+                propertyPrice.disabled = false;
+
+                vendorValidIDFront.disabled = false;
+                vendorValidIDBack.disabled = false;
+
+                vendeeName.disabled = false;
+                vendeeValidIDFront.disabled = false;
+                vendeeValidIDBack.disabled = false;
+
+                witnessName.disabled = false;
+                witnessValidIDFront.disabled = false;
+                witnessValidIDBack.disabled = false;
+
+                if(vendorSanPedroCityRadio.checked) {
+                    vendorBarangayGroup.classList.remove('d-none');
+                    vendorStreetGroup.classList.remove('d-none');
+                } else if (vendorOtherCityRadio.checked) {
+                    vendorOtherAddressGroup.classList.remove('d-none');
+                }
 
             } else if(originalDocumentType === 'Deed of Donation') {
                 const donorName = document.getElementById('donor_name');
-                const donorAge = document.getElementById('donor_age');
+                const donorCivilStatus = document.getElementById('donor_civil_status');
                 const useSameAddress = document.getElementById('use_same_address');
                 const donorSanPedroCityRadio = document.getElementById('document-san-pedro-city');
                 const donorOtherCityRadio = document.getElementById('document-other-city');
@@ -886,8 +940,11 @@
                 const donorOtherBarangay = document.getElementById('document-other-barangay');
                 const donorOtherStreet = document.getElementById('document-other-street');
 
+                const donorValidIDFront = document.getElementById('donor-valid-id-front');
+                const donorValidIDBack = document.getElementById('donor-valid-id-back');
+
                 const doneeName = document.getElementById('donee_name');
-                const doneeAge = document.getElementById('donee_age');
+                const doneeCivilStatus = document.getElementById('donee_civil_status');
                 const useSameAddress2 = document.getElementById('use_same_address_2');
                 const doneeSanPedroCityRadio = document.getElementById('document-san-pedro-city-2');
                 const doneeOtherCityRadio = document.getElementById('document-other-city-2');
@@ -902,17 +959,32 @@
                 const doneeOtherBarangay = document.getElementById('document-other-barangay-2');
                 const doneeOtherStreet = document.getElementById('document-other-street-2');
 
+                const doneeValidIDFront = document.getElementById('donee-valid-id-front');
+                const doneeValidIDBack = document.getElementById('donee-valid-id-back');
+
+                const propertyLandRadio = document.getElementById('property_land');
+                const propertyHouseRadio = document.getElementById('property_house');
+                const propertyVehicleRadio = document.getElementById('property_vehicle');
+
                 donorName.disabled = false;
-                donorAge.disabled = false;
+                donorCivilStatus.disabled = false;
                 useSameAddress.disabled = false;
                 donorSanPedroCityRadio.disabled = false;
                 donorOtherCityRadio.disabled = false;
+                donorValidIDFront.disabled = false;
+                donorValidIDBack.disabled = false;
 
                 doneeName.disabled = false;
-                doneeAge.disabled = false;
+                doneeCivilStatus.disabled = false;
                 useSameAddress2.disabled = false;
                 doneeSanPedroCityRadio.disabled = false;
                 doneeOtherCityRadio.disabled = false;
+                doneeValidIDFront.disabled = false;
+                doneeValidIDBack.disabled = false;
+
+                propertyLandRadio.disabled = false;
+                propertyHouseRadio.disabled = false;
+                propertyVehicleRadio.disabled = false;
 
                 if(donorSanPedroCityRadio.checked) {
                     donorBarangayGroup.classList.remove('d-none');
@@ -985,6 +1057,11 @@
                     additionalInfo.innerHTML = `
                         @include('document-request.additionalInfo.deedOfSale')
                     `;
+
+                    additionalInfoAddress();
+
+                    useNewSameAddress();
+
                 } else if(documentType.value === 'Deed of Donation') {
                     additionalInfo.innerHTML = `
                         @include('document-request.additionalInfo.deedOfDonation')
@@ -992,6 +1069,9 @@
 
                     additionalInfoAddress();
                     additionalInfoAddress2();
+
+                    useNewSameAddress();
+                    useNewSameAddress2();
 
                 } else if(documentType.value === 'Other Document') {
                     additionalInfo.innerHTML = `
@@ -1410,21 +1490,99 @@
             } else if(originalDocumentType === 'Deed of Sale') {
                 generateAdditionalInfo(originalDocumentType);
 
-                const nameOfIdentity1 = document.getElementById('party1_name');
-                const nameOfIdentity2 = document.getElementById('party2_name');
-                const propertyDetails = document.getElementById('property_details');
+                const vendorName = document.getElementById('name_of_vendor');
+                const vendorCivilStatus = document.getElementById('document_civil_status');
+                const vendorSanPedroCityRadio = document.getElementById('document-san-pedro-city');
+                const vendorOtherCityRadio = document.getElementById('document-other-city');
 
-                const originalNameOfIdentity1 = "{{ $additional_info->name_identity_1 }}";
-                const originalNameOfIdentity2 = "{{ $additional_info->name_identity_2 }}";
-                const originalPropertyDetails = "{{ $additional_info->details }}";
+                const vendorBarangayGroup = document.getElementById('document-barangay-group');
+                const vendorStreetGroup = document.getElementById('document-street-group');
+                const vendorBarangay = document.getElementById('document-barangay');
+                const vendorStreet = document.getElementById('document-street');
 
-                nameOfIdentity1.disabled = true;
-                nameOfIdentity2.disabled = true;
-                propertyDetails.disabled = true;
+                const vendorOtherAddressGroup = document.getElementById('document-other-address-group');
+                const vendorOtherCityInput = document.getElementById('document-other-city-input');
+                const vendorOtherBarangay = document.getElementById('document-other-barangay');
+                const vendorOtherStreet = document.getElementById('document-other-street');
 
-                nameOfIdentity1.value = originalNameOfIdentity1;
-                nameOfIdentity2.value = originalNameOfIdentity2;
-                propertyDetails.value = originalPropertyDetails;
+                const propertyDocument = document.getElementById('property_document');
+                const propertyPrice = document.getElementById('property_price');
+
+                const vendorValidIDFront = document.getElementById('vendor-valid-id-front');
+                const vendorValidIDBack = document.getElementById('vendor-valid-id-back');
+
+                const vendeeName = document.getElementById('name_of_vendee');
+                const vendeeValidIDFront = document.getElementById('vendee-valid-id-front');
+                const vendeeValidIDBack = document.getElementById('vendee-valid-id-back');
+
+                const witnessName = document.getElementById('name_of_witness');
+                const witnessValidIDFront = document.getElementById('witness-valid-id-front');
+                const witnessValidIDBack = document.getElementById('witness-valid-id-back');
+
+                const originalVendorName = "{{ $additional_info->name_of_vendor }}";
+                const originalVendorCivilStatus = "{{ $additional_info->vendor_civil_status }}";
+                const originalVendorCity = "{{ $document_city }}";
+                const originalVendorBarangay = "{{ $document_final_barangay }}";
+                const originalVendorStreet = "{{ $document_street }}";
+                const originalVendorOtherCity = "{{ $document_other_city }}";
+                const originalVendorOtherBarangay = "{{ $document_other_barangay }}";
+                const originalVendorOtherStreet = "{{ $document_other_street }}";
+
+                const originalPropertyPrice = "{{ $additional_info->property_price }}";
+
+                const originalVendeeName = "{{ $additional_info->name_of_vendee }}";
+
+                const originalWitnessName = "{{ $additional_info->name_of_witness }}";
+
+                vendorName.disabled = true;
+                vendorCivilStatus.disabled = true;
+                vendorSanPedroCityRadio.disabled = true;
+                vendorOtherCityRadio.disabled = true;
+
+                propertyDocument.disabled = true;
+                propertyPrice.disabled = true;
+
+                vendorValidIDFront.disabled = true;
+                vendorValidIDBack.disabled = true;
+
+                vendeeName.disabled = true;
+                vendeeValidIDFront.disabled = true;
+                vendeeValidIDBack.disabled = true;
+
+                witnessName.disabled = true;
+                witnessValidIDFront.disabled = true;
+                witnessValidIDBack.disabled = true;
+
+                vendorName.value = originalVendorName;
+                vendorCivilStatus.value = originalVendorCivilStatus;
+                propertyPrice.value = originalPropertyPrice;
+                vendeeName.value = originalVendeeName;
+                witnessName.value = originalWitnessName;
+                propertyDocument.value = "";
+                vendorValidIDFront.value = "";
+                vendorValidIDBack.value = "";
+                vendeeValidIDFront.value = "";
+                vendeeValidIDBack.value = "";
+                witnessValidIDFront.value = "";
+                witnessValidIDBack.value = "";
+
+                if(originalVendorCity === 'San Pedro City') {
+                    vendorSanPedroCityRadio.checked = true;
+                    vendorOtherCityRadio.checked = false;
+                    vendorBarangay.value = originalVendorBarangay;
+                    vendorStreet.value = originalVendorStreet;
+                    vendorOtherCityInput.value = originalVendorOtherCity;
+                    vendorOtherBarangay.value = originalVendorOtherBarangay;
+                    vendorOtherStreet.value = originalVendorOtherStreet;
+                } else {
+                    vendorSanPedroCityRadio.checked = false;
+                    vendorOtherCityRadio.checked = true;
+                    vendorOtherCityInput.value = originalVendorOtherCity;
+                    vendorOtherBarangay.value = originalVendorOtherBarangay;
+                    vendorOtherStreet.value = originalVendorOtherStreet;
+                    vendorBarangay.value = originalVendorBarangay;
+                    vendorStreet.value = originalVendorStreet;
+                }
 
                 const errorElements = document.querySelectorAll('.invalid-feedback');
                 errorElements.forEach(errorElement => {
@@ -1440,7 +1598,7 @@
                 generateAdditionalInfo(originalDocumentType);
 
                 const donorName = document.getElementById('donor_name');
-                const donorAge = document.getElementById('donor_age');
+                const donorCivilStatus = document.getElementById('donor_civil_status');
                 const donorSanPedroCityRadio = document.getElementById('document-san-pedro-city');
                 const donorOtherCityRadio = document.getElementById('document-other-city');
 
@@ -1454,8 +1612,11 @@
                 const donorOtherBarangay = document.getElementById('document-other-barangay');
                 const donorOtherStreet = document.getElementById('document-other-street');
 
+                const donorValidIDFront = document.getElementById('donor-valid-id-front');
+                const donorValidIDBack = document.getElementById('donor-valid-id-back');
+
                 const doneeName = document.getElementById('donee_name');
-                const doneeAge = document.getElementById('donee_age');
+                const doneeCivilStatus = document.getElementById('donee_civil_status');
                 const doneeSanPedroCityRadio = document.getElementById('document-san-pedro-city-2');
                 const doneeOtherCityRadio = document.getElementById('document-other-city-2');
 
@@ -1469,8 +1630,15 @@
                 const doneeOtherBarangay = document.getElementById('document-other-barangay-2');
                 const doneeOtherStreet = document.getElementById('document-other-street-2');
 
+                const doneeValidIDFront = document.getElementById('donee-valid-id-front');
+                const doneeValidIDBack = document.getElementById('donee-valid-id-back');
+
+                const propertyLandRadio = document.getElementById('property_land');
+                const propertyHouseRadio = document.getElementById('property_house');
+                const propertyVehicleRadio = document.getElementById('property_vehicle');
+
                 const originalDonorName = "{{ $additional_info->donor_name }}";
-                const originalDonorAge = "{{ $additional_info->donor_age }}";
+                const originalDonorCivilStatus = "{{ $additional_info->donor_civil_status }}";
                 const originalDonorCity = "{{ $document_city }}";
                 const originalDonorBarangay = "{{ $document_final_barangay }}";
                 const originalDonorStreet = "{{ $document_street }}";
@@ -1479,7 +1647,7 @@
                 const originalDonorOtherStreet = "{{ $document_other_street }}";
 
                 const originalDoneeName = "{{ $additional_info->donee_name }}";
-                const originalDoneeAge = "{{ $additional_info->donee_age }}";
+                const originalDoneeCivilStatus = "{{ $additional_info->donee_civil_status }}";
                 const originalDoneeCity = "{{ $document_city_2 }}";
                 const originalDoneeBarangay = "{{ $document_final_barangay_2 }}";
                 const originalDoneeStreet = "{{ $document_street_2 }}";
@@ -1487,21 +1655,49 @@
                 const originalDoneeOtherBarangay = "{{ $document_other_barangay_2 }}";
                 const originalDoneeOtherStreet = "{{ $document_other_street_2 }}";
 
+                const originalPropertyDescription = "{{ $additional_info->property_description }}";
+
                 donorName.disabled = true;
-                donorAge.disabled = true;
+                donorCivilStatus.disabled = true;
                 donorSanPedroCityRadio.disabled = true;
                 donorOtherCityRadio.disabled = true;
+                donorValidIDFront.disabled = true;
+                donorValidIDBack.disabled = true;
 
                 doneeName.disabled = true;
-                doneeAge.disabled = true;
+                doneeCivilStatus.disabled = true;
                 doneeSanPedroCityRadio.disabled = true;
                 doneeOtherCityRadio.disabled = true;
+                doneeValidIDFront.disabled = true;
+                doneeValidIDBack.disabled = true;
+
+                propertyLandRadio.disabled = true;
+                propertyHouseRadio.disabled = true;
+                propertyVehicleRadio.disabled = true;
 
                 donorName.value = originalDonorName;
-                donorAge.value = originalDonorAge;
-                
+                donorCivilStatus.value = originalDonorCivilStatus;
                 doneeName.value = originalDoneeName;
-                doneeAge.value = originalDoneeAge;
+                doneeCivilStatus.value = originalDoneeCivilStatus;
+                
+                if(originalPropertyDescription === 'Land') {
+                    propertyLandRadio.checked = true;
+                    propertyHouseRadio.checked = false;
+                    propertyVehicleRadio.checked = false;
+                } else if(originalPropertyDescription === 'House') {
+                    propertyLandRadio.checked = false;
+                    propertyHouseRadio.checked = true;
+                    propertyVehicleRadio.checked = false;
+                } else {
+                    propertyLandRadio.checked = false;
+                    propertyHouseRadio.checked = false;
+                    propertyVehicleRadio.checked = true;
+                }
+
+                donorValidIDFront.value = "";
+                donorValidIDBack.value = "";
+                doneeValidIDFront.value = "";
+                doneeValidIDBack.value = "";
 
                 if(originalDonorCity === 'San Pedro City') {
                     donorSanPedroCityRadio.checked = true;

@@ -1314,8 +1314,41 @@ class DocumentRequestController extends Controller
             }
         } else if ($documentRequest->document_type == 'Extra Judicial') {
             $additional_info = ExtraJudicial::where('documentRequest_id', $id)->get()->first();
+            
+            if($additional_info->surviving_spouse == null && $additional_info->spouse_valid_id_front == null && $additional_info->spouse_valid_id_back == null) {
+                $heirs_info = Heir::where('documentRequest_id', $id)->get();
+            }
+
         } else if ($documentRequest->document_type == 'Deed of Sale') {
             $additional_info = DeedOfSale::where('documentRequest_id', $id)->get()->first();
+
+            $document_address = explode(', ', $additional_info->vendor_address);
+            $document_city = $document_address[2];
+            $document_city = trim($document_city);
+
+            $document_final_barangay = '';
+            $document_street = '';
+            $document_other_city = '';
+            $document_other_barangay = '';
+            $document_other_street = '';
+
+            if($document_city == 'San Pedro City') {
+                $document_barangay = $document_address[1];
+                $trim_document_barangay = explode('. ', $document_barangay);
+                $document_final_barangay = $trim_document_barangay[1];
+                $document_final_barangay = trim($document_final_barangay);
+        
+                $document_street = $document_address[0];
+                $document_street = trim($document_street);
+            } else {
+                $document_other_city = $document_city;
+                
+                $document_other_barangay = $document_address[1];
+                $document_other_barangay = trim($document_other_barangay);
+    
+                $document_other_street = $document_address[0];
+                $document_other_street = trim($document_other_street);
+            }
         } else if ($documentRequest->document_type == 'Deed of Donation') {
             $additional_info = DeedOfDonation::where('documentRequest_id', $id)->get()->first();
 
@@ -1824,9 +1857,10 @@ class DocumentRequestController extends Controller
                     }
                     
                 } else if($request->document_type == 'Deed of Sale') {
+                    $document_address = $this->generateEditDocumentAddress($request);
                         
                     if($this->shouldUpdateDeedOfSale($request, $id)) {
-                        $updateDeedOfSaleDetails = $this->updateDeedOfSale($request, $id);
+                        $updateDeedOfSaleDetails = $this->updateDeedOfSale($request, $document_address, $id);
 
                         if($updateDocumentRequestDetails && $updateDeedOfSaleDetails) {
                             $this->logDocumentRequestEditSuccess($user, $id);
@@ -1985,43 +2019,83 @@ class DocumentRequestController extends Controller
             
                         $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->death_cert))) {
-                            unlink(public_path($additionalInfoDetails->death_cert));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->heirship))) {
-                            unlink(public_path($additionalInfoDetails->heirship));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->inv_estate))) {
-                            unlink(public_path($additionalInfoDetails->inv_estate));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->tax_clearance))) {
-                            unlink(public_path($additionalInfoDetails->tax_clearance));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->deed_extrajudicial))) {
-                            unlink(public_path($additionalInfoDetails->deed_extrajudicial));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
                         ExtraJudicial::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Deed of Sale') {
+
+                        $additionalInfoDetails = DeedOfSale::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->property_document))) {
+                            unlink(public_path($additionalInfoDetails->property_document));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendor_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->vendor_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendor_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->vendor_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendee_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->vendee_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendee_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->vendee_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->witness_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->witness_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->witness_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->witness_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         DeedOfSale::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Deed of Donation') {
+
+                        $additionalInfoDetails = DeedOfDonation::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->donor_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->donor_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donor_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->donor_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donee_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->donee_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donee_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->donee_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         DeedOfDonation::where('documentRequest_id', $id)->delete();
             
@@ -2149,43 +2223,83 @@ class DocumentRequestController extends Controller
             
                         $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->death_cert))) {
-                            unlink(public_path($additionalInfoDetails->death_cert));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->heirship))) {
-                            unlink(public_path($additionalInfoDetails->heirship));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->inv_estate))) {
-                            unlink(public_path($additionalInfoDetails->inv_estate));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->tax_clearance))) {
-                            unlink(public_path($additionalInfoDetails->tax_clearance));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->deed_extrajudicial))) {
-                            unlink(public_path($additionalInfoDetails->deed_extrajudicial));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
                         ExtraJudicial::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Deed of Sale') {
+
+                        $additionalInfoDetails = DeedOfSale::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->property_document))) {
+                            unlink(public_path($additionalInfoDetails->property_document));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendor_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->vendor_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendor_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->vendor_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendee_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->vendee_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendee_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->vendee_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->witness_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->witness_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->witness_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->witness_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         DeedOfSale::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Deed of Donation') {
+
+                        $additionalInfoDetails = DeedOfDonation::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->donor_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->donor_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donor_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->donor_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donee_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->donee_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donee_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->donee_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         DeedOfDonation::where('documentRequest_id', $id)->delete();
             
@@ -2313,43 +2427,83 @@ class DocumentRequestController extends Controller
             
                         $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->death_cert))) {
-                            unlink(public_path($additionalInfoDetails->death_cert));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->heirship))) {
-                            unlink(public_path($additionalInfoDetails->heirship));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->inv_estate))) {
-                            unlink(public_path($additionalInfoDetails->inv_estate));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->tax_clearance))) {
-                            unlink(public_path($additionalInfoDetails->tax_clearance));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->deed_extrajudicial))) {
-                            unlink(public_path($additionalInfoDetails->deed_extrajudicial));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
                         ExtraJudicial::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Deed of Sale') {
+
+                        $additionalInfoDetails = DeedOfSale::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->property_document))) {
+                            unlink(public_path($additionalInfoDetails->property_document));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendor_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->vendor_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendor_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->vendor_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendee_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->vendee_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendee_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->vendee_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->witness_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->witness_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->witness_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->witness_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         DeedOfSale::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Deed of Donation') {
+
+                        $additionalInfoDetails = DeedOfDonation::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->donor_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->donor_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donor_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->donor_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donee_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->donee_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donee_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->donee_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         DeedOfDonation::where('documentRequest_id', $id)->delete();
             
@@ -2478,43 +2632,83 @@ class DocumentRequestController extends Controller
 
                         $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->death_cert))) {
-                            unlink(public_path($additionalInfoDetails->death_cert));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->heirship))) {
-                            unlink(public_path($additionalInfoDetails->heirship));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->inv_estate))) {
-                            unlink(public_path($additionalInfoDetails->inv_estate));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->tax_clearance))) {
-                            unlink(public_path($additionalInfoDetails->tax_clearance));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->deed_extrajudicial))) {
-                            unlink(public_path($additionalInfoDetails->deed_extrajudicial));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
                         ExtraJudicial::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Deed of Sale') {
+
+                        $additionalInfoDetails = DeedOfSale::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->property_document))) {
+                            unlink(public_path($additionalInfoDetails->property_document));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendor_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->vendor_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendor_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->vendor_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendee_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->vendee_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendee_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->vendee_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->witness_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->witness_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->witness_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->witness_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         DeedOfSale::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Deed of Donation') {
+
+                        $additionalInfoDetails = DeedOfDonation::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->donor_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->donor_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donor_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->donor_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donee_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->donee_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donee_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->donee_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         DeedOfDonation::where('documentRequest_id', $id)->delete();
             
@@ -2643,43 +2837,83 @@ class DocumentRequestController extends Controller
 
                         $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->death_cert))) {
-                            unlink(public_path($additionalInfoDetails->death_cert));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->heirship))) {
-                            unlink(public_path($additionalInfoDetails->heirship));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->inv_estate))) {
-                            unlink(public_path($additionalInfoDetails->inv_estate));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->tax_clearance))) {
-                            unlink(public_path($additionalInfoDetails->tax_clearance));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->deed_extrajudicial))) {
-                            unlink(public_path($additionalInfoDetails->deed_extrajudicial));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
                         ExtraJudicial::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Deed of Sale') {
+
+                        $additionalInfoDetails = DeedOfSale::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->property_document))) {
+                            unlink(public_path($additionalInfoDetails->property_document));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendor_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->vendor_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendor_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->vendor_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendee_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->vendee_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendee_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->vendee_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->witness_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->witness_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->witness_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->witness_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         DeedOfSale::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Deed of Donation') {
+
+                        $additionalInfoDetails = DeedOfDonation::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->donor_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->donor_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donor_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->donor_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donee_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->donee_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donee_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->donee_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         DeedOfDonation::where('documentRequest_id', $id)->delete();
             
@@ -2810,43 +3044,83 @@ class DocumentRequestController extends Controller
             
                         $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->death_cert))) {
-                            unlink(public_path($additionalInfoDetails->death_cert));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->heirship))) {
-                            unlink(public_path($additionalInfoDetails->heirship));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->inv_estate))) {
-                            unlink(public_path($additionalInfoDetails->inv_estate));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->tax_clearance))) {
-                            unlink(public_path($additionalInfoDetails->tax_clearance));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->deed_extrajudicial))) {
-                            unlink(public_path($additionalInfoDetails->deed_extrajudicial));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
                         ExtraJudicial::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Deed of Sale') {
+
+                        $additionalInfoDetails = DeedOfSale::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->property_document))) {
+                            unlink(public_path($additionalInfoDetails->property_document));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendor_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->vendor_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendor_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->vendor_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendee_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->vendee_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendee_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->vendee_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->witness_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->witness_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->witness_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->witness_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         DeedOfSale::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Deed of Donation') {
+
+                        $additionalInfoDetails = DeedOfDonation::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->donor_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->donor_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donor_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->donor_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donee_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->donee_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donee_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->donee_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         DeedOfDonation::where('documentRequest_id', $id)->delete();
             
@@ -2870,7 +3144,16 @@ class DocumentRequestController extends Controller
             
                     }
 
-                    $createDeedOfSale = $this->createDeedOfSale($request, $id);
+                    $documentAddress = $this->generateEditDocumentAddress($request);
+                    $propertyDocumentFilePath = $this->uploadEditPropertyDocument($request);
+                    $vendorValidIdFrontFilePath = $this->uploadEditVendorValidIdFront($request);
+                    $vendorValidIdBackFilePath = $this->uploadEditVendorValidIdBack($request);
+                    $vendeeValidIdFrontFilePath = $this->uploadEditVendeeValidIdFront($request);
+                    $vendeeValidIdBackFilePath = $this->uploadEditVendeeValidIdBack($request);
+                    $witnessValidIdFrontFilePath = $this->uploadEditWitnessValidIdFront($request);
+                    $witnessValidIdBackFilePath = $this->uploadEditWitnessValidIdBack($request);
+
+                    $createDeedOfSale = $this->createDeedOfSale($request, $documentAddress, $propertyDocumentFilePath, $vendorValidIdFrontFilePath, $vendorValidIdBackFilePath, $vendeeValidIdFrontFilePath, $vendeeValidIdBackFilePath, $witnessValidIdFrontFilePath, $witnessValidIdBackFilePath, $id);
 
                     if($updateDocumentRequestDetails && $createDeedOfSale) {
                         $this->logDocumentRequestEditSuccess($user, $id);
@@ -2970,43 +3253,83 @@ class DocumentRequestController extends Controller
 
                         $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
             
-                        if (file_exists(public_path($additionalInfoDetails->death_cert))) {
-                            unlink(public_path($additionalInfoDetails->death_cert));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->heirship))) {
-                            unlink(public_path($additionalInfoDetails->heirship));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->inv_estate))) {
-                            unlink(public_path($additionalInfoDetails->inv_estate));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->tax_clearance))) {
-                            unlink(public_path($additionalInfoDetails->tax_clearance));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
-                        if (file_exists(public_path($additionalInfoDetails->deed_extrajudicial))) {
-                            unlink(public_path($additionalInfoDetails->deed_extrajudicial));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-            
                         ExtraJudicial::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Deed of Sale') {
+
+                        $additionalInfoDetails = DeedOfSale::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->property_document))) {
+                            unlink(public_path($additionalInfoDetails->property_document));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendor_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->vendor_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendor_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->vendor_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendee_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->vendee_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendee_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->vendee_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->witness_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->witness_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->witness_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->witness_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         DeedOfSale::where('documentRequest_id', $id)->delete();
             
                     } else if($documentRequest->document_type == 'Deed of Donation') {
+
+                        $additionalInfoDetails = DeedOfDonation::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->donor_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->donor_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donor_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->donor_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donee_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->donee_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donee_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->donee_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
             
                         DeedOfDonation::where('documentRequest_id', $id)->delete();
             
@@ -3032,8 +3355,12 @@ class DocumentRequestController extends Controller
 
                     $documentAddress = $this->generateEditDocumentAddress($request);
                     $documentAddress2 = $this->generateEditDocument2Address($request);
+                    $donorValidIdFrontFilePath = $this->uploadEditDonorValidIdFront($request);
+                    $donorValidIdBackFilePath = $this->uploadEditDonorValidIdBack($request);
+                    $doneeValidIdFrontFilePath = $this->uploadEditDoneeValidIdFront($request);
+                    $doneeValidIdBackFilePath = $this->uploadEditDoneeValidIdBack($request);
 
-                    $createDeedOfDonation = $this->createDeedOfDonation($request, $documentAddress, $documentAddress2, $id);
+                    $createDeedOfDonation = $this->createDeedOfDonation($request, $documentAddress, $donorValidIdFrontFilePath, $donorValidIdBackFilePath, $documentAddress2, $doneeValidIdFrontFilePath, $doneeValidIdBackFilePath, $id);
 
                     if($updateDocumentRequestDetails && $createDeedOfDonation) {
                         $this->logDocumentRequestEditSuccess($user, $id);
@@ -3133,43 +3460,83 @@ class DocumentRequestController extends Controller
 
                         $additionalInfoDetails = ExtraJudicial::where('documentRequest_id', $id)->first();
 
-                        if (file_exists(public_path($additionalInfoDetails->death_cert))) {
-                            unlink(public_path($additionalInfoDetails->death_cert));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-
-                        if (file_exists(public_path($additionalInfoDetails->heirship))) {
-                            unlink(public_path($additionalInfoDetails->heirship));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-
-                        if (file_exists(public_path($additionalInfoDetails->inv_estate))) {
-                            unlink(public_path($additionalInfoDetails->inv_estate));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-
-                        if (file_exists(public_path($additionalInfoDetails->tax_clearance))) {
-                            unlink(public_path($additionalInfoDetails->tax_clearance));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-
-                        if (file_exists(public_path($additionalInfoDetails->deed_extrajudicial))) {
-                            unlink(public_path($additionalInfoDetails->deed_extrajudicial));
-                        } else {
-                            return $this->failedEditRedirect($id);
-                        }
-
                         ExtraJudicial::where('documentRequest_id', $id)->delete();
 
                     } else if($documentRequest->document_type == 'Deed of Sale') {
 
+                        $additionalInfoDetails = DeedOfSale::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->property_document))) {
+                            unlink(public_path($additionalInfoDetails->property_document));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendor_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->vendor_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendor_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->vendor_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendee_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->vendee_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->vendee_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->vendee_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->witness_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->witness_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->witness_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->witness_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
                         DeedOfSale::where('documentRequest_id', $id)->delete();
 
                     } else if($documentRequest->document_type == 'Deed of Donation') {
+
+                        $additionalInfoDetails = DeedOfDonation::where('documentRequest_id', $id)->first();
+
+                        if (file_exists(public_path($additionalInfoDetails->donor_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->donor_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donor_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->donor_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donee_valid_id_front))) {
+                            unlink(public_path($additionalInfoDetails->donee_valid_id_front));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
+
+                        if (file_exists(public_path($additionalInfoDetails->donee_valid_id_back))) {
+                            unlink(public_path($additionalInfoDetails->donee_valid_id_back));
+                        } else {
+                            return $this->failedEditRedirect($id);
+                        }
 
                         DeedOfDonation::where('documentRequest_id', $id)->delete();
 
@@ -3269,7 +3636,9 @@ class DocumentRequestController extends Controller
                 return $this->failedEditRedirect($id);
             }
         } else if ($request->document_type == 'Deed of Sale' && $this->shouldUpdateDeedOfSale($request, $id)) {
-            $updateDeedOfSaleDetails = $this->updateDeedOfSale($request, $id);
+            $document_address = $this->generateEditDocumentAddress($request);
+
+            $updateDeedOfSaleDetails = $this->updateDeedOfSale($request, $document_address, $id);
 
             if($updateDeedOfSaleDetails) {
                 $this->logDocumentRequestEditSuccess($user, $id);
@@ -3281,6 +3650,7 @@ class DocumentRequestController extends Controller
         } else if ($request->document_type == 'Deed of Donation' && $this->shouldUpdateDeedOfDonation($request, $id)) {
             $document_address = $this->generateEditDocumentAddress($request);
             $document_address2 = $this->generateEditDocument2Address($request);
+
             $updateDeedOfDonationDetails = $this->updateDeedOfDonation($request, $document_address, $document_address2, $id);
 
             if($updateDeedOfDonationDetails) {
@@ -3396,32 +3766,72 @@ class DocumentRequestController extends Controller
             $request->valid_id_back != null;
     }
 
-    private function shouldUpdateExtraJudicial(Request $request) {
+    private function shouldUpdateExtraJudicial(Request $request, $id) {
+        $extraJudicialInfo = ExtraJudicial::where('documentRequest_id', $id)->get()->first();
         
-        return $request->death_certificate != null ||
-            $request->heirship_documents != null ||
-            $request->inventory_of_estate != null ||
-            $request->tax_clearance != null ||
-            $request->deed_of_extrajudicial_settlement != null;
+        if($extraJudicialInfo->surviving_spouse != null && $extraJudicialInfo->spouse_valid_id_front != null && $extraJudicialInfo->spouse_valid_id_back != null) {
+            return $request->title_of_property != null ||
+                $request->title_holder != $extraJudicialInfo->title_holder ||
+                $request->surviving_spouse != $extraJudicialInfo->surviving_spouse ||
+                $request->spouse_valid_id_front != null ||
+                $request->spouse_valid_id_back != null ||
+                ($request->has('deceased_spouse') && collect($request->surviving_heir)->contains(function ($value) {
+                    return $value != null;
+                })) ||
+                ($request->has('deceased_spouse') && collect($request->spouse_of_heir)->contains(function ($value) {
+                    return $value != null;
+                }));
+        } else {
+            $heirInfo = Heir::where('documentRequest_id', $id)->get();
+
+            $heirsModified = $heirInfo->contains(function ($heir) use ($request) {
+                // Check if the submitted value for each heir is different from the original value
+                return $request->has('surviving_heir') && $request->has('spouse_of_heir') &&
+                    $request->surviving_heir[$heir->id] != $heir->surviving_heir ||
+                    $request->spouse_of_heir[$heir->id] != $heir->spouse_of_heir;
+            });
+
+            return $request->title_of_property != null ||
+                $request->title_holder != $extraJudicialInfo->title_holder ||
+                $request->surviving_spouse != $extraJudicialInfo->surviving_spouse ||
+                $request->spouse_valid_id_front != null ||
+                $request->spouse_valid_id_back != null ||
+                $heirsModified;
+        }
     }
 
     private function shouldUpdateDeedOfSale(Request $request, $id) {
         $deedOfSaleInfo = DeedOfSale::where('documentRequest_id', $id)->get()->first();
 
-        return $request->party1_name != $deedOfSaleInfo->name_identity_1 ||
-            $request->party2_name != $deedOfSaleInfo->name_identity_2 ||
-            $request->property_details != $deedOfSaleInfo->details;
+        return $request->name_of_vendor != $deedOfSaleInfo->name_of_vendor ||
+            $request->document_civil_status != $deedOfSaleInfo->vendor_civil_status ||
+            $this->shouldUpdateDocumentAddress($request, $deedOfSaleInfo->vendor_address) ||
+            $request->property_document != null ||
+            $request->property_price != $deedOfSaleInfo->property_price ||
+            $request->vendor_valid_id_front != null ||
+            $request->vendor_valid_id_back != null ||
+            $request->name_of_vendee != $deedOfSaleInfo->name_of_vendee ||
+            $request->vendee_valid_id_front != null ||
+            $request->vendee_valid_id_back != null ||
+            $request->name_of_witness != $deedOfSaleInfo->name_of_witness ||
+            $request->witness_valid_id_front != null ||
+            $request->witness_valid_id_back != null;
     }
 
     private function shouldUpdateDeedOfDonation(Request $request, $id) {
         $deedOfDonationInfo = DeedOfDonation::where('documentRequest_id', $id)->get()->first();
 
         return $request->donor_name != $deedOfDonationInfo->donor_name ||
-            $request->donor_age != $deedOfDonationInfo->donor_age ||
+            $request->donor_civil_status != $deedOfDonationInfo->donor_civil_status ||
             $this->shouldUpdateDocumentAddress($request, $deedOfDonationInfo->donor_address) ||
+            $request->donor_valid_id_front != null ||
+            $request->donor_valid_id_back != null ||
             $request->donee_name != $deedOfDonationInfo->donee_name ||
-            $request->donee_age != $deedOfDonationInfo->donee_age ||
-            $this->shouldUpdateDocument2Address($request, $deedOfDonationInfo->donee_address);
+            $request->donee_civil_status != $deedOfDonationInfo->donee_civil_status ||
+            $this->shouldUpdateDocument2Address($request, $deedOfDonationInfo->donee_address) ||
+            $request->donee_valid_id_front != null ||
+            $request->donee_valid_id_back != null ||
+            $request->property_description != $deedOfDonationInfo->property_description;
     }
 
     private function shouldUpdateOtherDocument(Request $request, $id) {
@@ -3615,6 +4025,116 @@ class DocumentRequestController extends Controller
         $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
         $filePath = 'uploads/document-request/affidavitOfNoFixIncome/' . $fileName;
         $file->move('uploads/document-request/affidavitOfNoFixIncome/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditPropertyDocument(Request $request) {
+        $file = $request->file('property_document');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfSale/' . $fileName;
+        $file->move('uploads/document-request/deedOfSale/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditVendorValidIdFront(Request $request) {
+        $file = $request->file('vendor_valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfSale/' . $fileName;
+        $file->move('uploads/document-request/deedOfSale/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditVendorValidIdBack(Request $request) {
+        $file = $request->file('vendor_valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfSale/' . $fileName;
+        $file->move('uploads/document-request/deedOfSale/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditVendeeValidIdFront(Request $request) {
+        $file = $request->file('vendee_valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfSale/' . $fileName;
+        $file->move('uploads/document-request/deedOfSale/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditVendeeValidIdBack(Request $request) {
+        $file = $request->file('vendee_valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfSale/' . $fileName;
+        $file->move('uploads/document-request/deedOfSale/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditWitnessValidIdFront(Request $request) {
+        $file = $request->file('witness_valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfSale/' . $fileName;
+        $file->move('uploads/document-request/deedOfSale/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditWitnessValidIdBack(Request $request) {
+        $file = $request->file('witness_valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfSale/' . $fileName;
+        $file->move('uploads/document-request/deedOfSale/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditDonorValidIdFront(Request $request) {
+        $file = $request->file('donor_valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfDonation/' . $fileName;
+        $file->move('uploads/document-request/deedOfDonation/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditDonorValidIdBack(Request $request) {
+        $file = $request->file('donor_valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfDonation/' . $fileName;
+        $file->move('uploads/document-request/deedOfDonation/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditDoneeValidIdFront(Request $request) {
+        $file = $request->file('donee_valid_id_front');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfDonation/' . $fileName;
+        $file->move('uploads/document-request/deedOfDonation/', $fileName);
+    
+        return $filePath;
+    }
+
+    private function uploadEditDoneeValidIdBack(Request $request) {
+        $file = $request->file('donee_valid_id_back');
+        $originalFileName = $file->getClientOriginalName();
+        $fileName = time() . '_' . Str::slug(pathinfo($originalFileName, PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $filePath = 'uploads/document-request/deedOfDonation/' . $fileName;
+        $file->move('uploads/document-request/deedOfDonation/', $fileName);
     
         return $filePath;
     }
@@ -3921,27 +4441,145 @@ class DocumentRequestController extends Controller
         return ExtraJudicial::where('documentRequest_id', $documentRequestID)->update($data);
     }
 
-    private function updateDeedOfSale(Request $request, $documentRequestID) {
+    private function updateDeedOfSale(Request $request, $address, $documentRequestID) {
+        $documentRequest = DeedOfSale::where('documentRequest_id', $documentRequestID)->first();
+
         $data = [
-            'name_identity_1' => trim($request->party1_name),
-            'name_identity_2' => trim($request->party2_name),
-            'details' => trim($request->property_details),
+            'name_of_vendor' => trim($request->name_of_vendor),
+            'vendor_civil_status' => $request->document_civil_status,
+            'vendor_address' => $address,
+            'property_price' => $request->property_price,
+            'name_of_vendee' => trim($request->name_of_vendee),
+            'name_of_witness' => trim($request->name_of_witness),
             'updated_at' => Carbon::now('Asia/Manila'),
         ];
-    
+
+        if ($request->hasFile('property_document')) {
+            $filePath = $documentRequest->property_document;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $PropertyDocumentPath = $this->uploadEditPropertyDocument($request);
+            $data['property_document'] = $PropertyDocumentPath;
+        }
+
+        if ($request->hasFile('vendor_valid_id_front')) {
+            $filePath = $documentRequest->vendor_valid_id_front;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $VendorValidIdFrontPath = $this->uploadEditVendorValidIdFront($request);
+            $data['vendor_valid_id_front'] = $VendorValidIdFrontPath;
+        }
+
+        if ($request->hasFile('vendor_valid_id_back')) {
+            $filePath = $documentRequest->vendor_valid_id_back;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $VendorValidIdBackPath = $this->uploadEditVendorValidIdBack($request);
+            $data['vendor_valid_id_back'] = $VendorValidIdBackPath;
+        }
+
+        if ($request->hasFile('vendee_valid_id_front')) {
+            $filePath = $documentRequest->vendee_valid_id_front;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $VendeeValidIdFrontPath = $this->uploadEditVendeeValidIdFront($request);
+            $data['vendee_valid_id_front'] = $VendeeValidIdFrontPath;
+        }
+
+        if ($request->hasFile('vendee_valid_id_back')) {
+            $filePath = $documentRequest->vendee_valid_id_back;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $VendeeValidIdBackPath = $this->uploadEditVendeeValidIdBack($request);
+            $data['vendee_valid_id_back'] = $VendeeValidIdBackPath;
+        }
+
+        if ($request->hasFile('witness_valid_id_front')) {
+            $filePath = $documentRequest->witness_valid_id_front;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $WitnessValidIdFrontPath = $this->uploadEditWitnessValidIdFront($request);
+            $data['witness_valid_id_front'] = $WitnessValidIdFrontPath;
+        }
+
+        if ($request->hasFile('witness_valid_id_back')) {
+            $filePath = $documentRequest->witness_valid_id_back;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $WitnessValidIdBackPath = $this->uploadEditWitnessValidIdBack($request);
+            $data['witness_valid_id_back'] = $WitnessValidIdBackPath;
+        }
+
         return DeedOfSale::where('documentRequest_id', $documentRequestID)->update($data);
     }
 
     private function updateDeedOfDonation(Request $request, $address, $address2, $documentRequestID) {
+        $documentRequest = DeedOfDonation::where('documentRequest_id', $documentRequestID)->first();
+        
         $data = [
             'donor_name' => trim($request->donor_name),
-            'donor_age' => $request->donor_age,
+            'donor_civil_status' => $request->donor_civil_status,
             'donor_address' => $address,
             'donee_name' => trim($request->donee_name),
-            'donee_age' => $request->donee_age,
+            'donee_civil_status' => $request->donee_civil_status,
             'donee_address' => $address2,
+            'property_description' => trim($request->property_description),
             'updated_at' => Carbon::now('Asia/Manila'),
         ];
+
+        if ($request->hasFile('donor_valid_id_front')) {
+            $filePath = $documentRequest->donor_valid_id_front;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $DonorValidIdFrontPath = $this->uploadEditDonorValidIdFront($request);
+            $data['donor_valid_id_front'] = $DonorValidIdFrontPath;
+        }
+
+        if ($request->hasFile('donor_valid_id_back')) {
+            $filePath = $documentRequest->donor_valid_id_back;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $DonorValidIdBackPath = $this->uploadEditDonorValidIdBack($request);
+            $data['donor_valid_id_back'] = $DonorValidIdBackPath;
+        }
+
+        if ($request->hasFile('donee_valid_id_front')) {
+            $filePath = $documentRequest->donee_valid_id_front;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $DoneeValidIdFrontPath = $this->uploadEditDoneeValidIdFront($request);
+            $data['donee_valid_id_front'] = $DoneeValidIdFrontPath;
+        }
+
+        if ($request->hasFile('donee_valid_id_back')) {
+            $filePath = $documentRequest->donee_valid_id_back;
+            if (file_exists(public_path($filePath))) {
+                unlink(public_path($filePath));
+            }
+
+            $DoneeValidIdBackPath = $this->uploadEditDoneeValidIdBack($request);
+            $data['donee_valid_id_back'] = $DoneeValidIdBackPath;
+        }
     
         return DeedOfDonation::where('documentRequest_id', $documentRequestID)->update($data);
     }
