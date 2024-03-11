@@ -32,27 +32,27 @@
 									</div>
 
 									<form action="{{ route('loginAction') }}" method="POST" class="user">
-										@csrf
+    									@csrf
 										<div class="form-group mt-4">
-											<input name="username" id="username" type="text" class="form-control form-control-user @error('username')is-invalid @enderror"
-												id="exampleInputUsername" aria-describedby="usernameHelp"
-												placeholder="Username" value="{{ old('username') }}">
+											<input name="username" id="username" type="text" class="form-control form-control-user @error('username') is-invalid @enderror"
+												id="exampleInputUsername" aria-describedby="usernameHelp" placeholder="Username" value="{{ old('username') }}">
 											@error('username')
 											<span class="invalid-feedback">{{ $message }}</span>
 											@enderror
 										</div>
 										<div class="form-group">
-											<input name="password" id="password" type="password"
-												class="form-control form-control-user @error('password')is-invalid @enderror" id="exampleInputPassword"
-												placeholder="Password">
+											<div class="password-toggle-container">
+												<input name="password" id="password" type="password"
+													class="form-control form-control-user @error('password') is-invalid @enderror" id="exampleInputPassword"
+													placeholder="Password">
+												<span class="password-toggle-btn" onclick="togglePasswordVisibility()">Show</span>
+											</div>
 											@error('password')
 											<span class="invalid-feedback">{{ $message }}</span>
 											@enderror
 										</div>
 
-										<button type="submit"
-											class="btn btn-primary btn-block btn-user btn-login"
-										>LOGIN</button>
+										<button type="submit" class="btn btn-primary btn-block btn-user btn-login">LOGIN</button>
 									</form>
 									<hr>
 
@@ -70,7 +70,36 @@
 			</div>
 		</div>
 	</div>
-	
+
+	<style>
+		.password-toggle-container {
+			position: relative;
+		}
+		.password-toggle-btn {
+			font-size: 13px;
+			position: absolute;
+			top: 50%;
+			right: 10px;
+			transform: translateY(-50%);
+			cursor: pointer;
+		}
+	</style>
+
+	<script>
+		function togglePasswordVisibility() {
+			var passwordInput = document.getElementById("password");
+			var passwordToggleBtn = document.querySelector(".password-toggle-btn");
+
+			if (passwordInput.type === "password") {
+				passwordInput.type = "text";
+				passwordToggleBtn.textContent = "Hide";
+			} else {
+				passwordInput.type = "password";
+				passwordToggleBtn.textContent = "Show";
+			}
+		}
+	</script>
+
 	<!-- Bootstrap core JavaScript-->
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
