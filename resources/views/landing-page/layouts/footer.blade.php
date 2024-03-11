@@ -22,7 +22,7 @@
 						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('home') }}#home">Home</a></li>
 						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('displayCommittee') }}">City Ordinances</a></li>
 						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('home') }}#faq">FAQs</a></li>
-						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('termsOfService') }}">Terms of Service</a></li>
+						<!-- <li><i class="bi bi-chevron-right"></i> <a href="{{ route('termsOfService') }}">Terms of Service</a></li> -->
 						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('privacyPolicy') }}">Privacy Policy</a></li>
 					</ul>
 				</div>

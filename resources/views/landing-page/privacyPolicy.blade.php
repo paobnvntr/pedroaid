@@ -26,11 +26,18 @@
             </header>
 
             <div class="p-5 card shadow" id="clientDetailsForm">
-                <p class="indent">In accordance with the Data Privacy Act of 2012 or RA 10173, PedroAID ensures the utmost confidentiality, careful usage, and limited disclosure of all personal information collected through our legal office portal.</p>
-                <p class="indent">We collect and handle your personal information in accordance with PedroAID's Privacy Policy, unless explicitly stated otherwise. Personal information may encompass details such as your name, civil status, address, contact number, email address, images, files.</p>
-
+                <p class="indent">At PedroAID, we are committed to safeguarding your privacy and ensuring the secure handling of your personal information. This Privacy Policy outlines our practices regarding the collection, use, and disclosure of personal information through our legal office portal.</p>
+                <p><strong> Collection and Use of Personal Information</strong></p>
+                <p class="indent">We collect personal information from users of our portal to provide legal services and enhance user experience. This may include your name, civil status, address, contact number, email address, as well as images and files relevant to your legal matters. We use this information solely for the purposes stated in our Privacy Policy and with your consent.</p>
+                <p><strong>Confidentiality and Security</strong></p>
+                <p class="indent">PedroAID adheres to strict confidentiality standards and employs industry-standard security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. We regularly review and update our security protocols to ensure compliance with the Data Privacy Act of 2012 (RA 10173) and other relevant regulations.</p>
+                <p><strong>Limited Disclosure</strong></p>
+                <p class="indent">We do not disclose your personal information to third parties without your explicit consent, except as required by law or as outlined in this Privacy Policy. Trusted service providers may access your information solely for the purpose of assisting us in providing our services, and they are bound by confidentiality obligations.</p>
                 <p><strong>Complaints and Other Concerns</strong></p>
                 <p class="indent">If you have any questions, concerns, or requests regarding this Privacy Policy or our privacy practices, you may call us at <strong>8082020305</strong> via phone, <strong>09205001415</strong> via mobile, or <strong>santosritch@gmail.com</strong> via email.</p>
+                <p><strong>Updates on the Privacy Policy</strong></p>
+                <p class="indent">We may update this Privacy Policy from time to time to reflect changes in our practices or legal requirements. Any updates will be posted on our portal, and we encourage you to review this Policy periodically.</p>
+
             </div>
         </div>
     </section>
