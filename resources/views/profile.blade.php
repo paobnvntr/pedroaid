@@ -46,11 +46,17 @@
 					<div class="row">
 						<div class="form-group col-md-6">
 							<label for="password">Password</label>
-							<input type="password" class="form-control" id="password" name="password" disabled>
+							<div class="password-toggle-container">
+								<input type="password" class="form-control" id="password" name="password" disabled>
+								<span class="password-toggle-btn" style="display: none;" onclick="togglePasswordVisibility('password')">Show</span>
+							</div>
 						</div>
 						<div class="form-group col-md-6">
 							<label for="password_confirmation">Confirm Password</label>
-							<input type="password" class="form-control" id="password_confirmation" name="password_confirmation" disabled>
+							<div class="password-toggle-container">
+								<input type="password" class="form-control" id="password_confirmation" name="password_confirmation" disabled>
+								<span class="password-toggle-btn" style="display: none;" onclick="togglePasswordVisibility('password_confirmation')">Show</span>
+							</div>
 						</div>
 					</div>
 
@@ -69,6 +75,20 @@
 		</div>
 	</div>
 
+<style>
+	.password-toggle-container {
+		position: relative;
+	}
+	.password-toggle-btn {
+		font-size: 13px;
+		position: absolute;
+		top: 50%;
+		right: 10px;
+		transform: translateY(-50%);
+		cursor: pointer;
+	}
+</style>
+
 <script>
 	const originalName = "{{ $user->name }}";
 	const originalUsername = "{{ $user->username }}";
@@ -76,6 +96,19 @@
 	const passwordInput = document.getElementById("password");
 	const passwordConfirmationInput = document.getElementById("password_confirmation");
 	const profilePictureInput = document.getElementById("profile_picture");
+
+	function togglePasswordVisibility(fieldId) {
+        var passwordInput = document.getElementById(fieldId);
+        var passwordToggleBtn = passwordInput.parentNode.querySelector(".password-toggle-btn");
+
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            passwordToggleBtn.textContent = "Hide";
+        } else {
+            passwordInput.type = "password";
+            passwordToggleBtn.textContent = "Show";
+        }
+    }
 	
 	const editProfileBtn = document.getElementById("editProfileBtn");
 
@@ -87,6 +120,7 @@
 		const passwordInput = document.getElementById("password");
 		const passwordConfirmationInput = document.getElementById("password_confirmation");
 		const profilePictureInput = document.getElementById("profile_picture");
+		const showPasswordToggleBtns = document.querySelectorAll(".password-toggle-btn");
 
 		if (editProfileBtn.textContent === "Edit Profile") {
 			editProfileBtn.textContent = "Cancel";
@@ -99,6 +133,9 @@
 			passwordConfirmationInput.disabled = false;
 			profilePictureInput.disabled = false;
 			submitBtn.style.display = "block"; // show the submit button
+			showPasswordToggleBtns.forEach(btn => {
+				btn.style.display = "block";
+			});
 		} else {
 			editProfileBtn.textContent = "Edit Profile";
 			editProfileBtn.classList.remove("btn-danger");
@@ -110,6 +147,9 @@
 			passwordConfirmationInput.disabled = true;
 			profilePictureInput.disabled = true;
 			submitBtn.style.display = "none"; // hide the submit button
+			showPasswordToggleBtns.forEach(btn => {
+				btn.style.display = "none";
+			});
 
 			// reset the form
 			nameInput.value = originalName;
