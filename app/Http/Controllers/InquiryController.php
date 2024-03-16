@@ -59,7 +59,7 @@ class InquiryController extends Controller
             $mailData = [
                 'title' => 'Mail from PedroAID',
                 'name' => $request->name,
-                'message' => 'Inquiry Received!',
+                'message' => 'Inquiry Received! We will get back to you as soon as possible.',
                 'tracking_id' => $inquiryID,
                 'link' => 'http://127.0.0.1:8000/tracker/inquiry-details/check-details?inquiry_id=' . $inquiryID . '&email=' . $request->email,
             ];

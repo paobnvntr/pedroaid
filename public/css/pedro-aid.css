@@ -11463,3 +11463,15 @@
     max-height: 350px; /* Adjust the height as needed */
     overflow-y: auto; /* Add a scrollbar when content exceeds the container height */
   }
+
+  .password-toggle-container {
+		position: relative;
+	}
+	.password-toggle-btn {
+		font-size: 13px;
+		position: absolute;
+		top: 50%;
+		right: 10px;
+		transform: translateY(-50%);
+		cursor: pointer;
+	}

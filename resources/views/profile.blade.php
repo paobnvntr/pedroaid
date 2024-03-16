@@ -75,20 +75,6 @@
 		</div>
 	</div>
 
-<style>
-	.password-toggle-container {
-		position: relative;
-	}
-	.password-toggle-btn {
-		font-size: 13px;
-		position: absolute;
-		top: 50%;
-		right: 10px;
-		transform: translateY(-50%);
-		cursor: pointer;
-	}
-</style>
-
 <script>
 	const originalName = "{{ $user->name }}";
 	const originalUsername = "{{ $user->username }}";

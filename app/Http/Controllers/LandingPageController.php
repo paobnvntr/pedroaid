@@ -39,9 +39,9 @@ class LandingPageController extends Controller
         return view('landing-page.home', compact('feedback'));
     }
 
-    public function termsOfService()
+    public function sangguniangPanlungsod()
     {
-        return view('landing-page.termsOfService');
+        return view('landing-page.sangguniangPanlungsod');
     }
 
     public function privacyPolicy()
@@ -1328,7 +1328,7 @@ class LandingPageController extends Controller
         return [
             'title' => 'Mail from PedroAID',
             'name' => trim($request->name),
-            'message' => 'Document Request Received!',
+            'message' => 'Document Request Received! Our team will review your request shortly.',
             'tracking_id' => $documentRequestID,
             'link' => route('documentRequestDetails', ['documentRequest_id' => $documentRequestID, 'email' => $request->email]),
         ];

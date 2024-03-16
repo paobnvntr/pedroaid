@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta content="width=device-width, initial-scale=1.0" name="viewport">
-	<link rel="icon" href="/images/sangguniang-panlungsod-logo.png" type="image/png">
+	<link rel="icon" href="{{ asset('images/PedroAID-Logo.png') }}" type="image/png">
 
 	<title>@yield('title')</title>
 
@@ -32,7 +32,7 @@
 
 	@yield('contents')
 
-	<!-- $<link rel="stylesheet" href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css">
+	$<link rel="stylesheet" href="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/themes/df-messenger-default.css">
 	<script src="https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js"></script>
 	<df-messenger
 		location="asia-southeast1"
@@ -41,8 +41,13 @@
 		language-code="en"
 		max-query-length="-1">
 		<df-messenger-chat-bubble
-			chat-title="PeDroid">
+			chat-title="PeDroid"
+			chat-width="400"
+			chat-icon="{{ asset('images/PeDroid.svg') }}"
+			placeholder-text="Type 'Hi' to start conversation."
+			bot-actor-image="{{ asset('images/PeDroid-Logo.png') }}">
 		</df-messenger-chat-bubble>
+		
 	</df-messenger>
 	<style>
 		df-messenger {
@@ -52,8 +57,14 @@
 			right: 15px;
 			--df-messenger-primary-color : #35784F !important;
 			--df-messenger-chat-window-height : 480px !important;
+			--df-messenger-chat-border-radius: 20px !important;
+			--df-messenger-chat-bubble-close-icon-size: 30px !important;
+			--df-messenger-titlebar-title-font-size: 25px !important;
+			--df-messenger-titlebar-title-font-weight: 700 !important;
+			--df-messenger-titlebar-title-font-family: 'Nunito', sans-serif !important;
+			--df-messenger-titlebar-font-color: var(--df-messenger-primary-color) !important;
 		}
-	</style> -->
+	</style>
 
 	@include('landing-page.layouts.footer')
 

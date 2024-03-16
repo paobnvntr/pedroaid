@@ -40,7 +40,7 @@ Route::controller(LandingPageController::class)->group(function () {
     Route::get('city-ordinance/{committee_name}/{year}', 'displayOrdinance')->name('displayOrdinance');
     Route::get('search-ordinances', 'searchOrdinance')->name('searchOrdinance');
 
-    Route::get('terms-of-service', 'termsOfService')->name('termsOfService');
+    Route::get('sangguniang-panlungsod', 'sangguniangPanlungsod')->name('sangguniangPanlungsod');
     Route::get('privacy-policy', 'privacyPolicy')->name('privacyPolicy');
 
     Route::get('appointment-form', 'appointmentForm')->name('appointmentForm');

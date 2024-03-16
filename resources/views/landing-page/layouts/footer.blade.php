@@ -7,7 +7,7 @@
 					<a href="{{ route('home') }}#home" class="logo d-flex align-items-center">
 						<span>PedroAID</span>
 					</a>
-					<p>Pedro Appointment, Inquiry and Document System or AID, is an online help center
+					<p>PedroAID (Appointment, Inquiry, and Document Request) is an online help center
 					portal designed for the legal needs of citizens of San Pedro City, Laguna</p>
 					<div class="social-links mt-3">
 						<a href="https://www.facebook.com/AMFLAC" class="facebook"><i class="bi bi-facebook"></i></a>
@@ -18,6 +18,8 @@
 					<h4>Useful Links</h4>
 					<ul>
 						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('home') }}#home">Home</a></li>
+						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('home') }}#about-us">About Us</a></li>
+						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('home') }}#sangguniang-panlungsod">Sangguniang Panlungsod</a></li>
 						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('displayCommittee') }}">City Ordinances</a></li>
 						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('home') }}#faq">FAQs</a></li>
 						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('privacyPolicy') }}">Privacy Policy</a></li>

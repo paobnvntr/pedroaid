@@ -57,21 +57,27 @@
             <div class="form-group row">
                 <div class="col-sm-6 mb-3 mb-sm-0">
                     <label for="password">Password:</label>
-                    <input name="password" type="password"
-                        class="form-control form-control-user @error('password')is-invalid @enderror"
-                        id="password" disabled>
-                    @error('password')
-                    <span class="invalid-feedback">{{ $message }}</span>
-                    @enderror
+					<div class="password-toggle-container">
+						<input name="password" type="password"
+							class="form-control form-control-user @error('password')is-invalid @enderror"
+							id="password" disabled>
+						<span class="password-toggle-btn" style="display: none;" onclick="togglePasswordVisibility('password')">Show</span>
+						@error('password')
+						<span class="invalid-feedback">{{ $message }}</span>
+						@enderror
+					</div>
                 </div>
                 <div class="col-sm-6">
                     <label for="password_confirmation">Confirm Password:</label>
-                    <input name="password_confirmation" type="password"
-                        class="form-control form-control-user @error('password_confirmation')is-invalid @enderror"
-                        id="password_confirmation" disabled>
-                    @error('password_confirmation')
-                    <span class="invalid-feedback">{{ $message }}</span>
-                    @enderror
+					<div class="password-toggle-container">
+						<input name="password_confirmation" type="password"
+							class="form-control form-control-user @error('password_confirmation')is-invalid @enderror"
+							id="password_confirmation" disabled>
+						<span class="password-toggle-btn" style="display: none;" onclick="togglePasswordVisibility('password_confirmation')">Show</span>
+						@error('password_confirmation')
+						<span class="invalid-feedback">{{ $message }}</span>
+						@enderror
+					</div>
                 </div>
             </div>
 
@@ -98,6 +104,19 @@
 	const passwordInput = document.getElementById("password");
 	const passwordConfirmationInput = document.getElementById("password_confirmation");
 	const profilePictureInput = document.getElementById("profile_picture");
+
+	function togglePasswordVisibility(fieldId) {
+        var passwordInput = document.getElementById(fieldId);
+        var passwordToggleBtn = passwordInput.parentNode.querySelector(".password-toggle-btn");
+
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            passwordToggleBtn.textContent = "Hide";
+        } else {
+            passwordInput.type = "password";
+            passwordToggleBtn.textContent = "Show";
+        }
+    }
 	
 	const editAdminBtn = document.getElementById("editAdminBtn");
 
@@ -109,6 +128,8 @@
 		const passwordInput = document.getElementById("password");
 		const passwordConfirmationInput = document.getElementById("password_confirmation");
 		const profilePictureInput = document.getElementById("profile_picture");
+		const showPasswordToggleBtns = document.querySelectorAll('.password-toggle-btn');
+
 
 		if (editAdminBtn.textContent === "Edit Admin") {
 			editAdminBtn.textContent = "Cancel";
@@ -121,6 +142,9 @@
 			passwordConfirmationInput.disabled = false;
 			profilePictureInput.disabled = false;
 			submitBtn.style.display = "block"; // show the submit button
+			showPasswordToggleBtns.forEach(btn => {
+				btn.style.display = "block";
+			});
 		} else {
 			editAdminBtn.textContent = "Edit Admin";
 			editAdminBtn.classList.remove("btn-danger");
@@ -132,6 +156,9 @@
 			passwordConfirmationInput.disabled = true;
 			profilePictureInput.disabled = true;
 			submitBtn.style.display = "none"; // hide the submit button
+			showPasswordToggleBtns.forEach(btn => {
+				btn.style.display = "none";
+			});
 
 			// reset the form
 			nameInput.value = originalName;

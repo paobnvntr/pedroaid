@@ -103,6 +103,8 @@ class AppointmentController extends Controller
 
         if($status == 'Finished') {
             $additional_message = 'Kindly fill up the feedback form.';
+        } elseif($status == 'Booked') {
+            $additional_message = 'Please make sure to arrive on time.';
         } elseif($status == 'No-Show') {
             $additional_message = 'Please reschedule if you want to continue your appointment.';
         } else {
@@ -254,7 +256,7 @@ class AppointmentController extends Controller
             $mailData = [
                 'title' => 'Mail from PedroAID',
                 'name' => $request->name,
-                'message' => 'Appointment Request Received!',
+                'message' => 'Appointment Request Received! Our team will review your request shortly.',
                 'tracking_id' => $appointmentID,
                 'link' => route('appointmentDetails', ['appointment_id' => $appointmentID, 'email' => $request->email]),
             ];

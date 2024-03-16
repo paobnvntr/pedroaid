@@ -1,28 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PedroAID</title>
-</head>
-<body>
-    <h1>{{ $mailData['title'] }}</h1>
-    
-    <p>Hi {{ $mailData['name'] }},</p>
-    
-    <p>{{ $mailData['message'] }}</p>
+@component('mail::message')
+# {{ $mailData['title'] }}
 
-    <br>
+Hi {{ $mailData['name'] }},
 
-    <p><strong>Tracking ID:</strong> {{ $mailData['tracking_id'] }}</p>
+{{ $mailData['message'] }}
 
-    <p>You can view your request here:</p>
-    <p>{{ $mailData['link'] }}</p>
+@component('mail::panel')
+**Tracking ID:** {{ $mailData['tracking_id'] }}
+@endcomponent
 
-    <br>
+@component('mail::button', ['url' => $mailData['link']])
+View Your Request
+@endcomponent
 
-    <p>Sincerely,</p>
-    <p><strong>PedroAID</strong></p>
-    <p>https://pedroaid.com/</p>
-</body>
-</html>
+Sincerely,<br>
+[PedroAID](https://pedroaid.com/)
+
+@endcomponent

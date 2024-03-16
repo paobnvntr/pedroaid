@@ -7,7 +7,6 @@ use App\Models\Appointment;
 use App\Models\Ordinances;
 use App\Models\User;
 use App\Notifications\NewAppointment;
-use DateInterval;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -654,7 +653,7 @@ class WebhookController extends Controller
             $mailData = [
                 'title' => 'Mail from PedroAID',
                 'name' => $name,
-                'message' => 'Appointment Request Received!',
+                'message' => 'Appointment Request Received! Our team will review your request shortly.',
                 'tracking_id' => $appointmentID,
                 'link' => route('appointmentDetails', ['appointment_id' => $appointmentID, 'email' => $email]),
             ];
@@ -814,7 +813,7 @@ class WebhookController extends Controller
                 'sessionInfo' => [
                     'parameters' => [
                         'ord_number' => null,
-                        // 'ord-availability' => 'not-valid'
+
                     ],
                     'tag' => $tag
                 ] 
@@ -826,20 +825,53 @@ class WebhookController extends Controller
 
     public function webhookSearchOrdinanceByTopic(Request $request) {
         $tag = $request->input('fulfillmentInfo.tag');
-        $message = $tag ?: $request->input('message', 'Hello World!');
         $topic = $request->input('sessionInfo.parameters.ordinance_topic');
         $committee = $request->input('sessionInfo.parameters.ordinance_committee');
-        // $entity = $request->input('sessionInfo.parameters.ordinance_entity');
+        $entity = $request->input('sessionInfo.parameters.ordinance_entity');
+        $dateArray = $request->input('sessionInfo.parameters.ordinance_date');
+
+        if ($dateArray) {
+            $date = $dateArray['startDate']['year'];
+        }
     
-        if ($topic || $committee) {
+        if ($topic || $committee || $entity || $date) {
             $query = Ordinances::query();
     
-            if ($topic) {
+            if ($topic && !$committee && !$entity && !$date) {
                 $query->where('description', 'like', '%' . $topic . '%');
-            }
-    
-            if ($committee) {
+            } else if (!$topic && $committee && !$entity && !$date) {
                 $query->where('committee', $committee);
+            } else if (!$topic && !$committee && $entity && !$date) {
+                $query->where('description', 'like', '%' . $entity . '%');
+            } else if (!$topic && !$committee && !$entity && $date) {
+                $query->where('date_approved', 'like', '%' . $date . '%');
+
+            } else if ($topic && $committee && !$entity && !$date) {
+                $query->where('description', 'like', '%' . $topic . '%')->where('committee', $committee);
+            } else if ($topic && !$committee && $entity && !$date) {
+                $query->where('description', 'like', '%' . $topic . '%')->where('description', 'like', '%' . $entity . '%');
+            } else if ($topic && !$committee && !$entity && $date) {
+                $query->where('description', 'like', '%' . $topic . '%')->where('date_approved', 'like', '%' . $date . '%');
+
+            } else if ($committee && $entity && !$topic && !$date) {
+                $query->where('committee', $committee)->where('description', 'like', '%' . $entity . '%');
+            } else if ($committee && !$topic && !$entity && $date) {
+                $query->where('committee', $committee)->where('date_approved', 'like', '%' . $date . '%');
+
+            } else if ($entity && $date && !$topic && !$committee) {
+                $query->where('description', 'like', '%' . $entity . '%')->where('date_approved', 'like', '%' . $date . '%');
+
+            } else if ($topic && $committee && $entity && !$date) {
+                $query->where('description', 'like', '%' . $topic . '%')->where('committee', $committee)->where('description', 'like', '%' . $entity . '%');
+            } else if ($topic && $committee && !$entity && $date) {
+                $query->where('description', 'like', '%' . $topic . '%')->where('committee', $committee)->where('date_approved', 'like', '%' . $date . '%');
+            } else if ($topic && !$committee && $entity && $date) {
+                $query->where('description', 'like', '%' . $topic . '%')->where('description', 'like', '%' . $entity . '%')->where('date_approved', 'like', '%' . $date . '%');
+            } else if (!$topic && $committee && $entity && $date) {
+                $query->where('committee', $committee)->where('description', 'like', '%' . $entity . '%')->where('date_approved', 'like', '%' . $date . '%');
+            
+            } else if ($topic && $committee && $entity && $date) {
+                $query->where('description', 'like', '%' . $topic . '%')->where('committee', $committee)->where('description', 'like', '%' . $entity . '%')->where('date_approved', 'like', '%' . $date . '%');
             }
     
             $ordinances = $query->get();
@@ -851,7 +883,28 @@ class WebhookController extends Controller
                             [
                                 'text' => [
                                     'text' => [
-                                        $text = "Here are the ordinances related to " . ($topic ? $topic . ($committee ? ' under ' : '') : '') . ($committee ? $committee : '') . ".\n\n Ordinance No. " . $ordinances->implode('ordinance_number', "\nOrdinance No. ")
+                                        "Here are the ordinances" . 
+                                        ($topic && !$committee && !$entity && !$date ? " related to " . $topic : 
+                                        (!$topic && $committee && !$entity && !$date ? " under " . $committee : 
+                                        (!$topic && !$committee && $entity && !$date ? " related to " . $entity : 
+                                        (!$topic && !$committee && !$entity && $date ? " approved in " . $date :
+
+                                        ($topic && $committee && !$entity && !$date ? " related to " . $topic . " under " . $committee : 
+                                        ($topic && $entity && !$committee && !$date ? " related to " . $topic . " and " . $entity : 
+                                        ($topic && $date && !$committee && !$entity ? " related to " . $topic . " and approved in" . $date : 
+
+                                        ($committee && $entity && !$topic && !$date ? " related to " . $entity . " under " . $committee: 
+                                        ($committee && $date && !$topic && !$entity ? " under " . $committee . " and approved in " . $date : 
+
+                                        ($entity && $date && !$topic && !$committee ? " related to " . $entity . " and approved in " . $date : 
+
+                                        ($topic && $committee && $entity && !$date ? " related to " . $topic . " under " . $committee . " and related to " . $entity : 
+                                        ($topic && $committee && $date && !$entity ? " related to " . $topic . " under " . $committee . " and approved in " . $date : 
+                                        ($topic && $entity && $date && !$committee ? " related to " . $topic . " and " . $entity . " and approved in " . $date : 
+                                        ($committee && $entity && $date && !$topic ? " related to " . $entity . " under " . $committee . " and approved in " . $date : 
+
+                                        ($topic && $committee && $entity && $date ? " related to " . $topic . " and " . $entity . " under " . $committee . " and approved in " . $date : ""))))))))))))))) . "\n\n" .
+                                        "Ordinance No. " . $ordinances->implode('ordinance_number', "\nOrdinance No. ")
                                     ]
                                 ]
                             ]
@@ -872,7 +925,30 @@ class WebhookController extends Controller
                         'messages' => [
                             [
                                 'text' => [
-                                    'text' => ["There are no ordinances related to " . $topic . " and committee " . $committee . "."]
+                                    'text' => [
+                                        "There are no ordinances related to " . 
+                                        ($topic && !$committee && !$entity && !$date ? $topic : 
+                                        (!$topic && $committee && !$entity && !$date ? $committee : 
+                                        (!$topic && !$committee && $entity && !$date ? $entity : 
+                                        (!$topic && !$committee && !$entity && $date ? $date : 
+
+                                        ($topic && $committee && !$entity && !$date ? $topic . " under " . $committee : 
+                                        ($topic && $entity && !$committee && !$date ? $topic . " and " . $entity : 
+                                        ($topic && $date && !$committee && !$entity ? $topic . " and approved in " . $date : 
+
+                                        ($committee && $entity && !$topic && !$date ? $committee . " and " . $entity : 
+                                        ($committee && $date && !$topic && !$entity ? $committee . " and approved in " . $date : 
+
+                                        ($entity && $date && !$topic && !$committee ? $entity . " and approved in " . $date : 
+
+                                        ($topic && $committee && $entity && !$date ? $topic . " under " . $committee . " and " . $entity : 
+                                        ($topic && $committee && $date && !$entity ? $topic . " under " . $committee . " and approved in " . $date : 
+                                        ($topic && $entity && $date && !$committee ? $topic . " and " . $entity . " and approved in " . $date : 
+                                        ($committee && $entity && $date && !$topic ? $committee . " and " . $entity . " and approved in " . $date : 
+
+                                        ($topic && $committee && $entity && $date ? $topic . " and " . $entity . " under " . $committee .  " and approved in " . $date : ""))))))))))))))) .
+                                        "."
+                                    ]
                                 ]
                             ]
                         ]
@@ -912,3 +988,4 @@ class WebhookController extends Controller
         }
     }    
 }
+

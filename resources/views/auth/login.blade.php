@@ -6,7 +6,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-	<link rel="icon" href="/images/sangguniang-panlungsod-logo.png" type="image/png">
+	<link rel="icon" href="{{ asset('images/PedroAID-Logo.png') }}" type="image/png">
 
 	<title>PedroAID</title>
 

@@ -26,33 +26,13 @@ class DocumentRequestMail extends Mailable implements ShouldQueue
     }
 
     /**
-     * Get the message envelope.
-     */
-    public function envelope(): Envelope
-    {
-        $subject = $this->customSubject ?? 'Appointment Received';
-        return new Envelope(
-            subject: $subject,
-        );
-    }
-
-    /**
-     * Get the message content definition.
-     */
-    public function content(): Content
-    {
-        return new Content(
-            view: 'email.documentRequestMail',
-        );
-    }
-
-    /**
-     * Get the attachments for the message.
+     * Build the message.
      *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * @return $this
      */
-    public function attachments(): array
+    public function build()
     {
-        return [];
+        return $this->subject($this->customSubject)
+                    ->markdown('email.documentRequestMail');
     }
 }

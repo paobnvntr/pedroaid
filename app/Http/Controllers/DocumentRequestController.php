@@ -911,7 +911,7 @@ class DocumentRequestController extends Controller
         return [
             'title' => 'Mail from PedroAID',
             'name' => trim($request->name),
-            'message' => 'Document Request Received!',
+            'message' => 'Document Request Received! Our team will review your request shortly.',
             'tracking_id' => $documentRequestID,
             'link' => route('documentRequestDetails', ['documentRequest_id' => $documentRequestID, 'email' => $request->email]),
         ];

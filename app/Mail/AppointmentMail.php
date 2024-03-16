@@ -22,37 +22,17 @@ class AppointmentMail extends Mailable implements ShouldQueue
     public function __construct($mailData, $customSubject = null)
     {
         $this->mailData = $mailData;
-        $this->customSubject = $customSubject;
+        $this->customSubject = $customSubject ?? 'Appointment Received';
     }
 
     /**
-     * Get the message envelope.
-     */
-    public function envelope(): Envelope
-    {
-        $subject = $this->customSubject ?? 'Appointment Received';
-        return new Envelope(
-            subject: $subject,
-        );
-    }
-
-    /**
-     * Get the message content definition.
-     */
-    public function content(): Content
-    {
-        return new Content(
-            view: 'email.appointmentMail',
-        );
-    }
-
-    /**
-     * Get the attachments for the message.
+     * Build the message.
      *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * @return $this
      */
-    public function attachments(): array
+    public function build()
     {
-        return [];
+        return $this->subject($this->customSubject)
+                    ->markdown('email.appointmentMail');
     }
 }
