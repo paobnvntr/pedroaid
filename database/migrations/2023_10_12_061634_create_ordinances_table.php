@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('committee');
             $table->string('ordinance_number');
             $table->date('date_approved');
-            $table->string('description');
+            $table->text('description');
             $table->string('ordinance_file');
             $table->timestamps();
         });

@@ -17,7 +17,7 @@ class OrdinanceController extends Controller
     //display ordinance list
     public function index()
     {
-        $ordinance = Ordinances::orderBy('created_at', 'ASC')->get();
+        $ordinance = Ordinances::orderBy('ordinance_number', 'ASC')->get();
         return view('ordinance.index', compact('ordinance'));
     }
 
@@ -32,7 +32,7 @@ class OrdinanceController extends Controller
         $validator = Validator::make($request->all(), [
             '_token' => 'required',
             'committee' => 'required',
-            'ordinance_number' => 'required|numeric|unique:ordinances,ordinance_number',
+            'ordinance_number' => 'required|unique:ordinances,ordinance_number',
             'date_approved' => 'required|date',
             'description' => 'required',
             'ordinance_file' => 'required',
