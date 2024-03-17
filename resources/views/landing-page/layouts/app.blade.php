@@ -42,7 +42,9 @@
 		max-query-length="-1">
 		<df-messenger-chat-bubble
 			chat-title="PeDroid"
-			chat-width="400"
+			chat-subtitle="PedroAID's Bot"
+			chat-title-icon="{{ asset('images/PeDroid.svg') }}"
+			chat-width="365"
 			chat-icon="{{ asset('images/PeDroid.svg') }}"
 			placeholder-text="Type 'Hi' to start conversation."
 			bot-actor-image="{{ asset('images/PeDroid-Logo.png') }}">
@@ -63,6 +65,7 @@
 			--df-messenger-titlebar-title-font-weight: 700 !important;
 			--df-messenger-titlebar-title-font-family: 'Nunito', sans-serif !important;
 			--df-messenger-titlebar-font-color: var(--df-messenger-primary-color) !important;
+			--df-messenger-message-actor-padding: 2px !important;
 		}
 	</style>
 

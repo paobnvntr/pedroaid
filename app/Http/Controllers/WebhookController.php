@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Mail\AppointmentMail;
+use App\Mail\InquiryMail;
 use App\Models\Appointment;
+use App\Models\DocumentRequest;
+use App\Models\Inquiry;
 use App\Models\Ordinances;
 use App\Models\User;
 use App\Notifications\NewAppointment;
+use App\Notifications\NewInquiry;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -761,7 +765,11 @@ class WebhookController extends Controller
                             [
                                 'text' => [
                                     'text' => [
-                                        "Here is the information about Ordinance No. " . $ordinance_number . ".\n\nCommittee: " . $ordinance->committee . "\n\nDescription: " . $ordinance->description . "\n\nDate Approved: " . $ordinance->date_approved . "\n\nFile: [Click here to download](" . asset($ordinance->ordinance_file) . ")"
+                                        "Here is the information about Ordinance No. " . $ordinance_number . 
+                                        ".\n\nCommittee: " . $ordinance->committee . 
+                                        "\n\nDescription: " . $ordinance->description . 
+                                        "\n\nDate Approved: " . $ordinance->date_approved . 
+                                        "\n\nFile: <a href=\"" . asset($ordinance->ordinance_file) . "\" target=\"_blank\">Click here to download</a>"
                                     ]
                                 ]
                             ]
@@ -832,6 +840,8 @@ class WebhookController extends Controller
 
         if ($dateArray) {
             $date = $dateArray['startDate']['year'];
+        } else {
+            $date = null;
         }
     
         if ($topic || $committee || $entity || $date) {
@@ -891,7 +901,7 @@ class WebhookController extends Controller
 
                                         ($topic && $committee && !$entity && !$date ? " related to " . $topic . " under " . $committee : 
                                         ($topic && $entity && !$committee && !$date ? " related to " . $topic . " and " . $entity : 
-                                        ($topic && $date && !$committee && !$entity ? " related to " . $topic . " and approved in" . $date : 
+                                        ($topic && $date && !$committee && !$entity ? " related to " . $topic . " and approved in " . $date : 
 
                                         ($committee && $entity && !$topic && !$date ? " related to " . $entity . " under " . $committee: 
                                         ($committee && $date && !$topic && !$entity ? " under " . $committee . " and approved in " . $date : 
@@ -986,6 +996,297 @@ class WebhookController extends Controller
     
             return response()->json($response);
         }
-    }    
-}
+    }  
+    
+    public function sendInquiryEmail(string $email, array $data, string $subject) {
+        Mail::to($email)->send(new InquiryMail($data, $subject));
+    }
 
+    public function webhookCreateInquiry(Request $request) {
+        $tag = $request->input('fulfillmentInfo.tag');
+        $message = $tag ?: $request->input('message', 'Hello World!');
+
+        $inquiry = $request->input('sessionInfo.parameters.inquiry');
+        $nameArray = $request->input('sessionInfo.parameters.name');
+        $email = $request->input('sessionInfo.parameters.email');
+
+        $name = $nameArray['name'];
+
+        $inquiryID = Inquiry::generateUniqueInquiryID();
+
+        $inquiryData = [
+            'inquiry_id' => $inquiryID,
+            'name' => $name,
+            'email' => $email,
+            'inquiry' => $inquiry,
+            'status' => 'Unanswered',
+            'created_at' => now('Asia/Manila'),
+            'updated_at' => now('Asia/Manila'),
+        ];
+
+        $createInquiry = Inquiry::create($inquiryData);
+
+        if ($createInquiry->save()) {
+
+            $mailData = [
+                'title' => 'Mail from PedroAID',
+                'name' => $name,
+                'message' => 'Inquiry Received! We will get back to you as soon as possible.',
+                'tracking_id' => $inquiryID,
+                'link' => route('inquiryDetails', ['inquiry_id' => $inquiryID, 'email' => $email]),
+            ];
+
+            $mailSubject = "[#$inquiryID] Inquiry: Inquiry from $name";
+
+            $this->sendInquiryEmail($email, $mailData, $mailSubject);
+
+            $staff = User::where('transaction_level', 'Inquiry')->get();
+            $admins = User::where('level', 'Admin')->get();
+            $superAdmins = User::where('level', 'Super Admin')->get();
+            
+            $notificationData = [
+                'inquiry_id' => $inquiryID,
+                'name' => $name,
+            ];
+
+            foreach ($staff as $user) {
+                $user->notify(new NewInquiry($notificationData));
+            }
+
+            foreach ($admins as $admin) {
+                $admin->notify(new NewInquiry($notificationData));
+            }
+
+            foreach ($superAdmins as $superAdmin) {
+                $superAdmin->notify(new NewInquiry($notificationData));
+            }
+    
+            $message = "Your inquiry has been successfully submitted.";
+    
+            $response = [
+                'fulfillmentResponse' => [
+                    'messages' => [
+                        [
+                            'text' => [
+                                'text' => [$message]
+                            ]
+                        ]
+                    ]
+                ],
+                'sessionInfo' => [
+                    'parameters' => [
+                        'name' => null,
+                        'email' => null,
+                        'inquiry' => null,
+                        'confirm' => null,
+                    ],
+                    'tag' => $tag
+                ] 
+            ];
+        
+            return response()->json($response);
+
+        } else {
+            $message = "An error occurred while submitting your inquiry. Please try again later.";
+
+            $response = [
+                'fulfillmentResponse' => [
+                    'messages' => [
+                        [
+                            'text' => [
+                                'text' => [$message]
+                            ]
+                        ]
+                    ]
+                ],
+                'sessionInfo' => [
+                    'parameters' => [
+                        'name'=> null,
+                        'email' => null,
+                        'inquiry' => null,
+                        'confirm' => null,
+                    ],
+                    'tag' => $tag
+                ]
+            ];
+
+            return response()->json($response);
+        }
+    }
+
+    public function webhookTrackingIdChecker(Request $request) {
+        $tag = $request->input('fulfillmentInfo.tag');
+        $trackingID = $request->input('sessionInfo.parameters.tracking_id');
+        
+        // Check if the tracking ID is valid
+        $isValidTrackingID = $this->isTrackingIdValid($trackingID);
+        
+        // Define the response message based on the validity of the tracking ID
+        if ($isValidTrackingID) {
+            $response = [
+                'sessionInfo' => [
+                    'parameters' => [
+                        'tracking_id' => $trackingID,
+                        'tracking_id_checker' => "valid"
+                    ],
+                    'tag' => $tag
+                ] 
+            ];
+        
+            // Return the response
+            return response()->json($response);
+
+        } else {
+            $response = [
+                'sessionInfo' => [
+                    'parameters' => [
+                        'tracking_id' => null,
+                        'tracking_id_checker' => "invalid"
+                    ],
+                    'tag' => $tag
+                ] 
+            ];
+
+            // Return the response
+            return response()->json($response);
+        }
+
+    }
+    
+    private function isTrackingIdValid($trackingID) {
+        // Define the regular expression pattern for tracking IDs
+        $pattern = '/^[A-Z0-9]{3}-[A-Z0-9]{3}-[A-Z0-9]{3}$/'; // Assuming tracking ID consists of 10 characters, uppercase letters, digits, and hyphens only
+        
+        // Use preg_match to check if the trackingID matches the pattern
+        return preg_match($pattern, $trackingID);
+    }    
+
+    public function webhookCheckStatus(Request $request) {
+        $tag = $request->input('fulfillmentInfo.tag');
+        $trackingID = $request->input('sessionInfo.parameters.tracking_id');
+        $email = $request->input('sessionInfo.parameters.email');
+
+        $appointment = Appointment::where('appointment_id', $trackingID)->where('email', $email)->exists();
+        $inquiry = Inquiry::where('inquiry_id', $trackingID)->where('email', $email)->exists();
+        $documentRequest = DocumentRequest::where('documentRequest_id', $trackingID)->where('email', $email)->exists();
+
+        if ($appointment) {
+            $appointment = Appointment::where('appointment_id', $trackingID)->where('email', $email)->first();
+
+            $response = [
+                'fulfillmentResponse' => [
+                    'messages' => [
+                        [
+                            'text' => [
+                                'text' => [
+                                    "Here is the status of your appointment.\n
+                                    Appointment ID: " . $appointment->appointment_id . 
+                                    "\nAppointment Date: " . $appointment->appointment_date . 
+                                    "\nAppointment Time: " . $appointment->appointment_time .
+                                    "\nAppointment Status: " . $appointment->appointment_status .
+                                    "\nDate Finished: " . $appointment->date_finished .
+                                    "\n\nName: " . $appointment->name .
+                                    "\nAddress: " . $appointment->address .
+                                    "\nCellphone Number: " . $appointment->cellphone_number .
+                                    "\nEmail: " . $appointment->email
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'sessionInfo' => [
+                    'parameters' => [
+                        'tracking_id' => $trackingID,
+                        'tracking_id_checker' => "valid"
+                    ],
+                    'tag' => $tag
+                ] 
+            ];
+
+            return response()->json($response);
+        } else if ($inquiry) {
+            $inquiry = Inquiry::where('inquiry_id', $trackingID)->where('email', $email)->first();
+
+            $response = [
+                'fulfillmentResponse' => [
+                    'messages' => [
+                        [
+                            'text' => [
+                                'text' => [
+                                    "Here is the status of your inquiry.\n
+                                    Inquiry ID: " . $inquiry->inquiry_id . 
+                                    "\nName: " . $inquiry->name . 
+                                    "\nEmail: " . $inquiry->email .
+                                    "\nStatus: " . $inquiry->status .
+                                    "\n\nInquiry: " . $inquiry->inquiry
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'sessionInfo' => [
+                    'parameters' => [
+                        'tracking_id' => $trackingID,
+                        'tracking_id_checker' => "valid"
+                    ],
+                    'tag' => $tag
+                ] 
+            ];
+
+            return response()->json($response);
+
+        } else if ($documentRequest) {
+            $documentRequest = DocumentRequest::where('documentRequest_id', $trackingID)->where('email', $email)->first();
+
+            $response = [
+                'fulfillmentResponse' => [
+                    'messages' => [
+                        [
+                            'text' => [
+                                'text' => [
+                                    "Here is the status of your document request.\n
+                                    Document Request ID: " . $documentRequest->documentRequest_id . 
+                                    "\nDocument Type: " . $documentRequest->document_type .
+                                    "\nStatus: " . $documentRequest->status .
+                                    "\n\nName: " . $documentRequest->name . 
+                                    "\nAddress: " . $documentRequest->address .
+                                    "\nCellphone Number: " . $documentRequest->cellphone_number .
+                                    "\nEmail: " . $documentRequest->email
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'sessionInfo' => [
+                    'parameters' => [
+                        'tracking_id' => $trackingID,
+                        'tracking_id_checker' => "valid"
+                    ],
+                    'tag' => $tag
+                ] 
+            ];
+
+            return response()->json($response);
+        } else {
+            $response = [
+                'fulfillmentResponse' => [
+                    'messages' => [
+                        [
+                            'text' => [
+                                'text' => ["The tracking ID with email you provided doesn't exist."]
+                            ]
+                        ]
+                    ]
+                ],
+                'sessionInfo' => [
+                    'parameters' => [
+                        'tracking_id' => null,
+                        'tracking_id_checker' => "invalid"
+                    ],
+                    'tag' => $tag
+                ]
+            ];
+            return response()->json($response);
+        }
+    }
+}

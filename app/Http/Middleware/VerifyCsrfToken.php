@@ -20,5 +20,8 @@ class VerifyCsrfToken extends Middleware
         'webhookCreateAppoinment',
         'webhookSearchOrdinanceByNumber',
         'webhookSearchOrdinanceByTopic',
+        'webhookCreateInquiry',
+        'webhookTrackingIdChecker',
+        'webhookCheckStatus',
     ];
 }

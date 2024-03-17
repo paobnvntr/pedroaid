@@ -68,6 +68,11 @@ Route::controller(WebhookController::class)->group(function () {
 
     Route::post('webhookSearchOrdinanceByNumber', 'webhookSearchOrdinanceByNumber')->name('webhookSearchOrdinanceByNumber');
     Route::post('webhookSearchOrdinanceByTopic', 'webhookSearchOrdinanceByTopic')->name('webhookSearchOrdinanceByTopic');
+
+    Route::post('webhookCreateInquiry', 'webhookCreateInquiry')->name('webhookCreateInquiry');
+
+    Route::post('webhookTrackingIdChecker', 'webhookTrackingIdChecker')->name('webhookTrackingIdChecker');
+    Route::post('webhookCheckStatus', 'webhookCheckStatus')->name('webhookCheckStatus');
 });
 
 Route::controller(TrackerController::class)->group(function () {
