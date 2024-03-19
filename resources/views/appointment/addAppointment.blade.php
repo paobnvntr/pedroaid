@@ -191,8 +191,20 @@
                 scrollTop: $("#dateLabel").offset().top
             }, 100);
 
+            var selectedOption = $(this).find("option:selected");
+            // Extract the display text (2:00 PM - 2:10 PM)
+            var displayText = selectedOption.text();
+            // Extract the value (14:00)
+            var selectedValue = $(this).val();
+
+            console.log(selectedValue);
+            console.log(displayText);
+
+            // Set the display text in clientDetailsForm
+            $("#selected_timeslot_display").val(displayText).prop("readonly", true);;
+
             // Set the selected time to the hidden input
-            $("#appointment_time").val($(this).val()).prop("readonly", true);
+            $("#appointment_time").val($(this).val());
             $("#appointment_date").prop("readonly", true);
             
         } else {
