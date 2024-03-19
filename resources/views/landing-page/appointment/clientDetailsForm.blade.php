@@ -11,7 +11,8 @@
         </div>
 
         <div class="col-sm-6">
-            <input name="appointment_time" id="appointment_time" type="text"
+            <input name="appointment_time" id="appointment_time" type="hidden">
+            <input name="selected_timeslot_display" id="selected_timeslot_display" type="text"
                 class="form-control form-control-user @error('appointment_time')is-invalid @enderror">
             @error('appointment_time')
             <span class="invalid-feedback">{{ $message }}</span>
@@ -130,7 +131,7 @@
         <label for="contact_details">Contact Details:</label>
         <div class="col-sm-6 mb-3 mb-sm-0">
             <input name="cellphone_number" type="tel"
-                class="form-control form-control-user @error('cellphone_number')is-invalid @enderror"
+                class="form-control form-control-user @error('cellphone_number')is-invalid @enderror" maxlength="11"
                 id="cellphone" placeholder="Cellphone Number (e.g. 09XXXXXXXXX)" value="{{ old('cellphone_number') }}"
                 >
             @error('cellphone_number')
@@ -139,7 +140,7 @@
         </div>
         <div class="col-sm-6">
             <input name="email" id="email" type="email"
-                class="form-control form-control-user @error('email')is-invalid @enderror"
+                class="form-control form-control-user @error('email')is-invalid @enderror" maxlength="320"
                 id="email" placeholder="Email Address (e.g. juandelacruz@gmail.com)" value="{{ old('email') }}">
             @error('email')
             <span class="invalid-feedback">{{ $message }}</span>
