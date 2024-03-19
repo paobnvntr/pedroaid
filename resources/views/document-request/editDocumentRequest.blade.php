@@ -151,7 +151,7 @@
                     <label for="contact_details">Contact Details:</label>
                     <div class="col-sm-6 mb-3 mb-sm-0">
                         <input name="cellphone_number" type="tel"
-                            class="form-control form-control-user @error('cellphone_number')is-invalid @enderror"
+                            class="form-control form-control-user @error('cellphone_number')is-invalid @enderror" maxlength="11"
                             id="cellphone_number" placeholder="Current Cellphone Number: {{ $documentRequest->cellphone_number }}" value="{{ old('cellphone_number', $documentRequest->cellphone_number) }}" disabled>
                         @error('cellphone_number')
                         <span class="invalid-feedback">{{ $message }}</span>
@@ -159,7 +159,7 @@
                     </div>
                     <div class="col-sm-6">
                         <input name="email" id="email" type="email"
-                            class="form-control form-control-user @error('email')is-invalid @enderror"
+                            class="form-control form-control-user @error('email')is-invalid @enderror" maxlength="320"
                             placeholder="Current Email Address: {{ $documentRequest->email }}" value="{{ old('email', $documentRequest->email) }}" disabled>
                         @error('email')
                         <span class="invalid-feedback">{{ $message }}</span>
