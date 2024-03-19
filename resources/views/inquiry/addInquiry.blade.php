@@ -33,7 +33,7 @@
                         </div>
 
                         <div class="col-sm-6">
-                            <input name="email" id="email" type="email"
+                            <input name="email" id="email" type="email" maxlength="320"
                                 class="form-control form-control-user @error('email')is-invalid @enderror"
                                 id="email" placeholder="Email Address (e.g. juandelacruz@gmail.com)" value="{{ old('email') }}">
                             @error('email')
