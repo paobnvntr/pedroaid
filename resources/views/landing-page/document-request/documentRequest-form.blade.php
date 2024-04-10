@@ -16,10 +16,10 @@
             
             @if(Session::has('success'))
                 <div class="alert alert-success" role="alert">
-                    {{ Session::get('success') }} <span id="reloadMessage">Reloading in <span id="countdown">5</span> seconds...</span>
+                    {{ Session::get('success') }} <span id="reloadMessage">Reloading in <span id="countdown">10</span> seconds...</span>
                 </div>
                 <script>
-                    var timer = 5;
+                    var timer = 10;
                     var countdown = setInterval(function() {
                         timer--;
                         document.getElementById('countdown').innerText = timer;
@@ -33,10 +33,10 @@
 
             @if(Session::has('failed'))
                 <div class="alert alert-danger" role="alert">
-                    {{ Session::get('failed') }} <span id="reloadMessage">Reloading in <span id="countdown">5</span> seconds...</span>
+                    {{ Session::get('failed') }} <span id="reloadMessage">Reloading in <span id="countdown">10</span> seconds...</span>
                 </div>
                 <script>
-                    var timer = 5;
+                    var timer = 10;
                     var countdown = setInterval(function() {
                         timer--;
                         document.getElementById('countdown').innerText = timer;
@@ -600,6 +600,9 @@
     const createDocumentRequestBtn = document.getElementById("createDocumentRequestBtn");
 
     createDocumentRequestBtn.addEventListener("click", async () => {
+        createDocumentRequestBtn.disabled = true;
+        createDocumentRequestBtn.textContent = 'Processing Document Request . . .';
+
         const documentRequestForm = document.getElementById("documentRequestForm");
         const formData = new FormData(documentRequestForm);
 
@@ -625,6 +628,9 @@
             const data = await response.json();
 
             if (data.message === 'Validation failed') {
+                createDocumentRequestBtn.disabled = false;
+                createDocumentRequestBtn.textContent = 'Send Document Request';
+
                 const errorElements = document.querySelectorAll('.invalid-feedback');
                 errorElements.forEach(errorElement => {
                     errorElement.remove();

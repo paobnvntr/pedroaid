@@ -128,10 +128,10 @@
 
             @if(Session::has('success'))
                 <div class="alert alert-success" role="alert">
-                    {{ Session::get('success') }} <span id="reloadMessage">Reloading in <span id="countdown">5</span> seconds...</span>
+                    {{ Session::get('success') }} <span id="reloadMessage">Reloading in <span id="countdown">10</span> seconds...</span>
                 </div>
                 <script>
-                    var timer = 5;
+                    var timer = 10;
                     var countdown = setInterval(function() {
                         timer--;
                         document.getElementById('countdown').innerText = timer;
@@ -145,10 +145,10 @@
 
             @if(Session::has('failed'))
                 <div class="alert alert-danger" role="alert">
-                    {{ Session::get('failed') }} <span id="reloadMessage">Reloading in <span id="countdown">5</span> seconds...</span>
+                    {{ Session::get('failed') }} <span id="reloadMessage">Reloading in <span id="countdown">10</span> seconds...</span>
                 </div>
                 <script>
-                    var timer = 5;
+                    var timer = 10;
                     var countdown = setInterval(function() {
                         timer--;
                         document.getElementById('countdown').innerText = timer;
@@ -256,6 +256,9 @@
     const createAppointmentBtn = document.getElementById("createAppointmentBtn");
 
     createAppointmentBtn.addEventListener("click", async () => {
+        createAppointmentBtn.disabled = true;
+        createAppointmentBtn.textContent = 'Processing Appointment . . .';
+
         const appointmentForm = document.getElementById("appointmentForm");
         const formData = new FormData(appointmentForm);
 
@@ -271,6 +274,9 @@
             const data = await response.json();
 
             if (data.message === 'Validation failed') {
+                createAppointmentBtn.disabled = false;
+                createAppointmentBtn.textContent = 'Create Appointment';
+                
                 document.getElementById('clientDetailsForm').style.display = 'block';
 
                 const errorElements = document.querySelectorAll('.invalid-feedback');

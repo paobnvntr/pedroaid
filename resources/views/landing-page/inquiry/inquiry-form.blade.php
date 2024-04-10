@@ -16,10 +16,10 @@
 
             @if(Session::has('success'))
                 <div class="alert alert-success" role="alert">
-                    {{ Session::get('success') }} <span id="reloadMessage">Reloading in <span id="countdown">5</span> seconds...</span>
+                    {{ Session::get('success') }} <span id="reloadMessage">Reloading in <span id="countdown">10</span> seconds...</span>
                 </div>
                 <script>
-                    var timer = 5;
+                    var timer = 10;
                     var countdown = setInterval(function() {
                         timer--;
                         document.getElementById('countdown').innerText = timer;
@@ -33,10 +33,10 @@
 
             @if(Session::has('failed'))
                 <div class="alert alert-danger" role="alert">
-                    {{ Session::get('failed') }} <span id="reloadMessage">Reloading in <span id="countdown">5</span> seconds...</span>
+                    {{ Session::get('failed') }} <span id="reloadMessage">Reloading in <span id="countdown">10</span> seconds...</span>
                 </div>
                 <script>
-                    var timer = 5;
+                    var timer = 10;
                     var countdown = setInterval(function() {
                         timer--;
                         document.getElementById('countdown').innerText = timer;
@@ -109,6 +109,10 @@
     const createInquiryBtn = document.getElementById("createInquiryBtn");
 
     createInquiryBtn.addEventListener("click", async () => {
+        createInquiryBtn.disabled = true;
+        createInquiryBtn.textContent = 'Processing Inquiry . . .';
+
+
         const inquiryForm = document.getElementById("inquiryForm");
         const formData = new FormData(inquiryForm);
 
@@ -134,6 +138,9 @@
             const data = await response.json();
 
             if (data.message === 'Validation failed') {
+                createInquiryBtn.disabled = false;
+                createInquiryBtn.textContent = 'Send Inquiry';
+
                 const errorElements = document.querySelectorAll('.invalid-feedback');
                 errorElements.forEach(errorElement => {
                     errorElement.remove();
