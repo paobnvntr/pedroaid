@@ -178,6 +178,16 @@
 		const updateProfileForm = document.getElementById("updateProfileForm");
 		const formData = new FormData(updateProfileForm);
 
+		const errorElements = document.querySelectorAll('.invalid-feedback');
+        errorElements.forEach(errorElement => {
+            errorElement.remove();
+        });
+
+        const inputElements = document.querySelectorAll('.is-invalid');
+        inputElements.forEach(inputElement => {
+            inputElement.classList.remove('is-invalid');
+        });
+
 		try {
 			const response = await fetch('{{ route('profile.validateProfileForm', $user->id) }}', {
 				method: 'POST',

@@ -104,22 +104,11 @@
     </li>
   @endif
 
-  @if (auth()->user()->level == 'Super Admin' || auth()->user()->level == 'Admin')
+  @if (auth()->user()->level == 'Super Admin')
     <li class="nav-item">
       <a class="nav-link" href="{{ route('logs') }}">
         <i class="fas fa-fw fa-file-alt"></i>
         <span>Logs</span></a>
     </li>
   @endif
-
-  <!-- <li class="nav-item">
-    <a class="nav-link" href="{{ route('dashboard') }}">
-      <i class="fas fa-fw fa-cog"></i>
-      <span>Settings and Profile</span></a>
-  </li> -->
- 
-  <!-- Sidebar Toggler (Sidebar) -->
-  <!-- <div class="text-center d-none d-md-inline">
-    <button class="rounded-circle border-0" id="sidebarToggle"></button>
-  </div>  -->
 </ul>

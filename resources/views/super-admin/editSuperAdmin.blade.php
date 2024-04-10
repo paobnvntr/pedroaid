@@ -58,7 +58,7 @@
 
             <div class="form-group row">
                 <div class="col-sm-6 mb-3 mb-sm-0">
-                    <label for="password">Password:</label>
+                    <label for="password">New Password:</label>
 					<div class="password-toggle-container">
 						<input name="password" type="password"
 							class="form-control form-control-user @error('password')is-invalid @enderror"
