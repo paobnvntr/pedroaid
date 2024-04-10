@@ -60,37 +60,45 @@
             </header>
 
             <div class="p-5 card shadow" id="clientDetailsForm">
+                <div class="text-end text-primary mb-3">
+                    <small><span class="text-danger">*</span> = Required Field</small>
+                </div>
                 <form action="{{ route('saveInquiry') }}" method="POST" id="inquiryForm" class="user" enctype="multipart/form-data">
                     @csrf
                     <div class="form-group row">
-                        <div class="col-sm-6 mb-3 mb-sm-0">
+                        <div class="col-sm-6 mb-3 mb-sm-0 position-relative">
                             <input name="name" id="name" type="text"
                                 class="form-control form-control-user @error('name')is-invalid @enderror"
                                 placeholder="Client Name (e.g. Juan Dela Cruz)" value="{{ old('name') }}">
                             @error('name')
                             <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
+                            <span class="text-danger position-absolute top-0 end-0 required-indicator" title="Required Field">*</span>
                         </div>
-
-                        <div class="col-sm-6">
-                            <input name="email" id="email" type="email"
-                                class="form-control form-control-user @error('email')is-invalid @enderror" maxlength="320"
-                                id="email" placeholder="Email Address (e.g. juandelacruz@gmail.com)" value="{{ old('email') }}">
+                
+                        <div class="col-sm-6 position-relative">
+                            <input name="email" id="email" type="email" maxlength="320"
+                                class="form-control form-control-user @error('email')is-invalid @enderror"
+                                placeholder="Email Address (e.g. juandelacruz@gmail.com)" value="{{ old('email') }}">
                             @error('email')
                             <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
+                            <span class="text-danger position-absolute top-0 end-0 required-indicator" title="Required Field">*</span>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <textarea name="inquiry" id="inquiry" rows="5" 
-                        class="form-control form-control-textbox @error('inquiry')is-invalid @enderror" 
-                        placeholder="Write your inquiry here...">{{ old('inquiry') }}</textarea>
-                        @error('inquiry')
-                        <span class="invalid-feedback">{{ $message }}</span>
-                        @enderror
+                    <div class="form-group row">
+                        <div class="col-sm-12 position-relative">
+                            <textarea name="inquiry" id="inquiry" rows="5" 
+                            class="form-control form-control-textbox @error('inquiry')is-invalid @enderror" 
+                            placeholder="Write your inquiry here...">{{ old('inquiry') }}</textarea>
+                            @error('inquiry')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                            <span class="text-danger position-absolute top-0 end-0 required-indicator" title="Required Field">*</span>
+                        </div>
                     </div>
-
+                
                     <button type="button" class="btn btn-primary btn-user btn-block" id="createInquiryBtn">Send Inquiry</button>
                 </form>
             </div>

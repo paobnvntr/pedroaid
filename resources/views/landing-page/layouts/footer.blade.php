@@ -10,7 +10,8 @@
 					<p>PedroAID (Appointment, Inquiry, and Document Request) is an online help center
 					portal designed for the legal needs of citizens of San Pedro City, Laguna</p>
 					<div class="social-links mt-3">
-						<a href="https://www.facebook.com/AMFLAC" class="facebook"><i class="bi bi-facebook"></i></a>
+						<a href="https://www.facebook.com/AMFLAC" class="facebook" target="_blank"><i class="bi bi-facebook"></i> Atty. Marky Oliveros</a>
+						<a href="https://www.facebook.com/groups/405644160278321/" class="facebook" target="_blank"><i class="bi bi-facebook"></i> AMFLAC Facebook Group</a>
 					</div>
 				</div>
 
@@ -19,8 +20,8 @@
 					<ul>
 						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('home') }}#home">Home</a></li>
 						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('home') }}#about-us">About Us</a></li>
-						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('home') }}#sangguniang-panlungsod">Sangguniang Panlungsod</a></li>
-						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('displayCommittee') }}">City Ordinances</a></li>
+						<!--<li><i class="bi bi-chevron-right"></i> <a href="{{ route('home') }}#sangguniang-panlungsod">Sangguniang Panlungsod</a></li>-->
+						<!--<li><i class="bi bi-chevron-right"></i> <a href="{{ route('displayCommittee') }}">City Ordinances</a></li>-->
 						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('home') }}#faq">FAQs</a></li>
 						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('privacyPolicy') }}">Privacy Policy</a></li>
 					</ul>
@@ -42,10 +43,12 @@
 						3F New City Hall Bldg.,<br>
 						Brgy. Poblacion, <br>
 						City of San Pedro, 4023<br>
-						Laguna, Philippines <br><br>
+						Laguna, Philippines <br>
+						<strong>Google Maps: </strong> <a href="https://maps.app.goo.gl/pyGqSpdLeSFNkAQi9" target="_blank">Click here</a>
+						<br><br>
 						<strong>Phone:</strong> 8082020305<br>
 						<strong>Mobile:</strong> 09205001415<br>
-						<strong>Email:</strong> santosritch@gmail.com<br>
+						<strong>Email:</strong> contact@pedroaid.com<br>
 					</p>
 
 				</div>
