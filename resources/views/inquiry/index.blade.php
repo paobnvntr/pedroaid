@@ -49,8 +49,10 @@
                                     <td class="align-middle text-center">
                                         <div class="btn-group" role="group" aria-label="Basic example">
                                             <a href="{{ route('inquiry.inquiryDetails', $inq->inquiry_id) }}" type="button" class="btn btn-primary p-2">Details</a>
-                                            <a href="{{ route('inquiry.editInquiry', $inq->inquiry_id) }}" type="button" class="btn btn-warning p-2">Edit</a>
-                                            <a href="{{ route('inquiry.deleteInquiry', $inq->inquiry_id) }}" type="button" class="btn btn-danger p-2">Delete</a>
+                                            @if (auth()->user()->level == 'Super Admin')
+                                                <a href="{{ route('inquiry.editInquiry', $inq->inquiry_id) }}" type="button" class="btn btn-warning p-2">Edit</a>
+                                                <a href="{{ route('inquiry.deleteInquiry', $inq->inquiry_id) }}" type="button" class="btn btn-danger p-2">Delete</a>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
@@ -99,8 +101,10 @@
                                     <td class="align-middle text-center">
                                         <div class="btn-group" role="group" aria-label="Basic example">
                                             <a href="{{ route('inquiry.inquiryDetails', $inq->inquiry_id) }}" type="button" class="btn btn-primary p-2">Details</a>
-                                            <a href="{{ route('inquiry.editInquiry', $inq->inquiry_id) }}" type="button" class="btn btn-warning p-2">Edit</a>
-                                            <a href="{{ route('inquiry.deleteInquiry', $inq->inquiry_id) }}" type="button" class="btn btn-danger p-2">Delete</a>
+                                            @if (auth()->user()->level == 'Super Admin')
+                                                <a href="{{ route('inquiry.editInquiry', $inq->inquiry_id) }}" type="button" class="btn btn-warning p-2">Edit</a>
+                                                <a href="{{ route('inquiry.deleteInquiry', $inq->inquiry_id) }}" type="button" class="btn btn-danger p-2">Delete</a>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

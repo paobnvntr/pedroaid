@@ -41,19 +41,19 @@
         </header>
         <!-- Feature Tabs -->
         <div class="row feture-tabs">
-            <div class="col-lg-3" data-aos="zoom-in" data-aos-delay="200">
+            <div class="col-lg-3" data-aos="zoom-in">
                 <div class="feture-tabs">
 					<img src="{{ asset('images/PedroAID-Logo.png') }}" class="img-fluid" alt=""> 
 				</div>
             </div>
 			
-            <div class="col-lg-3" data-aos="zoom-in" data-aos-delay="300">
+            <div class="col-lg-3" data-aos="zoom-in">
                 <div class="feture-tabs">
 					<img src="{{ asset('images/sangguniang-panlungsod-logo.png') }}" class="img-fluid" alt=""> 
 				</div>
             </div>
 
-            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+            <div class="col-lg-6" data-aos="fade-up">
 				<h3>Free Legal Access to San Pedro City</h3>
 
                 <!-- Tabs -->
@@ -129,7 +129,7 @@
 <section id="about-ordinances" class="about">
 	<div class="container" data-aos="fade-up">
 		<div class="row gx-0">
-			<div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="200">
+			<div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up">
 				<div class="content">
 					<h3>San Pedro City Ordinances</h3>
 					<h2>Dive into the rules and regulations that shape our vibrant community, ensuring a safe, sustainable, and prosperous environment for all residents and visitors</h2>
@@ -165,7 +165,7 @@
 
 		<div class="row gy-4">
 
-			<div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+			<div class="col-lg-4 col-md-6" data-aos="fade-up">
 				<a href="{{ route('appointmentForm') }}">
 					<div class="service-box green">
 						<i class="ri-calendar-todo-fill icon"></i>
@@ -176,7 +176,7 @@
 				</a>
 			</div>
 
-			<div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+			<div class="col-lg-4 col-md-6" data-aos="fade-up">
 				<a href="{{ route('inquiryForm') }}">
 					<div class="service-box green">
 						<i class="ri-questionnaire-fill icon"></i>
@@ -187,7 +187,7 @@
 				</a>
 			</div>
 
-			<div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
+			<div class="col-lg-4 col-md-6" data-aos="fade-up">
 				<a href="{{ route('documentRequestForm') }}">
 					<div class="service-box green">
 						<i class="ri-file-text-fill icon"></i>
@@ -230,7 +230,7 @@
 			<p>What they are saying about us</p>
 		</header>
 
-		<div class="testimonials-slider swiper" data-aos="fade-up" data-aos-delay="200">
+		<div class="testimonials-slider swiper" data-aos="fade-up">
 			<div class="swiper-wrapper">
 
 				@if($feedback->count() > 0)

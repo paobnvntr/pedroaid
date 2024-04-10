@@ -30,7 +30,9 @@
                             <th>Comment</th>
                             <th>Date Created</th>
                             <th>Last Update</th>
-                            <th></th>
+                            @if (auth()->user()->level == 'Super Admin')
+                                <th></th>
+                            @endif
                         </tr>
                     </thead>
 
@@ -45,12 +47,14 @@
                                     <td class="align-middle text-center">{{ $fdbck->comment }}</td>
                                     <td class="align-middle text-center">{{ $fdbck->created_at }}</td>  
                                     <td class="align-middle text-center">{{ $fdbck->updated_at }}</td>
-                                    <td class="align-middle text-center">
-                                        <div class="btn-group" role="group" aria-label="Basic example">
-                                            <a href="{{ route('document-request.feedbackEditForm', $fdbck->transaction_id) }}" type="button" class="btn btn-warning p-2">Edit</a>
-                                            <a href="{{ route('document-request.deleteFeedback', $fdbck->transaction_id) }}" type="button" class="btn btn-danger p-2">Delete</a>
-                                        </div>
-                                    </td>
+                                    @if (auth()->user()->level == 'Super Admin')
+                                        <td class="align-middle text-center">
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                                <a href="{{ route('document-request.feedbackEditForm', $fdbck->transaction_id) }}" type="button" class="btn btn-warning p-2">Edit</a>
+                                                <a href="{{ route('document-request.deleteFeedback', $fdbck->transaction_id) }}" type="button" class="btn btn-danger p-2">Delete</a>
+                                            </div>
+                                        </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         @endif
