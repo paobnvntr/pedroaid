@@ -78,6 +78,20 @@ class LandingPageController extends Controller
         return view('landing-page.city-ordinance.ordinance-list', compact('committee', 'ordinance'));
     }
 
+    public function incrementViewCount($id)
+    {
+        $ord = Ordinances::findOrFail($id);
+        $ord->increment('view_count');
+        return response()->json(['view_count' => $ord->view_count]);
+    }
+
+    public function incrementDownloadCount($id)
+    {
+        $ord = Ordinances::findOrFail($id);
+        $ord->increment('download_count');
+        return response()->json(['download_count' => $ord->download_count]);
+    }
+
     public function searchOrdinance(Request $request) {
         // Get the search query from the request
         $query = $request->input('query');
@@ -162,7 +176,7 @@ class LandingPageController extends Controller
             'other_barangay'=> 'required_if:city,Other City',
             'other_street'=> 'required_if:city,Other City',
             'cellphone_number' => ['required', 'regex:/^(09|\+639)\d{9}$/'],
-            'email' => 'required|email',
+            'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'appointment_date' => 'required',
             'appointment_time' => 'required',
         ],
@@ -258,7 +272,7 @@ class LandingPageController extends Controller
         $validator = Validator::make($request->all(), [
             '_token' => 'required',
             'name' => 'required',
-            'email' => 'required|email',
+            'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'inquiry' => 'required',
          ]);
 
@@ -338,7 +352,7 @@ class LandingPageController extends Controller
             'other_barangay'=> 'required_if:city,Other City',
             'other_street'=> 'required_if:city,Other City',
             'cellphone_number' => ['required', 'regex:/^(09|\+639)\d{9}$/'],
-            'email' => 'required|email',
+            'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'document_type' => 'required',
 
             'document_name' => 'required_if:document_type,Affidavit of Loss,Affidavit of No income,Affidavit of No fix income',

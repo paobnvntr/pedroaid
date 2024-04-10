@@ -40,7 +40,7 @@ class TrackerController extends Controller
     public function appointmentDetails(request $request) { 
         Validator::make($request->all(), [
             'appointment_id' => ['required', 'regex:/^[A-Z0-9]{3}-[A-Z0-9]{3}-[A-Z0-9]{3}$/'],
-            'email' => 'required|email'
+            'email' => 'required|email|regex:/^.+@.+\..+$/i'
         ])->validate();
 
         $appointment = Appointment::where('appointment_id', $request->appointment_id)->first();
@@ -504,7 +504,7 @@ class TrackerController extends Controller
     public function inquiryDetails(request $request) { 
         Validator::make($request->all(), [
             'inquiry_id' => ['required', 'regex:/^[A-Z0-9]{3}-[A-Z0-9]{3}-[A-Z0-9]{3}$/'],
-            'email' => 'required|email'
+            'email' => 'required|email|regex:/^.+@.+\..+$/i'
         ])->validate();
 
         $inquiry = Inquiry::where('inquiry_id', $request->inquiry_id)->first();
@@ -612,7 +612,7 @@ class TrackerController extends Controller
     public function documentRequestDetails(Request $request) { 
         Validator::make($request->all(), [
             'documentRequest_id' => ['required', 'regex:/^[A-Z0-9]{3}-[A-Z0-9]{3}-[A-Z0-9]{3}$/'],
-            'email' => 'required|email'
+            'email' => 'required|email|regex:/^.+@.+\..+$/i'
         ])->validate();
 
         $documentRequest = DocumentRequest::where('documentRequest_id', $request->documentRequest_id)->first();
