@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileUpdateController extends Controller
 {
@@ -25,7 +26,18 @@ class ProfileUpdateController extends Controller
                 Rule::unique('users')->ignore($id),
             ],
             'email' => 'email',
-            'password' => 'nullable|confirmed|min:8',
+            'old_password' => [
+                'nullable',
+                'min:8',
+                function ($attribute, $value, $fail) use ($request) {
+                    $user = User::find($request->user()->id);
+                    if (!Hash::check($value, $user->password)) {
+                        $fail('The old password is incorrect.');
+                    }
+                },
+                'required_with:password',
+            ],
+            'password' => 'nullable|confirmed|min:8|required_with:old_password',
             'profile_picture' => 'nullable|image|mimes:jpeg,jpg,png',
         ]);
 

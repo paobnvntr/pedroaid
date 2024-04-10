@@ -43,9 +43,17 @@
 						<input type="email" class="form-control" id="email" name="email" value="{{ $user->email }}" disabled>
 					</div>
 
+					<div class="form-group">
+						<label for="password">Old Password</label>
+						<div class="password-toggle-container">
+							<input type="password" class="form-control" id="old_password" name="old_password" disabled>
+							<span class="password-toggle-btn" style="display: none;" onclick="togglePasswordVisibility('old_password')">Show</span>
+						</div>
+					</div>
+
 					<div class="row">
 						<div class="form-group col-md-6">
-							<label for="password">Password</label>
+							<label for="password">New Password</label>
 							<div class="password-toggle-container">
 								<input type="password" class="form-control" id="password" name="password" disabled>
 								<span class="password-toggle-btn" style="display: none;" onclick="togglePasswordVisibility('password')">Show</span>
@@ -103,6 +111,7 @@
 		const nameInput = document.getElementById("name");
 		const usernameInput = document.getElementById("username");
 		const emailInput = document.getElementById("email");
+		const oldPasswordInput = document.getElementById("old_password");
 		const passwordInput = document.getElementById("password");
 		const passwordConfirmationInput = document.getElementById("password_confirmation");
 		const profilePictureInput = document.getElementById("profile_picture");
@@ -115,6 +124,7 @@
 			nameInput.disabled = false;
 			usernameInput.disabled = false;
 			emailInput.disabled = false;
+			oldPasswordInput.disabled = false;
 			passwordInput.disabled = false;
 			passwordConfirmationInput.disabled = false;
 			profilePictureInput.disabled = false;
@@ -129,6 +139,7 @@
 			nameInput.disabled = true;
 			usernameInput.disabled = true;
 			emailInput.disabled = true;
+			oldPasswordInput.disabled = true;
 			passwordInput.disabled = true;
 			passwordConfirmationInput.disabled = true;
 			profilePictureInput.disabled = true;
@@ -141,6 +152,7 @@
 			nameInput.value = originalName;
 			usernameInput.value = originalUsername;
 			emailInput.value = originalEmail;
+			oldPasswordInput.value = "";
 			passwordInput.value = "";
 			passwordConfirmationInput.value = "";
 			profilePictureInput.value = "";
@@ -160,6 +172,9 @@
 	const updateProfileBtn = document.getElementById("updateProfileBtn");
 
 	updateProfileBtn.addEventListener("click", async () => {
+		updateProfileBtn.disabled = true;
+		updateProfileBtn.textContent = 'Updating Profile . . .';
+
 		const updateProfileForm = document.getElementById("updateProfileForm");
 		const formData = new FormData(updateProfileForm);
 
@@ -175,6 +190,9 @@
 			const data = await response.json();
 
 			if (data.message === 'Validation failed') {
+				updateProfileBtn.disabled = false;
+				updateProfileBtn.textContent = 'Update Profile';
+
 				const errorElements = document.querySelectorAll('.invalid-feedback');
 				errorElements.forEach(errorElement => {
 					errorElement.remove();
