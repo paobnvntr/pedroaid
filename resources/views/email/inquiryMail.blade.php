@@ -16,4 +16,8 @@ View Your Request
 Sincerely,<br>
 [PedroAID](https://pedroaid.com/)
 
+<div style="font-size: 12px; text-align:center;">
+    3F New City Hall Bldg., Brgy. Poblacion, San Pedro City, Laguna
+</div>
+
 @endcomponent
