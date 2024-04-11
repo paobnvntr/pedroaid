@@ -93,7 +93,7 @@ class DocumentRequestController extends Controller
             'other_barangay'=> 'required_if:city,Other City',
             'other_street'=> 'required_if:city,Other City',
             'cellphone_number' => ['required', 'regex:/^(09|\+639)\d{9}$/'],
-            'email' => 'required|email',
+            'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'document_type' => 'required',
 
             'document_name' => 'required_if:document_type,Affidavit of Loss,Affidavit of No income,Affidavit of No fix income',
@@ -1430,7 +1430,7 @@ class DocumentRequestController extends Controller
             'other_barangay'=> 'required_if:city,Other City',
             'other_street'=> 'required_if:city,Other City',
             'cellphone_number' => ['required', 'regex:/^(09|\+639)\d{9}$/'],
-            'email' => 'required|email',
+            'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'document_type' => 'required',
 
             'document_name' => 'required_if:document_type,Affidavit of Loss,Affidavit of No income,Affidavit of No fix income',
@@ -1584,7 +1584,7 @@ class DocumentRequestController extends Controller
             'other_barangay'=> 'required_if:city,Other City',
             'other_street'=> 'required_if:city,Other City',
             'cellphone_number' => ['required', 'regex:/^(09|\+639)\d{9}$/'],
-            'email' => 'required|email',
+            'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'document_type' => 'required',
 
             'document_name' => 'required_if:document_type,Affidavit of Loss,Affidavit of No income,Affidavit of No fix income',

@@ -31,7 +31,7 @@ class InquiryController extends Controller
         $validator = Validator::make($request->all(), [
             '_token' => 'required',
             'name' => 'required',
-            'email' => 'required|email',
+            'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'inquiry' => 'required',
          ]);
 
@@ -192,7 +192,7 @@ class InquiryController extends Controller
         $validator = Validator::make($request->all(), [
             '_token' => 'required',
             'name' => 'required',
-            'email' => 'required|email',
+            'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'inquiry' => 'required',
             'status' => 'required',
         ]);

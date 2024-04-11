@@ -35,7 +35,7 @@ class StaffController extends Controller
             '_token' => 'required',
             'name' => 'required',
             'username' => 'required|unique:users,username',
-            'email' => 'required|email',
+            'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'transaction_level' => 'required',
             'password' => 'required|confirmed|min:8',
             'profile_picture' => 'nullable|image|mimes:jpeg,jpg,png',
@@ -133,7 +133,7 @@ class StaffController extends Controller
             'username' => [
                 Rule::unique('users')->ignore($id),
             ],
-            'email' => 'email',
+            'email' => 'email|regex:/^.+@.+\..+$/i',
             'password' => 'nullable|confirmed',
             'profile_picture' => 'nullable|image|mimes:jpeg,jpg,png',
         ]);

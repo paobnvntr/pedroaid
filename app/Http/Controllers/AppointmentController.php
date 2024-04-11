@@ -210,7 +210,7 @@ class AppointmentController extends Controller
             'other_barangay'=> 'required_if:city,Other City',
             'other_street'=> 'required_if:city,Other City',
             'cellphone_number' => ['required', 'regex:/^(09|\+639)\d{9}$/'],
-            'email' => 'required|email',
+            'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'appointment_date' => 'required',
             'appointment_time' => 'required',
         ],
@@ -506,7 +506,7 @@ class AppointmentController extends Controller
 
         $validator = Validator::make($request->all(), [
             'cellphone_number' => ['regex:/^(09|\+639)\d{9}$/'],
-            'email' => 'email',
+            'email' => 'email|regex:/^.+@.+\..+$/i',
             'barangay'=> 'required_if:city,San Pedro City',
             'street'=> 'required_if:city,San Pedro City',
             'other_city'=> 'required_if:city,Other City',

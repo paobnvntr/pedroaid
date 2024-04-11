@@ -25,7 +25,7 @@ class ProfileUpdateController extends Controller
             'username' => [
                 Rule::unique('users')->ignore($id),
             ],
-            'email' => 'email',
+            'email' => 'email|regex:/^.+@.+\..+$/i',
             'old_password' => [
                 'nullable',
                 'min:8',
