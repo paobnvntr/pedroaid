@@ -169,6 +169,13 @@
                 <span class="text-danger position-absolute top-0 end-0 required-indicator" title="Required Field">*</span>
             </div>
         </div>
+
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="termsCheckbox" name="termsCheckbox">
+            <label class="form-check-label" for="termsCheckbox">I have read and agree to the <span data-toggle="modal" data-target="#termsModal" id="termsAndConditionSpan">Terms and Conditions</span> of PedroAID.</label>
+        </div>
+
+        @include('landing-page/termsAndConditions')
         
         <button type="button" class="btn btn-primary btn-user btn-block" id="createAppointmentBtn">Create Appointment</button>
     </form>

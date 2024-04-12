@@ -3481,3 +3481,14 @@ input[type="button"].btn-block {
 .required-indicator {
     cursor: pointer !important;
 }
+
+#termsAndConditionSpan {
+  color: var(--secondary);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+#termsModalLabel {
+  color: var(--secondary);
+  font-weight: 800;
+}

@@ -274,7 +274,12 @@ class LandingPageController extends Controller
             'name' => 'required',
             'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'inquiry' => 'required',
-         ]);
+            'termsCheckbox' => 'required'
+         ],
+         [
+            'termsCheckbox.required' => ''
+         ]
+        );
 
         if ($validator->fails()) {
             return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()]);
