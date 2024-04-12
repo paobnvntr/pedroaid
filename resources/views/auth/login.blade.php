@@ -31,7 +31,7 @@
 										<hr>
 									</div>
 
-									<form action="{{ route('loginAction') }}" method="POST" class="user">
+									<form action="{{ route('loginAction') }}" method="POST" class="user" id="loginForm">
     									@csrf
 										<div class="form-group mt-4">
 											<input name="username" id="username" type="text" class="form-control form-control-user @error('username') is-invalid @enderror"
@@ -40,7 +40,7 @@
 											<span class="invalid-feedback">{{ $message }}</span>
 											@enderror
 										</div>
-										<div class="form-group">
+										<div class="form-group m-0">
 											<div class="password-toggle-container">
 												<input name="password" id="password" type="password"
 													class="form-control form-control-user @error('password') is-invalid @enderror" id="exampleInputPassword"
@@ -50,6 +50,11 @@
 											@error('password')
 											<span class="invalid-feedback">{{ $message }}</span>
 											@enderror
+										</div>
+
+										<div class="form-group m-0 d-flex justify-content-between">
+											<div></div>
+											<a href="#" class="form-control-user forgot-password" onclick="submitForgotPasswordForm()">Forgot Password?</a>
 										</div>
 
 										<button type="submit" class="btn btn-primary btn-block btn-user btn-login">LOGIN</button>
@@ -97,6 +102,11 @@
 				passwordInput.type = "password";
 				passwordToggleBtn.textContent = "Show";
 			}
+		}
+
+		function submitForgotPasswordForm() {
+			document.getElementById("loginForm").action = "{{ route('forgotPassword') }}";
+			document.getElementById("loginForm").submit();
 		}
 	</script>
 

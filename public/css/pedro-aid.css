@@ -11475,3 +11475,13 @@
 		transform: translateY(-50%);
 		cursor: pointer;
 	}
+
+  .forgot-password {
+    color: var(--danger);
+    padding: 0.5rem !important;
+  }
+
+  .forgot-password:hover {
+    text-decoration: none;
+    color: var(--danger);
+  }

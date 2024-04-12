@@ -179,6 +179,7 @@ class LandingPageController extends Controller
             'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'appointment_date' => 'required',
             'appointment_time' => 'required',
+            'termsCheckbox' => 'required',
         ],
         [
             'barangay.required_if' => 'The barangay field is required.',
@@ -186,6 +187,7 @@ class LandingPageController extends Controller
             'other_city.required_if' => 'The city field is required.',
             'other_barangay.required_if' => 'The barangay field is required.',
             'other_street.required_if' => 'The street field is required.',
+            'termsCheckbox.required' => ''
         ]);
 
         if ($validator->fails()) {
@@ -358,6 +360,7 @@ class LandingPageController extends Controller
             'other_street'=> 'required_if:city,Other City',
             'cellphone_number' => ['required', 'regex:/^(09|\+639)\d{9}$/'],
             'email' => 'required|email|regex:/^.+@.+\..+$/i',
+            'termsCheckbox' => 'required',
             'document_type' => 'required',
 
             'document_name' => 'required_if:document_type,Affidavit of Loss,Affidavit of No income,Affidavit of No fix income',
@@ -449,6 +452,7 @@ class LandingPageController extends Controller
             'other_city.required_if' => 'The city field is required.',
             'other_barangay.required_if' => 'The barangay field is required.',
             'other_street.required_if' => 'The street field is required.',
+            'termsCheckbox.required' => '',
 
             'document_name.required_if' => 'The name field is required.',
             'document_civil_status.required_if' => 'The civil status field is required.',

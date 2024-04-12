@@ -34,7 +34,9 @@
                             <th>Profile Picture</th>
                             <th>Date Created</th>
                             <th>Last Update</th>
-                            <th></th>
+                            @if (auth()->user()->level == 'Super Admin')
+                                <th></th>
+                            @endif
                         </tr>
                     </thead>
                     
@@ -51,12 +53,14 @@
                                     <td class="align-middle text-center"> <img src="{{ $sf->profile_picture }}" alt="{{ $sf->profile_picture }}" width="50" class="rounded-circle"> </td>
                                     <td class="align-middle text-center">{{ $sf->created_at }}</td>  
                                     <td class="align-middle text-center">{{ $sf->updated_at }}</td>
-                                    <td class="align-middle text-center">
-                                        <div class="btn-group" role="group" aria-label="Basic example">
-                                            <a href="{{ route('staff.editStaff', $sf->id) }}" type="button" class="btn btn-warning p-2">Edit</a>
-                                            <a href="{{ route('staff.deleteStaff', $sf->id) }}" type="button" class="btn btn-danger p-2">Delete</a>
-                                        </div>
-                                    </td>
+                                    @if (auth()->user()->level == 'Super Admin')
+                                        <td class="align-middle text-center">
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                                <a href="{{ route('staff.editStaff', $sf->id) }}" type="button" class="btn btn-warning p-2">Edit</a>
+                                                <a href="{{ route('staff.deleteStaff', $sf->id) }}" type="button" class="btn btn-danger p-2">Delete</a>
+                                            </div>
+                                        </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         @endif

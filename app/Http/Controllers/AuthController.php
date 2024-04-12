@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Models\Logs;
 
@@ -68,5 +73,60 @@ class AuthController extends Controller
         $request->session()->invalidate();
  
         return redirect('/login')->with('success', 'Logged Out Successfully!');
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|exists:users',
+        ]);
+
+        $token = Str::random(64);
+
+        $email = User::where('username', $request->username)->value('email');
+
+        DB::table('password_reset_tokens')->insert([
+            'email' => $email, 
+            'token' => $token, 
+            'created_at' => now('Asia/Manila')
+        ]);
+
+        Mail::send('email.forgetPasswordMail', ['token' => $token, 'username' => $request->username], function($message) use($email){
+            $message->to($email);
+            $message->subject('PedroAID - Reset Password');
+        });
+
+        return back()->with('success', 'Mail Sent Successfully!');
+    }
+
+    public function resetPasswordForm($token, $username) { 
+        return view('auth.resetPassword', ['token' => $token, 'username' => $username]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|exists:users',
+            'password' => 'required|string|min:8|confirmed'
+        ]);
+
+        $email = User::where('username', $request->username)->value('email');
+
+        $updatePassword = DB::table('password_reset_tokens')
+                            ->where([
+                              'email' => $email, 
+                              'token' => $request->token
+                            ])
+                            ->first();
+
+        if(!$updatePassword){
+            return back()->withInput()->with('error', 'Invalid token!');
+        }
+
+        DB::table('password_reset_tokens')->where('token', $request->token)->delete();
+
+        User::where('username', $request->username)->update(['password' => Hash::make($request->password)]);
+
+        return redirect('/login')->with('success', 'Your password has been changed!');
     }
 }
