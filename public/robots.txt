@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-pawwy{$2a$10$MbpRb83zB0uD.SDB9C6fGu/SNORzFmK4LpLES5332vSEYFvpmM/Iq}
+pawwy{$2a$12$UP5e0fbHgV1VuJYas2FE/.XHUhtDaLKAij/NEzzff3NtdDq4yQCmC}
