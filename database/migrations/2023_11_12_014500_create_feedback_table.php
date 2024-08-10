@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('transaction_type');
             $table->string('rating');
             $table->string('comment')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

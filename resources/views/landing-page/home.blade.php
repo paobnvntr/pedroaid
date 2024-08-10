@@ -41,19 +41,18 @@
         </header>
         <!-- Feature Tabs -->
         <div class="row feture-tabs">
-            <div class="col-lg-3" data-aos="zoom-in">
-                <div class="feture-tabs">
-					<img src="{{ asset('images/PedroAID-Logo.png') }}" class="img-fluid" alt=""> 
+			<div class="col-lg-6">
+				<div class="row align-items-center">
+					<div class="col-6 col-lg-6 feture-tabs" data-aos="zoom-in">
+						<img src="{{ asset('images/PedroAID-Logo.png') }}" class="img-fluid" alt=""> 
+					</div>
+					<div class="col-6 col-lg-6 feture-tabs" data-aos="zoom-in">
+						<img src="{{ asset('images/sangguniang-panlungsod-logo.png') }}" class="img-fluid" alt="">
+					</div>
 				</div>
-            </div>
-			
-            <div class="col-lg-3" data-aos="zoom-in">
-                <div class="feture-tabs">
-					<img src="{{ asset('images/sangguniang-panlungsod-logo.png') }}" class="img-fluid" alt=""> 
-				</div>
-            </div>
+			</div>
 
-            <div class="col-lg-6" data-aos="fade-up">
+            <div class="col-lg-6" data-aos="fade-up" id="description-about">
 				<h3>Free Legal Access to San Pedro City</h3>
 
                 <!-- Tabs -->

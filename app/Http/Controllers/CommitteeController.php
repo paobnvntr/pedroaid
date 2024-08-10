@@ -15,7 +15,7 @@ class CommitteeController extends Controller
     //display committee list
     public function index()
     {
-        $committees = Committee::orderBy('created_at', 'ASC')->get();
+        $committees = Committee::where('is_active', true)->orderBy('created_at', 'ASC')->get();
         return view('committee.index', compact('committees'));
     }
 
@@ -564,13 +564,6 @@ class CommitteeController extends Controller
         }
     }
 
-    //redirect to delete committee page
-    public function deleteCommittee(string $id)
-    {
-        $committee = Committee::findOrFail($id);
-        return view('committee.deleteCommittee', compact('committee'));
-    }
-
     //delete ordinance
     public function destroyCommittee(string $id)
     {
@@ -582,7 +575,10 @@ class CommitteeController extends Controller
     
             $this->createCommitteeDeleteLog($user, $committee);
     
-            Committee::destroy($id);
+            $committee->is_active = false;
+            $committee->updated_at = now('Asia/Manila');
+
+            $committee->update();
     
             DB::commit();
     

@@ -2,13 +2,13 @@
   
 @section('contents')
     @if(Session::has('success'))
-        <div class="alert alert-success" role="alert">
-            {{ Session::get('success') }}
+        <div class="alert alert-success" id="alert-success" role="alert">
+            {!! Session::get('success') !!}
         </div>
     @endif
 
     @if(Session::has('failed'))
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-danger" id="alert-failed" role="alert">
             {{ Session::get('failed') }}
         </div>
     @endif
@@ -51,10 +51,12 @@
                                     <td class="align-middle text-center">
                                         <div class="btn-group" role="group" aria-label="Basic example">
                                             <a href="{{ route('super-admin.editSuperAdmin', $sad->id) }}" type="button" class="btn btn-warning p-2">Edit</a>
-                                            <a href="{{ route('super-admin.deleteSuperAdmin', $sad->id) }}" type="button" class="btn btn-danger p-2">Delete</a>
+                                            <button type="button" class="btn btn-danger p-2" data-toggle="modal" data-target="#deleteModal{{$sad->id}}">Delete</button>
                                         </div>
                                     </td>
                                 </tr>
+
+                                @include('super-admin.deleteSuperAdmin')
                             @endforeach
                         @endif
                     </tbody>
@@ -63,3 +65,25 @@
         </div>
     </div>
 @endsection
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        let successAlert = document.getElementById('alert-success');
+        if (successAlert) {
+            setTimeout(() => {
+                successAlert.style.transition = "opacity 0.5s ease";
+                successAlert.style.opacity = 0;
+                setTimeout(() => { successAlert.remove(); }, 500);
+            }, 10000);
+        }
+
+        let failedAlert = document.getElementById('alert-failed');
+        if (failedAlert) {
+            setTimeout(() => {
+                failedAlert.style.transition = "opacity 0.5s ease";
+                failedAlert.style.opacity = 0;
+                setTimeout(() => { failedAlert.remove(); }, 500);
+            }, 2000);
+        }
+    });
+</script>

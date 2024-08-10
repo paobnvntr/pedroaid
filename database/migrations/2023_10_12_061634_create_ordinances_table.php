@@ -18,6 +18,9 @@ return new class extends Migration
             $table->date('date_approved');
             $table->text('description');
             $table->string('ordinance_file');
+            $table->integer('view_count')->default(0);
+            $table->integer('download_count')->default(0);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

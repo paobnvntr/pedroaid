@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('member_1')->nullable();
             $table->string('member_2')->nullable();
             $table->string('member_3')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

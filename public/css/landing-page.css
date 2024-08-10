@@ -759,6 +759,11 @@ section {
   .features .feture-tabs h3 {
     font-size: 28px;
   }
+
+  .features .feture-tabs img{
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
 }
 
 .features .feture-tabs .nav-pills {
@@ -2208,6 +2213,14 @@ section {
   font-size: 14px;
 }
 
+#privacyPolicySpan {
+  cursor: pointer;
+}
+
+#privacyPolicySpan:hover {
+  color: var(--primary);
+}
+
 .aid-tracker {
   padding: 50px 0;
   background: #f6f9ff;
@@ -2627,12 +2640,8 @@ section {
 .ordinance .ordinance-box .dateApproved {
   text-align: left;
   color: rgba(128, 128, 128, 0.678);
-  font-weight: 800;
-  font-size: .75rem;
-}
-
-.ordinance .ordinance-box .dateApproved span {
-  font-size: 1rem;
+  font-weight: 800 !important;
+  font-size: .85rem !important;
 }
 
 .ordinance .ordinance-box .description {
@@ -2649,6 +2658,12 @@ section {
 
 .p-5 {
   padding: 3rem !important;
+}
+
+@media (max-width: 576px) {
+  .p-5 {
+    padding: 1.5rem !important;
+  }
 }
 
 form.user .custom-checkbox.small label {

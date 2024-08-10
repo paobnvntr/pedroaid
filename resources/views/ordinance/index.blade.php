@@ -57,10 +57,11 @@
                                     <td class="align-middle text-center">
                                         <div class="btn-group" role="group" aria-label="Basic example">
                                             <a href="{{ route('ordinance.editOrdinance', $ord->id) }}" type="button" class="btn btn-warning p-2">Edit</a>
-                                            <a href="{{ route('ordinance.deleteOrdinance', $ord->id) }}" type="button" class="btn btn-danger p-2">Delete</a>
-                                        </div>
+                                            <button type="button" class="btn btn-danger p-2" data-toggle="modal" data-target="#deleteModal{{$ord->id}}">Delete</button>
                                     </td>
                                 </tr>
+
+                                @include('ordinance.deleteOrdinance')
                             @endforeach
                         @endif
                     </tbody>

@@ -43,7 +43,7 @@
                                     <td class="align-middle text-center">{{ $loop->iteration }}</td>
                                     <td class="align-middle text-center">{{ $inq->name }}</td>
                                     <td class="align-middle text-center">{{ $inq->email }}</td>  
-                                    <td class="align-middle text-center">{{ $inq->inquiry }}</td>
+                                    <td class="align-middle text-center"><div class="inquiry">{{ $inq->inquiry }}</div></td>
                                     <td class="align-middle text-center">{{ $inq->created_at }}</td>  
                                     <td class="align-middle text-center">{{ $inq->updated_at }}</td>
                                     <td class="align-middle text-center">
@@ -51,11 +51,13 @@
                                             <a href="{{ route('inquiry.inquiryDetails', $inq->inquiry_id) }}" type="button" class="btn btn-primary p-2">Details</a>
                                             @if (auth()->user()->level == 'Super Admin')
                                                 <a href="{{ route('inquiry.editInquiry', $inq->inquiry_id) }}" type="button" class="btn btn-warning p-2">Edit</a>
-                                                <a href="{{ route('inquiry.deleteInquiry', $inq->inquiry_id) }}" type="button" class="btn btn-danger p-2">Delete</a>
+                                                <button type="button" class="btn btn-danger p-2" data-toggle="modal" data-target="#deleteModal{{$inq->inquiry_id}}">Delete</button>
                                             @endif
                                         </div>
                                     </td>
                                 </tr>
+
+                                @include('inquiry.deleteInquiry')
                             @endforeach
                         @endif
                     </tbody>
@@ -95,7 +97,7 @@
                                     <td class="align-middle text-center">{{ $loop->iteration }}</td>
                                     <td class="align-middle text-center">{{ $inq->name }}</td>
                                     <td class="align-middle text-center">{{ $inq->email }}</td>  
-                                    <td class="align-middle text-center">{{ $inq->inquiry }}</td>
+                                    <td class="align-middle text-center"><div class="inquiry">{{ $inq->inquiry }}</div></td>
                                     <td class="align-middle text-center">{{ $inq->created_at }}</td>  
                                     <td class="align-middle text-center">{{ $inq->updated_at }}</td>
                                     <td class="align-middle text-center">
@@ -103,11 +105,13 @@
                                             <a href="{{ route('inquiry.inquiryDetails', $inq->inquiry_id) }}" type="button" class="btn btn-primary p-2">Details</a>
                                             @if (auth()->user()->level == 'Super Admin')
                                                 <a href="{{ route('inquiry.editInquiry', $inq->inquiry_id) }}" type="button" class="btn btn-warning p-2">Edit</a>
-                                                <a href="{{ route('inquiry.deleteInquiry', $inq->inquiry_id) }}" type="button" class="btn btn-danger p-2">Delete</a>
+                                                <button type="button" class="btn btn-danger p-2" data-toggle="modal" data-target="#deleteModal{{$inq->inquiry_id}}">Delete</button>
                                             @endif
                                         </div>
                                     </td>
                                 </tr>
+
+                                @include('inquiry.deleteInquiry')
                             @endforeach
                         @endif
                     </tbody>

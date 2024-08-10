@@ -36,7 +36,25 @@
                     <p><strong>Email Address:</strong> {{ $appointment->email }}</p>
                 </div>
                 
-                <hr>
+                <hr class="mb-1">
+
+                <div class="trackerAppointmentContact bg-notes p-1 d-flex align-items-center justify-content-between">
+                    <div>
+                        <h5 class="mb-2">Note:</h5>
+                        <p class="ml-3" id="appointment-notes">{{ $appointment->notes }}</p>
+                    </div>
+
+                    <div id="buttons-container">
+                        <!-- Conditionally render Edit icon if notes exist -->
+                        @if ($appointment->notes)
+                            <button onclick="showEditNoteInput()" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>
+                        @else
+                            <!-- Render Add Note icon if notes are null -->
+                            <button onclick="showAddNoteInput()" class="btn btn-sm btn-warning"><i class="fas fa-plus"></i></button>
+                        @endif
+                    </div>
+                </div>
+
                 <div>
                     <div class="message-wrapper">
                         <!-- Message History Here -->
@@ -102,7 +120,9 @@
                     <p><strong>Status:</strong> {{ $appointment->appointment_status }}</p>
                     <p><strong>Appointment Date:</strong> {{ $appointment->appointment_date }}</p>
                     <p><strong>Appointment Time:</strong> {{ $appointment->appointment_time }}</p>
-                    <p><strong>Date Finished:</strong> {{ $appointment->date_finished }}</p>
+                    @if ($appointment->appointment_status == 'Finished')
+                        <p><strong>Date Finished:</strong> {{ $appointment->date_finished }}</p>
+                    @endif
                     <p><strong>Created At:</strong> {{ $appointment->created_at }}</p>
                     <p><strong>Updated At:</strong> {{ $appointment->updated_at }}</p>
 
@@ -141,4 +161,125 @@
             </div>
         </div>
     </div>
+
+<script>
+     function showAddNoteInput() {
+        var notesContainer = document.getElementById('appointment-notes');
+        var buttonsContainer = document.getElementById('buttons-container');
+
+        // Create a text input element
+        var input = document.createElement('input');
+        input.setAttribute('type', 'text');
+        input.setAttribute('id', 'note-input');
+
+        // Create a save button
+        var saveButton = document.createElement('button');
+        saveButton.innerHTML = '<i class="fas fa-save"></i>';
+        saveButton.classList.add('btn', 'btn-sm', 'btn-primary', 'mx-1');
+        saveButton.onclick = saveNote;
+
+        // Create a cancel button
+        var cancelButton = document.createElement('button');
+        cancelButton.innerHTML = '<i class="fas fa-times"></i>';
+        cancelButton.classList.add('btn', 'btn-sm', 'btn-danger');
+        cancelButton.onclick = cancelAddNote;
+
+        // Append the input and buttons to the appropriate containers
+        notesContainer.appendChild(input);
+        buttonsContainer.innerHTML = ''; // Clear existing buttons
+        buttonsContainer.appendChild(saveButton);
+        buttonsContainer.appendChild(cancelButton);
+    }
+
+    function showEditNoteInput() {
+        var notesContainer = document.getElementById('appointment-notes');
+        var buttonsContainer = document.getElementById('buttons-container');
+
+        // Save the existing note text
+        var currentNote = notesContainer.textContent.trim();
+
+        // Create a text input element
+        var input = document.createElement('input');
+        input.setAttribute('type', 'text');
+        input.setAttribute('id', 'note-input');
+        input.setAttribute('value', currentNote);
+
+        // Create a save button
+        var saveButton = document.createElement('button');
+        saveButton.innerHTML = '<i class="fas fa-save"></i>';
+        saveButton.classList.add('btn', 'btn-sm', 'btn-success', 'mx-1');
+        saveButton.onclick = saveNote;
+
+        // Create a cancel button
+        var cancelButton = document.createElement('button');
+        cancelButton.innerHTML = '<i class="fas fa-times"></i>';
+        cancelButton.classList.add('btn', 'btn-sm', 'btn-danger');
+        cancelButton.onclick = cancelEditNote;
+
+        // Append the input and buttons to the appropriate containers
+        notesContainer.innerHTML = ''; // Clear existing content
+        notesContainer.appendChild(input);
+        buttonsContainer.innerHTML = ''; // Clear existing buttons
+        buttonsContainer.appendChild(saveButton);
+        buttonsContainer.appendChild(cancelButton);
+    }
+
+    function saveNote() {
+        var notesContainer = document.getElementById('appointment-notes');
+        var input = document.getElementById('note-input').value;
+        
+        // Send AJAX request to save the note
+        var id = '{{ $appointment->appointment_id }}'; // Assuming you have access to the appointment ID in your Blade template
+        var formData = new FormData();
+        formData.append('notes', input);
+        
+        fetch('{{ route('appointment.addNote', ['id' => $appointment->appointment_id]) }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.reload();
+            }
+            throw new Error('Network response was not ok.');
+        })
+        .catch(error => {
+            console.error('There was an error!', error);
+        });
+    }
+
+    function cancelAddNote() {
+        var notesContainer = document.getElementById('appointment-notes');
+        var input = document.getElementById('note-input');
+        notesContainer.removeChild(input);
+
+        var buttonsContainer = document.getElementById('buttons-container');
+        buttonsContainer.innerHTML = '';
+        var addButton = document.createElement('button');
+        addButton.innerHTML = '<i class="fas fa-plus"></i>';
+        addButton.classList.add('btn', 'btn-sm', 'btn-warning');
+        addButton.onclick = showAddNoteInput;
+        buttonsContainer.appendChild(addButton);
+    }
+
+    function cancelEditNote() {
+        var notesContainer = document.getElementById('appointment-notes');
+        var buttonsContainer = document.getElementById('buttons-container');
+
+        // Restore the original note text
+        var originalNote = '{{ $appointment->notes }}';
+        notesContainer.textContent = originalNote;
+
+        // Restore the original buttons
+        buttonsContainer.innerHTML = '';
+        var editButton = document.createElement('button');
+        editButton.innerHTML = '<i class="fas fa-edit"></i>';
+        editButton.classList.add('btn', 'btn-sm', 'btn-warning');
+        editButton.onclick = showEditNoteInput;
+        buttonsContainer.appendChild(editButton);
+    }
+</script>
 @endsection

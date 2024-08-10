@@ -15,6 +15,9 @@ class Ordinances extends Model
         'date_approved',
         'description',
         'ordinance_file',
+        'view_count',
+        'download_count',
+        'is_active',
         'created_at',
         'updated_at',
     ];

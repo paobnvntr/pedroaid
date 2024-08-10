@@ -57,10 +57,12 @@
                                     <td class="align-middle text-center">
                                         <div class="btn-group" role="group" aria-label="Basic example">
                                             <a href="{{ route('committee.editCommittee', $com->id) }}" type="button" class="btn btn-warning p-2">Edit</a>
-                                            <a href="{{ route('committee.deleteCommittee', $com->id) }}" type="button" class="btn btn-danger p-2">Delete</a>
+                                            <button type="button" class="btn btn-danger p-2" data-toggle="modal" data-target="#deleteModal{{$com->id}}">Delete</button>
                                         </div>
                                     </td>
                                 </tr>
+
+                                @include('committee.deleteCommittee')
                             @endforeach
                         @endif
                     </tbody>

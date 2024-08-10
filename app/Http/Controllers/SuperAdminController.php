@@ -19,7 +19,7 @@ class SuperAdminController extends Controller
     public function index()
     {
         $user = Auth::user()->username;
-        $super_admin = User::where('level', 'super admin')->where('username', '!=', $user)->orderBy('created_at', 'ASC')->get();
+        $super_admin = User::where('level', 'super admin')->where('is_active', true)->where('username', '!=', $user)->orderBy('created_at', 'ASC')->get();
         return view('super-admin.index', compact('super_admin'));
     }
 
@@ -34,9 +34,16 @@ class SuperAdminController extends Controller
         $validator = Validator::make($request->all(), [
             '_token' => 'required',
             'name' => 'required',
-            'username' => 'required|unique:users,username',
+            'username' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $user = User::where('username', $value)->where('is_active', true)->first();
+                    if ($user) {
+                        $fail('The ' . $attribute . ' has already been taken by an active user.');
+                    }
+                },
+            ],
             'email' => 'required|email|regex:/^.+@.+\..+$/i',
-            'password' => 'required|confirmed|min:8',
             'profile_picture' => 'nullable|image|mimes:jpeg,jpg,png',
         ]);
 
@@ -52,11 +59,13 @@ class SuperAdminController extends Controller
     {
         $filePath = $this->uploadProfilePicture($request);
 
+        $password = "24AID_" . trim($request->username);
+
         $superAdminData = [
             'name' => trim($request->name),
             'username' => trim($request->username),
             'email' => trim($request->email),
-            'password' => trim(Hash::make($request->password)),
+            'password' => trim(Hash::make($password)),
             'level' => 'Super Admin',
             'profile_picture' => $filePath,
             'created_at' => now('Asia/Manila'),
@@ -69,7 +78,8 @@ class SuperAdminController extends Controller
 
         if ($createSuperAdmin) {
             $this->logAddSuperAdminSuccess($user, $request->username);
-            return redirect()->route('super-admin')->with('success', 'Super Admin Added Successfully!');
+            session()->flash('password', $password);
+            return redirect()->route('super-admin')->with('success', 'Super Admin Added Successfully!<br><br>Password: <strong>' . $password . '</strong>');
         } else {
             $this->logAddSuperAdminFailed($user, $request->username);
             return redirect()->route('super-admin')->with('failed', 'Failed to Add Super Admin!');
@@ -236,13 +246,6 @@ class SuperAdminController extends Controller
         ]);
     }   
 
-    // redirect to delete super admin page
-    public function deleteSuperAdmin(string $id)
-    {
-        $super_admin = User::findOrFail($id);
-        return view('super-admin.deleteSuperAdmin', compact('super_admin'));
-    }
-
     // delete super admin account
     public function destroySuperAdmin(string $id)
     {
@@ -254,15 +257,10 @@ class SuperAdminController extends Controller
     
             $this->createSuperAdminDeleteLog($user, $superAdmin);
     
-            if ($superAdmin->profile_picture !== 'uploads/profile/superadmin/default_superadmin.jpg') {
-                $filePath = public_path($superAdmin->profile_picture);
-    
-                if (file_exists($filePath)) {
-                    unlink($filePath);
-                }
-            }
-    
-            $superAdmin->delete();
+            $superAdmin->is_active = false;
+            $superAdmin->updated_at = now('Asia/Manila');
+
+            $superAdmin->update();
     
             DB::commit();
     

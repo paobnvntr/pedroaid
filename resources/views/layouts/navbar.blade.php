@@ -5,18 +5,6 @@
     <i class="fa fa-bars"></i>
   </button>
  
-  <!-- Topbar Search -->
-  <!-- <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-    <div class="input-group">
-      <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-      <div class="input-group-append">
-        <button class="btn btn-primary" type="button">
-          <i class="fas fa-search fa-sm"></i>
-        </button>
-      </div>
-    </div>
-  </form> -->
- 
   <!-- Topbar Navbar -->
   <ul class="navbar-nav ml-auto">
  
@@ -45,13 +33,23 @@
       <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="fas fa-bell fa-fw"></i>
         <!-- Counter - Alerts -->
-        @if (auth()->user()->unreadNotifications->where('type', 'App\Notifications\NewAppointment')->count() > 0 ||
-              auth()->user()->unreadNotifications->where('type', 'App\Notifications\NewDocumentRequest')->count() > 0 ||
-              auth()->user()->unreadNotifications->where('type', 'App\Notifications\NewInquiry')->count() > 0)
-              <span class="badge badge-danger badge-counter">
-                  {{ auth()->user()->unreadNotifications->where('type', 'App\Notifications\NewAppointment')->count() + auth()->user()->unreadNotifications->where('type', 'App\Notifications\NewDocumentRequest')->count() + auth()->user()->unreadNotifications->where('type', 'App\Notifications\NewInquiry')->count()}}
-              </span>
-          @endif
+        @php
+            $unreadNotifications = auth()->user()->unreadNotifications
+                ->filter(function ($notification) {
+                    return isset($notification->data['is_active']) && $notification->data['is_active'] === true &&
+                        (
+                            $notification->type === 'App\Notifications\NewAppointment' ||
+                            $notification->type === 'App\Notifications\NewDocumentRequest' ||
+                            $notification->type === 'App\Notifications\NewInquiry'
+                        );
+                });
+        @endphp
+
+        @if ($unreadNotifications->isNotEmpty())
+            <span class="badge badge-danger badge-counter">
+                {{ $unreadNotifications->count() }}
+            </span>
+        @endif
       </a>
       <!-- Dropdown - Alerts -->
       <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
@@ -63,15 +61,18 @@
         </h6>
           
         <div class="notification-container">
-          @php
-              $unreadNotificationsFiltered = auth()->user()->unreadNotifications
-                  ->filter(function ($notification) {
-                      return $notification->type === 'App\Notifications\NewAppointment' ||
-                            $notification->type === 'App\Notifications\NewDocumentRequest' ||
-                            $notification->type === 'App\Notifications\NewInquiry';
-                  });
-
-                  $unreadNotificationsGrouped = $unreadNotificationsFiltered->groupBy(function($notification) {
+            @php
+                $unreadNotificationsFiltered = auth()->user()->unreadNotifications
+                    ->filter(function ($notification) {
+                        return isset($notification->data['is_active']) && $notification->data['is_active'] === true &&
+                            (
+                                $notification->type === 'App\Notifications\NewAppointment' ||
+                                $notification->type === 'App\Notifications\NewDocumentRequest' ||
+                                $notification->type === 'App\Notifications\NewInquiry'
+                            );
+                    });
+            
+                $unreadNotificationsGrouped = $unreadNotificationsFiltered->groupBy(function($notification) {
                     $transactionType = $notification->data['transaction_type'];
                     $id = '';
                     if ($transactionType === 'Appointment') {
@@ -83,7 +84,8 @@
                     }
                     return $transactionType . '_' . $id;
                 });
-          @endphp
+            @endphp
+
 
           @foreach ($unreadNotificationsGrouped as $transactionKey => $notifications)
               @php
@@ -120,13 +122,24 @@
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="fas fa-envelope fa-fw" id="message-notification"></i>
           <!-- Counter - Messages -->
-          @if (auth()->user()->unreadNotifications->where('type', 'App\Notifications\NewAppointmentMessage')->count() > 0 ||
-              auth()->user()->unreadNotifications->where('type', 'App\Notifications\NewDocumentRequestMessage')->count() > 0 ||
-              auth()->user()->unreadNotifications->where('type', 'App\Notifications\NewInquiryMessage')->count() > 0)
+            @php
+                $unreadMessages = auth()->user()->unreadNotifications
+                    ->filter(function ($notification) {
+                        // Only include notifications where 'is_active' exists and is true
+                        return isset($notification->data['is_active']) && $notification->data['is_active'] === true &&
+                            (
+                                $notification->type === 'App\Notifications\NewAppointmentMessage' ||
+                                $notification->type === 'App\Notifications\NewDocumentRequestMessage' ||
+                                $notification->type === 'App\Notifications\NewInquiryMessage'
+                            );
+                    });
+            @endphp
+
+
+
+          @if ($unreadMessages->isNotEmpty())
               <span class="badge badge-danger badge-counter">
-                  {{ auth()->user()->unreadNotifications->where('type', 'App\Notifications\NewAppointmentMessage')->count() + 
-                  auth()->user()->unreadNotifications->where('type', 'App\Notifications\NewDocumentRequestMessage')->count() + 
-                  auth()->user()->unreadNotifications->where('type', 'App\Notifications\NewInquiryMessage')->count()}}
+                  {{ $unreadMessages->count() }}
               </span>
           @endif
       </a>
@@ -145,11 +158,14 @@
             @php
                 $unreadNotificationsFiltered = auth()->user()->unreadNotifications
                     ->filter(function ($notification) {
-                        return $notification->type === 'App\Notifications\NewAppointmentMessage' ||
-                              $notification->type === 'App\Notifications\NewDocumentRequestMessage' ||
-                              $notification->type === 'App\Notifications\NewInquiryMessage';
+                        return isset($notification->data['is_active']) && $notification->data['is_active'] === true &&
+                            (
+                                $notification->type === 'App\Notifications\NewAppointmentMessage' ||
+                                $notification->type === 'App\Notifications\NewDocumentRequestMessage' ||
+                                $notification->type === 'App\Notifications\NewInquiryMessage'
+                            );
                     });
-
+            
                 $unreadNotificationsGrouped = $unreadNotificationsFiltered->groupBy(function($notification) {
                     $transactionType = $notification->data['transaction_type'];
                     $id = '';
@@ -163,6 +179,8 @@
                     return $transactionType . '_' . $id;
                 });
             @endphp
+
+
 
             @foreach ($unreadNotificationsGrouped as $transactionKey => $notifications)
                 @php

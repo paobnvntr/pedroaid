@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('cellphone_number');
             $table->string('documentRequest_status')->default('Pending');
             $table->timestamp('date_claimed')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

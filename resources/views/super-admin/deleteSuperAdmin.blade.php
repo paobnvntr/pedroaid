@@ -1,20 +1,22 @@
-@extends('layouts.app')
-
-@section('contents')
-  <div class="d-flex align-items-center justify-content-start addStaff mb-4">
-    <a href="{{ route('super-admin') }}" class="fas fa-angle-left fs-4"></a>
-    <h1 class="mb-0 ml-4">Delete Super Admin Account</h1>
-  </div>
-
-  <div class="p-5">
-    <form action="{{ route('super-admin.destroySuperAdmin', $super_admin->id) }}" method="POST" class="user">
-      @csrf
-      @method('DELETE')
-      <div class="form-group">
-        <p>Are you sure you want to delete <strong>{{ $super_admin->name }}'s</strong> account permanently?</p>
-      </div>
-      
-      <button type="submit" class="btn btn-danger btn-user btn-block">Permanently Delete Account</button>
-    </form>
-    <hr>
-@endsection
+<div class="modal fade" id="deleteModal{{$sad->id}}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{$sad->id}}" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger font-weight-bold" id="deleteModalLabel{{$sad->id}}">Delete Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete <strong>{{ $sad->username }}</strong>?
+            </div>
+            <div class="modal-footer">
+              <form action="{{ route('super-admin.destroySuperAdmin', $sad->id) }}" method="POST" class="user">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger btn-user">Confirm Delete</button>
+              </form>
+            </div>
+        </div>
+    </div>
+</div>

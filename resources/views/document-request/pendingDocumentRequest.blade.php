@@ -51,11 +51,13 @@
                                             <a href="{{ route('document-request.documentRequestDetails', $docreq->documentRequest_id) }}" type="button" class="btn btn-primary p-2">Details</a>
                                             @if (auth()->user()->level == 'Super Admin')
                                                 <a href="{{ route('document-request.editDocumentRequest', $docreq->documentRequest_id) }}" type="button" class="btn btn-warning p-2">Edit</a>
-                                                <a href="{{ route('document-request.deleteDocumentRequest', $docreq->documentRequest_id) }}" type="button" class="btn btn-danger p-2">Delete</a>
+                                                <button type="button" class="btn btn-danger p-2" data-toggle="modal" data-target="#deleteModal{{$docreq->documentRequest_id}}">Delete</button>
                                             @endif
                                         </div>
                                     </td>
                                 </tr>
+
+                                @include('document-request.deleteDocumentRequest')
                             @endforeach
                         @endif
                     </tbody>
@@ -101,11 +103,13 @@
                                             <a href="{{ route('document-request.documentRequestDetails', $docreq->documentRequest_id) }}" type="button" class="btn btn-primary p-2">Details</a>
                                             @if (auth()->user()->level == 'Super Admin')
                                                 <a href="{{ route('document-request.editDocumentRequest', $docreq->documentRequest_id) }}" type="button" class="btn btn-warning p-2">Edit</a>
-                                                <a href="{{ route('document-request.deleteDocumentRequest', $docreq->documentRequest_id) }}" type="button" class="btn btn-danger p-2">Delete</a>
+                                                <button type="button" class="btn btn-danger p-2" data-toggle="modal" data-target="#deleteModal{{$docreq->documentRequest_id}}">Delete</button>
                                             @endif
                                         </div>
                                     </td>
                                 </tr>
+
+                                @include('document-request.deleteDocumentRequest')
                             @endforeach
                         @endif
                     </tbody>

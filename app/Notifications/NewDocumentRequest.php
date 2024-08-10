@@ -40,6 +40,7 @@ class NewDocumentRequest extends Notification
             'documentRequest_id' => $this->documentRequest['documentRequest_id'],
             'name' => $this->documentRequest['name'],
             'transaction_type' => 'Document Request',
+            'is_active' => true,
         ];
     }
 }

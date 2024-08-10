@@ -25,6 +25,7 @@ class User extends Authenticatable
         'level',
         'transaction_level',
         'profile_picture',
+        'is_active',
         'created_at',
         'updated_at',
     ];

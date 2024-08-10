@@ -31,20 +31,24 @@ class DocumentRequestController extends Controller
     public function index()
     {
         $approved = DocumentRequest::where('documentRequest_status', 'Approved')
-                                         ->orderBy('created_at', 'ASC')
-                                         ->get();
+                                    ->where('is_active', true)
+                                    ->orderBy('created_at', 'ASC')
+                                    ->get();
 
         $processing = DocumentRequest::where('documentRequest_status', 'Processing')
-                                         ->orderBy('created_at', 'ASC')
-                                         ->get();
+                                        ->where('is_active', true)
+                                        ->orderBy('created_at', 'ASC')
+                                        ->get();
 
         $on_hold = DocumentRequest::where('documentRequest_status', 'On Hold')
-                                         ->orderBy('created_at', 'ASC')
-                                         ->get();
+                                    ->where('is_active', true)
+                                    ->orderBy('created_at', 'ASC')
+                                    ->get();
 
         $cancelled = DocumentRequest::where('documentRequest_status', 'Cancelled')
-                                         ->orderBy('created_at', 'ASC')
-                                         ->get();
+                                    ->where('is_active', true)
+                                    ->orderBy('created_at', 'ASC')
+                                    ->get();
         
         return view('document-request.index', compact('approved', 'processing', 'on_hold', 'cancelled'));  
     }
@@ -52,27 +56,34 @@ class DocumentRequestController extends Controller
     public function pendingDocumentRequest()
     {
         $pending = DocumentRequest::where('documentRequest_status', 'Pending')
-                                         ->orderBy('created_at', 'ASC')
-                                         ->get();
+                                    ->where('is_active', true)
+                                    ->orderBy('created_at', 'ASC')
+                                    ->get();
+
         $declined = DocumentRequest::where('documentRequest_status', 'Declined')
-                                         ->orderBy('created_at', 'ASC')
-                                         ->get();
+                                    ->where('is_active', true)
+                                    ->orderBy('created_at', 'ASC')
+                                    ->get();
+
         return view('document-request.pendingDocumentRequest', compact('pending', 'declined'));   
     }
 
     public function finishedDocumentRequest()
     {
         $to_claim = DocumentRequest::where('documentRequest_status', 'To Claim')
-                                         ->orderBy('created_at', 'ASC')
-                                         ->get();
+                                    ->where('is_active', true)
+                                    ->orderBy('created_at', 'ASC')
+                                    ->get();
 
         $claimed = DocumentRequest::where('documentRequest_status', 'Claimed')
-                                         ->orderBy('created_at', 'ASC')
-                                         ->get();
+                                    ->where('is_active', true)
+                                    ->orderBy('created_at', 'ASC')
+                                    ->get();
 
         $unclaimed = DocumentRequest::where('documentRequest_status', 'Unclaimed')
-                                         ->orderBy('created_at', 'ASC')
-                                         ->get();
+                                    ->where('is_active', true)
+                                    ->orderBy('created_at', 'ASC')
+                                    ->get();
 
         return view('document-request.finishedDocumentRequest', compact('to_claim', 'claimed', 'unclaimed'));   
     }
@@ -5028,156 +5039,32 @@ class DocumentRequestController extends Controller
     
             $this->createDeleteDocumentRequestLog($user, $documentRequest);
     
-            if ($documentRequest->document_type == 'Affidavit of Loss') {
-                $additionalInfo = AffidavitOfLoss::where('documentRequest_id', $id)->get()->first();
-
-                if (file_exists(public_path($additionalInfo->valid_id_front))) {
-                    unlink(public_path($additionalInfo->valid_id_front));
-                }
-
-                if (file_exists(public_path($additionalInfo->valid_id_back))) {
-                    unlink(public_path($additionalInfo->valid_id_back));
-                }
-
-            } else if ($documentRequest->document_type == 'Affidavit of Guardianship') {
-                $additionalInfo = AffidavitOfGuardianship::where('documentRequest_id', $id)->get()->first();
-
-                if (file_exists(public_path($additionalInfo->valid_id_front))) {
-                    unlink(public_path($additionalInfo->valid_id_front));
-                }
-
-                if (file_exists(public_path($additionalInfo->valid_id_back))) {
-                    unlink(public_path($additionalInfo->valid_id_back));
-                }
-
-            } else if ($documentRequest->document_type == 'Affidavit of No income') {
-                $additionalInfo = AffidavitOfNoIncome::where('documentRequest_id', $id)->get()->first();
-
-                if (file_exists(public_path($additionalInfo->certificate_of_indigency))) {
-                    unlink(public_path($additionalInfo->certificate_of_indigency));
-                }
-
-                if (file_exists(public_path($additionalInfo->valid_id_front))) {
-                    unlink(public_path($additionalInfo->valid_id_front));
-                }
-
-                if (file_exists(public_path($additionalInfo->valid_id_back))) {
-                    unlink(public_path($additionalInfo->valid_id_back));
-                }
-
-            } else if ($documentRequest->document_type == 'Affidavit of No fix income') {
-                $additionalInfo = AffidavitOfNoFixIncome::where('documentRequest_id', $id)->get()->first();
-
-                if (file_exists(public_path($additionalInfo->certificate_of_residency))) {
-                    unlink(public_path($additionalInfo->certificate_of_residency));
-                }
-
-                if (file_exists(public_path($additionalInfo->valid_id_front))) {
-                    unlink(public_path($additionalInfo->valid_id_front));
-                }
-
-                if (file_exists(public_path($additionalInfo->valid_id_back))) {
-                    unlink(public_path($additionalInfo->valid_id_back));
-                }
-
-            } else if ($documentRequest->document_type == 'Extra Judicial') {
-                $additionalInfo = ExtraJudicial::where('documentRequest_id', $id)->get()->first();
-
-
-                if (file_exists(public_path($additionalInfo->title_of_property))) {
-                    unlink(public_path($additionalInfo->title_of_property));
-                }
-
-                if (file_exists(public_path($additionalInfo->spouse_valid_id_front))) {
-                    unlink(public_path($additionalInfo->spouse_valid_id_front));
-                }
-
-                if (file_exists(public_path($additionalInfo->spouse_valid_id_back))) {
-                    unlink(public_path($additionalInfo->spouse_valid_id_back));
-                }
-
-            } else if ($documentRequest->document_type == 'Deed of Sale') {
-                $additionalInfo = DeedOfSale::where('documentRequest_id', $id)->get()->first();
-
-                if (file_exists(public_path($additionalInfo->property_document))) {
-                    unlink(public_path($additionalInfo->property_document));
-                }
-
-                if (file_exists(public_path($additionalInfo->vendor_valid_id_front))) {
-                    unlink(public_path($additionalInfo->vendor_valid_id_front));
-                }
-
-                if (file_exists(public_path($additionalInfo->vendor_valid_id_back))) {
-                    unlink(public_path($additionalInfo->vendor_valid_id_back));
-                }
-
-                if (file_exists(public_path($additionalInfo->vendee_valid_id_front))) {
-                    unlink(public_path($additionalInfo->vendee_valid_id_front));
-                }
-
-                if (file_exists(public_path($additionalInfo->vendee_valid_id_back))) {
-                    unlink(public_path($additionalInfo->vendee_valid_id_back));
-                }
-
-                if (file_exists(public_path($additionalInfo->witness_valid_id_front))) {
-                    unlink(public_path($additionalInfo->witness_valid_id_front));
-                }
-
-                if (file_exists(public_path($additionalInfo->witness_valid_id_back))) {
-                    unlink(public_path($additionalInfo->witness_valid_id_back));
-                }
-
-            } else if ($documentRequest->document_type == 'Deed of Donation') {
-                $additionalInfo = DeedOfDonation::where('documentRequest_id', $id)->get()->first();
-
-                if (file_exists(public_path($additionalInfo->donor_valid_id_front))) {
-                    unlink(public_path($additionalInfo->donor_valid_id_front));
-                }
-
-                if (file_exists(public_path($additionalInfo->donor_valid_id_back))) {
-                    unlink(public_path($additionalInfo->donor_valid_id_back));
-                }
-
-                if (file_exists(public_path($additionalInfo->donee_valid_id_front))) {
-                    unlink(public_path($additionalInfo->donee_valid_id_front));
-                }
-
-                if (file_exists(public_path($additionalInfo->donee_valid_id_back))) {
-                    unlink(public_path($additionalInfo->donee_valid_id_back));
-                }
-            
-            } else if ($documentRequest->document_type == 'Other Document') {
-                $additionalInfo = OtherDocument::where('documentRequest_id', $id)->get()->first();
-
-                if (file_exists(public_path($additionalInfo->valid_id_front))) {
-                    unlink(public_path($additionalInfo->valid_id_front));
-                }
-
-                if (file_exists(public_path($additionalInfo->valid_id_back))) {
-                    unlink(public_path($additionalInfo->valid_id_back));
-                }
-            }
-    
             $route = $this->getRouteByDocumentRequestStatus($documentRequest->documentRequest_status);
     
-            DocumentRequest::where('documentRequest_id', $id)->delete();
+            DocumentRequest::where('documentRequest_id', $id)->update([
+                'is_active' => false,
+                'updated_at' => now('Asia/Manila'),
+            ]);
 
             if(Feedback::where('transaction_id', $id)->where('transaction_type', 'Document Request')->get()->count() > 0) {
-                Feedback::where('transaction_id', $id)->where('transaction_type', 'Document Request')->delete();
+                Feedback::where('transaction_id', $id)->where('transaction_type', 'Document Request')->update([
+                    'is_active' => false,
+                    'updated_at' => now('Asia/Manila'),
+                ]);
             }
 
             if(DB::table('notifications')->where('data->documentRequest_id', $id)->where('type', 'App\Notifications\NewDocumentRequest')->get()->count() > 0) {
                 DB::table('notifications')
                 ->where('data->documentRequest_id', $id)
                 ->where('type', 'App\Notifications\NewDocumentRequest')
-                ->delete();
+                ->update(['data->is_active' => false]);
             }
 
             if(DB::table('notifications')->where('data->documentRequest_id', $id)->where('type', 'App\Notifications\NewDocumentRequestMessage')->get()->count() > 0) {
                 DB::table('notifications')
                 ->where('data->documentRequest_id', $id)
                 ->where('type', 'App\Notifications\NewDocumentRequestMessage')
-                ->delete();
+                ->update(['data->is_active' => false]);
             }
     
             DB::commit();
@@ -5224,7 +5111,7 @@ class DocumentRequestController extends Controller
     }  
     
     public function documentRequestFeedback() {
-        $feedback = Feedback::where('transaction_type', 'Document Request')->get();
+        $feedback = Feedback::where('transaction_type', 'Document Request')->where('is_active', true)->get();
         return view('document-request.documentRequestFeedbackTable', compact('feedback'));
     }
 
@@ -5333,14 +5220,12 @@ class DocumentRequestController extends Controller
         }
     }
 
-    public function deleteFeedback(string $id) {
-        $feedback = Feedback::where('transaction_id', $id)->where('transaction_type', 'Document Request')->get()->first();
-        return view('document-request.deleteFeedback', compact('feedback'));
-    }
-
     public function destroyFeedback(string $id) {
-        $feedback = Feedback::where('transaction_id', $id)->where('transaction_type', 'Document Request')->get()->first();
-        $feedback->delete();
+        
+        Feedback::where('transaction_id', $id)->where('transaction_type', 'Document Request')->update([
+            'is_active' => false,
+            'updated_at' => now('Asia/Manila'),
+        ]);
 
         $user = Auth::user()->username;
         Logs::create([

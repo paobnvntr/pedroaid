@@ -170,12 +170,34 @@ function handleCommitteeSearch() {
 								<p class="dateApproved">Date Approved: <br> <span>${ord.date_approved}</span></p>
 							</div>
 							<hr>
+
 							<p class="description">${ord.description}</p>
-							<div class="text-center text-lg-start d-flex align-items-center justify-content-center">
-								<a href="/${ord.ordinance_file}" target="_blank" class="btn-view scrollto d-inline-flex align-items-center justify-content-center align-self-center">
-									<span>Read More</span>
-									<i class="bi bi-arrow-right"></i>
-								</a>
+
+							<div class="row">
+								<div class="col-md-6">
+									<a href="/${ord.ordinance_file}" target="_blank" id="view_${ord.id}"
+										class="btn-view scrollto d-inline-flex align-items-center justify-content-center align-self-center"
+										onclick="incrementViewCount('${ord.id}')">
+										<span>Read More</span>
+										<i class="bi bi-arrow-right"></i>
+									</a>
+								</div>
+
+								<div class="col-md-6">
+									<a href="/${ord.ordinance_file}" download="${ord.ordinance_number}.pdf"
+										class="btn-view scrollto d-inline-flex align-items-center justify-content-center align-self-center"
+										onclick="incrementDownloadCount('${ord.id}')">
+										<span>Download</span>
+										<i class="bi bi-download"></i>
+									</a>
+								</div>
+							</div>
+						
+							<hr>
+
+							<div class="d-flex align-items-center justify-content-end">
+								<span id="view_count_${ord.id}" class="dateApproved">Views: ${ord.view_count}</span>
+								<span id="download_count_${ord.id}" class="dateApproved ml-4">Downloads: ${ord.download_count}</span>
 							</div>
 						</div>
 					`;
@@ -188,6 +210,35 @@ function handleCommitteeSearch() {
 	// Attach the handleSearch function to the input event of the search input
 	searchInput.addEventListener('input', handleCommitteeSearch);
 	searchInput.addEventListener('input', handleOrdinanceSearch);
+
+	function incrementViewCount(id) {
+        $.ajax({
+            type: "GET",
+            url: "/ordinance/view/" + id,
+            success: function(response) {
+                console.log("View count incremented successfully.");
+				$('#view_count_' + id).text('Views: ' + response.view_count);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error incrementing view count:", error);
+            }
+        });
+    }
+
+    // Function to increment download count
+    function incrementDownloadCount(id) {
+        $.ajax({
+            type: "GET",
+            url: "/ordinance/download/" + id,
+            success: function(response) {
+                console.log("Download count incremented successfully.");
+				$('#download_count_' + id).text('Downloads: ' + response.download_count);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error incrementing download count:", error);
+            }
+        });
+    }
 </script>
 
 @endsection

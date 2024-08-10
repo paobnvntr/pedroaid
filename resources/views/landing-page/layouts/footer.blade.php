@@ -20,12 +20,14 @@
 					<ul>
 						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('home') }}#home">Home</a></li>
 						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('home') }}#about-us">About Us</a></li>
-						<!--<li><i class="bi bi-chevron-right"></i> <a href="{{ route('home') }}#sangguniang-panlungsod">Sangguniang Panlungsod</a></li>-->
-						<!--<li><i class="bi bi-chevron-right"></i> <a href="{{ route('displayCommittee') }}">City Ordinances</a></li>-->
+						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('home') }}#sangguniang-panlungsod">Sangguniang Panlungsod</a></li>
+						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('displayCommittee') }}">City Ordinances</a></li>
 						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('home') }}#faq">FAQs</a></li>
-						<li><i class="bi bi-chevron-right"></i> <a href="{{ route('privacyPolicy') }}">Privacy Policy</a></li>
+						<li><i class="bi bi-chevron-right"></i> <span data-toggle="modal" data-target="#privacyModal" id="privacyPolicySpan">Privacy Policy</span></li>
 					</ul>
 				</div>
+
+				@include('landing-page/privacyPolicy')
 
 				<div class="col-lg-2 col-6 footer-links">
 					<h4>Our Services</h4>
@@ -48,7 +50,7 @@
 						<br><br>
 						<strong>Phone:</strong> 8082020305<br>
 						<strong>Mobile:</strong> 09205001415<br>
-						<strong>Email:</strong> contact@pedroaid.com<br>
+						<strong>Email:</strong> <a href="https://mail.google.com/mail/?view=cm&fs=1&to=contact@pedroaid.com" target="_blank">contact@pedroaid.com</a><br>
 					</p>
 
 				</div>

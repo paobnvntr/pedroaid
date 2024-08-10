@@ -1,26 +1,22 @@
-@extends('layouts.app')
-
-@section('contents')
-  <div class="d-flex align-items-center justify-content-start addStaff mb-4">
-    @if($appointment->appointment_status == 'Pending' || $appointment->appointment_status == 'Declined')
-        <a href="{{ route('appointment.pendingAppointment') }}" class="fas fa-angle-left fs-4"></a>
-    @elseif($appointment->appointment_status == 'Booked' || $appointment->appointment_status == 'Rescheduled')
-        <a href="{{ route('appointment') }}" class="fas fa-angle-left fs-4"></a>
-    @else
-      <a href="{{ route('appointment.finishedAppointment') }}" class="fas fa-angle-left fs-4"></a>
-    @endif
-    <h1 class="mb-0 ml-4">Delete Appointment</h1>
-  </div>
-
-  <div class="p-5">
-    <form action="{{ route('appointment.destroyAppointment', $appointment->appointment_id) }}" method="POST" class="user">
-      @csrf
-      @method('DELETE')
-      <div class="form-group">
-        <p>Are you sure you want to delete Appointment ID: <strong>{{ $appointment->appointment_id }}</strong> permanently?</p>
-      </div>
-      
-      <button type="submit" class="btn btn-danger btn-user btn-block">Permanently Delete Appointment</button>
-    </form>
-    <hr>
-@endsection
+<div class="modal fade" id="deleteModal{{$appt->appointment_id}}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{$appt->appointment_id}}" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger font-weight-bold" id="deleteModalLabel{{$appt->appointment_id}}">Delete Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete Appointment ID: <strong>{{ $appt->appointment_id }}</strong>?
+            </div>
+            <div class="modal-footer">
+              <form action="{{ route('appointment.destroyAppointment', $appt->appointment_id) }}" method="POST" class="user">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger btn-user">Confirm Delete</button>
+              </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -17,7 +17,7 @@ class OrdinanceController extends Controller
     //display ordinance list
     public function index()
     {
-        $ordinance = Ordinances::orderBy('ordinance_number', 'ASC')->get();
+        $ordinance = Ordinances::where('is_active', true)->orderBy('ordinance_number', 'ASC')->get();
         return view('ordinance.index', compact('ordinance'));
     }
 
@@ -241,14 +241,6 @@ class OrdinanceController extends Controller
     
         Logs::create($logData);
     }
-    
-
-    //redirect to delete ordinance page
-    public function deleteOrdinance(string $id)
-    {
-        $ordinance = Ordinances::findOrFail($id);
-        return view('ordinance.deleteOrdinance', compact('ordinance'));
-    }
 
     //delete ordinance
     public function destroyOrdinance(string $id)
@@ -261,9 +253,10 @@ class OrdinanceController extends Controller
     
             $this->createOrdinanceDeleteLog($user, $ordinance);
     
-            unlink(public_path($ordinance->ordinance_file));
-    
-            Ordinances::destroy($id);
+            $ordinance->is_active = false;
+            $ordinance->updated_at = now('Asia/Manila');
+
+            $ordinance->update();
     
             DB::commit();
     

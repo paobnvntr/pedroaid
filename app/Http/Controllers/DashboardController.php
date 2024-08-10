@@ -61,4 +61,104 @@ class DashboardController extends Controller
     
         return response()->json($feedbackData);
     }
+
+    public function getServicesCountData() {
+        // Initialize arrays to hold counts for all months, initialized to 0
+        $appointmentsData = array_fill(1, 12, 0);
+        $inquiriesData = array_fill(1, 12, 0);
+        $documentRequestsData = array_fill(1, 12, 0);
+    
+        // Fetch the appointment data from the database
+        $appointments = Appointment::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+    
+        // Fetch the inquiry data from the database
+        $inquiries = Inquiry::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+    
+        // Fetch the document request data from the database
+        $documentRequests = DocumentRequest::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+    
+        // Populate the counts for the corresponding months in each array
+        foreach ($appointments as $appointment) {
+            $month = $appointment->month;
+            $count = $appointment->count;
+            $appointmentsData[$month] = $count;
+        }
+    
+        foreach ($inquiries as $inquiry) {
+            $month = $inquiry->month;
+            $count = $inquiry->count;
+            $inquiriesData[$month] = $count;
+        }
+    
+        foreach ($documentRequests as $documentRequest) {
+            $month = $documentRequest->month;
+            $count = $documentRequest->count;
+            $documentRequestsData[$month] = $count;
+        }
+    
+        // Return the data as JSON response
+        return response()->json([
+            'appointmentsData' => $appointmentsData,
+            'inquiriesData' => $inquiriesData,
+            'documentRequestsData' => $documentRequestsData,
+        ]);
+    }
+    
+    public function getDocumentTypeCountData() {
+        // Initialize arrays to hold counts for all months, initialized to 0
+        $affidavitOfLossData = array_fill(1, 12, 0);
+        $affidavitOfGuardianshipData = array_fill(1, 12, 0);
+        $affidavitOfNoIncomeData = array_fill(1, 12, 0);
+        $affidavitOfNoFixIncomeData = array_fill(1, 12, 0);
+        $extraJudicialData = array_fill(1, 12, 0);
+        $deedOfSaleData = array_fill(1, 12, 0);
+        $deedOfDonationData = array_fill(1, 12, 0);
+        $otherDocumentData = array_fill(1, 12, 0);
+    
+        // Fetch data for each document type separately
+        $this->fetchDocumentTypeData($affidavitOfLossData, 'Affidavit of Loss');
+        $this->fetchDocumentTypeData($affidavitOfGuardianshipData, 'Affidavit of Guardianship');
+        $this->fetchDocumentTypeData($affidavitOfNoIncomeData, 'Affidavit of No Income');
+        $this->fetchDocumentTypeData($affidavitOfNoFixIncomeData, 'Affidavit of No Fixed Income');
+        $this->fetchDocumentTypeData($extraJudicialData, 'Extra Judicial');
+        $this->fetchDocumentTypeData($deedOfSaleData, 'Deed of Sale');
+        $this->fetchDocumentTypeData($deedOfDonationData, 'Deed of Donation');
+        $this->fetchDocumentTypeData($otherDocumentData, 'Other Document');
+    
+        // Return the data as JSON response
+        return response()->json([
+            'affidavitOfLossData' => $affidavitOfLossData,
+            'affidavitOfGuardianshipData' => $affidavitOfGuardianshipData,
+            'affidavitOfNoIncomeData' => $affidavitOfNoIncomeData,
+            'affidavitOfNoFixIncomeData' => $affidavitOfNoFixIncomeData,
+            'extraJudicialData' => $extraJudicialData,
+            'deedOfSaleData' => $deedOfSaleData,
+            'deedOfDonationData' => $deedOfDonationData,
+            'otherDocumentData' => $otherDocumentData,
+        ]);
+    }
+    
+    private function fetchDocumentTypeData(&$dataArray, $documentType) {
+        $documentTypeData = DocumentRequest::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+            ->where('document_type', $documentType)
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+    
+        // Populate the counts for the corresponding months in the given array
+        foreach ($documentTypeData as $data) {
+            $month = $data->month;
+            $count = $data->count;
+            $dataArray[$month] = $count;
+        }
+    }    
 }

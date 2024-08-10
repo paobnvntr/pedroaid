@@ -55,11 +55,13 @@
                                             <a href="{{ route('appointment.appointmentDetails', $appt->appointment_id) }}" type="button" class="btn btn-primary p-2">Details</a>
                                             @if (auth()->user()->level == 'Super Admin')
                                                 <a href="{{ route('appointment.editAppointment', $appt->appointment_id) }}" type="button" class="btn btn-warning p-2">Edit</a>
-                                                <a href="{{ route('appointment.deleteAppointment', $appt->appointment_id) }}" type="button" class="btn btn-danger p-2">Delete</a>
+                                                <button type="button" class="btn btn-danger p-2" data-toggle="modal" data-target="#deleteModal{{$appt->appointment_id}}">Delete</button>
                                             @endif
                                         </div>
                                     </td>
                                 </tr>
+
+                                @include('appointment.deleteAppointment')
                             @endforeach
                         @endif
                     </tbody>
@@ -106,11 +108,13 @@
                                             <a href="{{ route('appointment.appointmentDetails', $appt->appointment_id) }}" type="button" class="btn btn-primary p-2">Details</a>
                                             @if (auth()->user()->level == 'Super Admin')
                                                 <a href="{{ route('appointment.editAppointment', $appt->appointment_id) }}" type="button" class="btn btn-warning p-2">Edit</a>
-                                                <a href="{{ route('appointment.deleteAppointment', $appt->appointment_id) }}" type="button" class="btn btn-danger p-2">Delete</a>
+                                                <button type="button" class="btn btn-danger p-2" data-toggle="modal" data-target="#deleteModal{{$appt->appointment_id}}">Delete</button>
                                             @endif
                                         </div>
                                     </td>
                                 </tr>
+
+                                @include('appointment.deleteAppointment')
                             @endforeach
                         @endif
                     </tbody>

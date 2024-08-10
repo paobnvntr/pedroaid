@@ -51,11 +51,13 @@
                                         <td class="align-middle text-center">
                                             <div class="btn-group" role="group" aria-label="Basic example">
                                                 <a href="{{ route('document-request.feedbackEditForm', $fdbck->transaction_id) }}" type="button" class="btn btn-warning p-2">Edit</a>
-                                                <a href="{{ route('document-request.deleteFeedback', $fdbck->transaction_id) }}" type="button" class="btn btn-danger p-2">Delete</a>
+                                                <button type="button" class="btn btn-danger p-2" data-toggle="modal" data-target="#deleteModal{{$fdbck->transaction_id}}">Delete</button>
                                             </div>
                                         </td>
                                     @endif
                                 </tr>
+
+                                @include('document-request.deleteFeedback')
                             @endforeach
                         @endif
                     </tbody>

@@ -16,6 +16,7 @@ class Committee extends Model
         'member_1',
         'member_2',
         'member_3',
+        'is_active',
         'created_at',
         'updated_at',
     ];

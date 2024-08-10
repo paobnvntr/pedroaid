@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email');
             $table->text('inquiry');
             $table->string('status');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

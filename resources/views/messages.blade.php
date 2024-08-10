@@ -18,9 +18,12 @@
                                 @php
                                     $unreadNotificationsFiltered = auth()->user()->unreadNotifications
                                         ->filter(function ($notification) {
-                                            return $notification->type === 'App\Notifications\NewAppointmentMessage' ||
-                                                    $notification->type === 'App\Notifications\NewDocumentRequestMessage' ||
-                                                    $notification->type === 'App\Notifications\NewInquiryMessage';
+                                            return $notification->data['is_active'] === true &&
+                                                    (
+                                                        $notification->type === 'App\Notifications\NewAppointmentMessage' ||
+                                                        $notification->type === 'App\Notifications\NewDocumentRequestMessage' ||
+                                                        $notification->type === 'App\Notifications\NewInquiryMessage'
+                                                    );
                                         });
 
                                         $unreadNotificationsGrouped = $unreadNotificationsFiltered->groupBy(function($notification) {
@@ -89,7 +92,7 @@
                                     @endphp
 
                                     {{-- Check if the notification type matches --}}
-                                    @if ($notification->type === 'App\Notifications\NewAppointmentMessage' || $notification->type === 'App\Notifications\NewDocumentRequestMessage' || $notification->type === 'App\Notifications\NewInquiryMessage')
+                                    @if ($notification->data['is_active'] === true && ($notification->type === 'App\Notifications\NewAppointmentMessage' || $notification->type === 'App\Notifications\NewDocumentRequestMessage' || $notification->type === 'App\Notifications\NewInquiryMessage'))
                                         {{-- Check if the notification is within the last 7 days --}}
                                         @if ($notificationDate->greaterThanOrEqualTo($sevenDaysAgo))
                                             <a id="notification_{{ $notification->id }}" class="dropdown-item d-flex align-items-center mb-2 notification-item shadow-sm rounded" href="{{ 

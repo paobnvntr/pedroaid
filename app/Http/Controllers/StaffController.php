@@ -19,7 +19,7 @@ class StaffController extends Controller
     // display staff list
     public function index()
     {
-        $staff = User::where('level', 'staff')->orderBy('created_at', 'ASC')->get();
+        $staff = User::where('level', 'staff')->where('is_active', true)->orderBy('created_at', 'ASC')->get();
         return view('staff.index', compact('staff'));
     }
 
@@ -239,14 +239,6 @@ class StaffController extends Controller
         ]);
     }
 
-
-    // redirect to delete staff page
-    public function deleteStaff(string $id)
-    {
-        $staff = User::findOrFail($id);
-        return view('staff.deleteStaff', compact('staff'));
-    }
-
     // delete staff account
     public function destroyStaff(string $id)
     {
@@ -258,15 +250,10 @@ class StaffController extends Controller
 
             $this->createStaffDeleteLog($user, $staff);
 
-            if ($staff->profile_picture !== 'uploads/profile/staff/default_staff.jpg') {
-                $filePath = public_path($staff->profile_picture);
+            $staff->is_active = false;
+            $staff->updated_at = now('Asia/Manila');
 
-                if (file_exists($filePath)) {
-                    unlink($filePath);
-                }
-            }
-
-            $staff->delete();
+            $staff->update();
 
             DB::commit();
 

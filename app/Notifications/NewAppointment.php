@@ -40,6 +40,7 @@ class NewAppointment extends Notification
             'appointment_id' => $this->appointment['appointment_id'],
             'name' => $this->appointment['name'],
             'transaction_type' => 'Appointment',
+            'is_active' => true,
         ];
     }
 }

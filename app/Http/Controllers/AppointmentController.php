@@ -19,11 +19,13 @@ class AppointmentController extends Controller
     public function index()
     {
         $booked_rescheduled = Appointment::whereIn('appointment_status', ['Booked', 'Rescheduled'])
+                                        ->where('is_active', true)
                                         ->orderBy('appointment_date', 'ASC')
                                         ->orderBy('appointment_time', 'ASC')
                                         ->get();
 
         $cancelled = Appointment::where('appointment_status', 'Cancelled')
+                                ->where('is_active', true)
                                 ->orderBy('appointment_date', 'ASC')
                                 ->orderBy('appointment_time', 'ASC')
                                 ->get();
@@ -34,13 +36,15 @@ class AppointmentController extends Controller
     public function pendingAppointment()
     {
         $pending = Appointment::where('appointment_status', 'Pending')
-                                         ->orderBy('appointment_date', 'ASC')
-                                         ->orderBy('appointment_time', 'ASC')
-                                         ->get();
+                                ->where('is_active', true)
+                                ->orderBy('appointment_date', 'ASC')
+                                ->orderBy('appointment_time', 'ASC')
+                                ->get();
         $declined = Appointment::where('appointment_status', 'Declined')
-                                         ->orderBy('appointment_date', 'ASC')
-                                         ->orderBy('appointment_time', 'ASC')
-                                         ->get();
+                                ->where('is_active', true)
+                                ->orderBy('appointment_date', 'ASC')
+                                ->orderBy('appointment_time', 'ASC')
+                                ->get();
 
         return view('appointment.pendingAppointment', compact('pending', 'declined'));   
     }
@@ -48,14 +52,16 @@ class AppointmentController extends Controller
     public function finishedAppointment()
     {
         $finished = Appointment::where('appointment_status', 'Finished')
-                                         ->orderBy('appointment_date', 'ASC')
-                                         ->orderBy('appointment_time', 'ASC')
-                                         ->get();
+                                ->where('is_active', true)
+                                ->orderBy('appointment_date', 'ASC')
+                                ->orderBy('appointment_time', 'ASC')
+                                ->get();
         
         $no_show = Appointment::where('appointment_status', 'No-Show')
-                                         ->orderBy('appointment_date', 'ASC')
-                                         ->orderBy('appointment_time', 'ASC')
-                                         ->get();
+                                ->where('is_active', true)
+                                ->orderBy('appointment_date', 'ASC')
+                                ->orderBy('appointment_time', 'ASC')
+                                ->get();
 
         return view('appointment.finishedAppointment', compact('finished', 'no_show'));   
     }
@@ -620,14 +626,7 @@ class AppointmentController extends Controller
             'created_at' => now('Asia/Manila'),
             'updated_at' => now('Asia/Manila'),
         ]);
-    }    
-
-    // redirect to delete appointment page
-    public function deleteAppointment(string $id)
-    {
-        $appointment = Appointment::where('appointment_id', $id)->get()->first();
-        return view('appointment.deleteAppointment', compact('appointment'));
-    }
+    }   
 
     // delete appointment account
     public function destroyAppointment(string $id)
@@ -642,21 +641,31 @@ class AppointmentController extends Controller
     
             $appointmentStatus = $appointment->appointment_status;
     
-            Appointment::where('appointment_id', $id)->delete();
+            Appointment::where('appointment_id', $id)->update([
+                'is_active' => false,
+                'updated_at' => now('Asia/Manila'),
+            ]);
 
             if(Feedback::where('transaction_id', $id)->where('transaction_type', 'Appointment')->get()->count() > 0) {
-                Feedback::where('transaction_id', $id)->where('transaction_type', 'Appointment')->delete();
+                Feedback::where('transaction_id', $id)->where('transaction_type', 'Appointment')->update([
+                    'is_active' => false,
+                    'updated_at' => now('Asia/Manila'),
+                ]);
             }
 
-            DB::table('notifications')
-            ->where('data->appointment_id', $id)
-            ->where('type', 'App\Notifications\NewAppointment')
-            ->delete();
+            if(DB::table('notifications')->where('data->appointment_id', $id)->where('type', 'App\Notifications\NewAppointment')->get()->count() > 0) {
+                DB::table('notifications')
+                ->where('data->appointment_id', $id)
+                ->where('type', 'App\Notifications\NewAppointment')
+                ->update(['data->is_active' => false]);
+            }
 
-            DB::table('notifications')
-            ->where('data->appointment_id', $id)
-            ->where('type', 'App\Notifications\NewAppointmentMessage')
-            ->delete();
+            if(DB::table('notifications')->where('data->appointment_id', $id)->where('type', 'App\Notifications\NewAppointmentMessage')->get()->count() > 0) {
+                DB::table('notifications')
+                ->where('data->appointment_id', $id)
+                ->where('type', 'App\Notifications\NewAppointmentMessage')
+                ->update(['data->is_active' => false]);
+            }
     
             $route = $this->getRouteByAppointmentStatus($appointmentStatus);
     
@@ -703,7 +712,7 @@ class AppointmentController extends Controller
 
     public function appointmentFeedback()
     {
-        $feedback = Feedback::where('transaction_type', 'Appointment')->get();
+        $feedback = Feedback::where('transaction_type', 'Appointment')->where('is_active', true)->get();
         return view('appointment.appointmentFeedback', compact('feedback'));
     }
 
@@ -812,14 +821,12 @@ class AppointmentController extends Controller
         }
     }
 
-    public function deleteFeedback(string $id) {
-        $feedback = Feedback::where('transaction_id', $id)->where('transaction_type', 'Appointment')->get()->first();
-        return view('appointment.deleteFeedback', compact('feedback'));
-    }
-
     public function destroyFeedback(string $id) {
-        $feedback = Feedback::where('transaction_id', $id)->where('transaction_type', 'Appointment')->get()->first();
-        $feedback->delete();
+        
+        Feedback::where('transaction_id', $id)->where('transaction_type', 'Appointment')->update([
+            'is_active' => false,
+            'updated_at' => now('Asia/Manila'),
+        ]);
 
         $user = Auth::user()->username;
         Logs::create([
@@ -832,5 +839,15 @@ class AppointmentController extends Controller
         ]);
 
         return redirect()->route('appointment.appointmentFeedback')->with('success', 'Feedback Deleted Successfully!');
+    }
+
+    public function addNote(Request $request, string $id) {
+
+        Appointment::where('appointment_id', $id)->update([
+            'notes' => $request->notes,
+            'updated_at' => now('Asia/Manila'),
+        ]);
+
+        return response()->json(['message' => 'Note Added!']);
     }
 }

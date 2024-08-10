@@ -24,6 +24,7 @@ class Inquiry extends Model
         'name',
         'email',
         'inquiry',
-        'status'
+        'status',
+        'is_active'
     ];
 }

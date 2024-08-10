@@ -1,20 +1,22 @@
-@extends('layouts.app')
-
-@section('contents')
-  <div class="d-flex align-items-center justify-content-start addStaff mb-4">
-    <a href="{{ route('ordinance') }}" class="fas fa-angle-left fs-4"></a>
-    <h1 class="mb-0 ml-4">Delete Ordinance Account</h1>
-  </div>
-
-  <div class="p-5">
-    <form action="{{ route('ordinance.destroyOrdinance', $ordinance->id) }}" method="POST" class="user">
-      @csrf
-      @method('DELETE')
-      <div class="form-group">
-        <p>Are you sure you want to delete Ordinance No. <strong>{{ $ordinance->ordinance_number }}</strong> permanently?</p>
-      </div>
-      
-      <button type="submit" class="btn btn-danger btn-user btn-block">Permanently Delete Ordinance</button>
-    </form>
-    <hr>
-@endsection
+<div class="modal fade" id="deleteModal{{$ord->id}}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{$ord->id}}" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger font-weight-bold" id="deleteModalLabel{{$ord->id}}">Delete Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete Ordinance No. <strong>{{ $ord->ordinance_number }}</strong>?
+            </div>
+            <div class="modal-footer">
+              <form action="{{ route('ordinance.destroyOrdinance', $ord->id) }}" method="POST" class="user">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger btn-user">Confirm Delete</button>
+              </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -19,7 +19,7 @@ class AdminController extends Controller
     // display admin list
     public function index()
     {
-        $admin = User::where('level', 'admin')->orderBy('created_at', 'ASC')->get();
+        $admin = User::where('level', 'admin')->where('is_active', true)->orderBy('created_at', 'ASC')->get();
         return view('admin.index', compact('admin'));
     }
 
@@ -236,12 +236,6 @@ class AdminController extends Controller
         ]);
     }
 
-    public function deleteAdmin(string $id)
-    {
-        $admin = User::findOrFail($id);
-        return view('admin.deleteAdmin', compact('admin'));
-    }
-
     // delete admin account
     public function destroyAdmin(string $id)
     {
@@ -252,16 +246,11 @@ class AdminController extends Controller
             $user = Auth::user()->username;
     
             $this->createAdminDeleteLog($user, $admin);
+
+            $admin->is_active = false;
+            $admin->updated_at = now('Asia/Manila');
     
-            if ($admin->profile_picture !== 'uploads/profile/admin/default_admin.jpg') {
-                $filePath = public_path($admin->profile_picture);
-    
-                if (file_exists($filePath)) {
-                    unlink($filePath);
-                }
-            }
-    
-            $admin->delete();
+            $admin->update();
     
             DB::commit();
     

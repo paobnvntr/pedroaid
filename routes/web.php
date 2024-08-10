@@ -38,6 +38,8 @@ Route::controller(LandingPageController::class)->group(function () {
     Route::get('city-ordinance/committee', 'displayCommittee')->name('displayCommittee');
     Route::get('city-ordinance/{committee_name}', 'displayYear')->name('displayYear');
     Route::get('city-ordinance/{committee_name}/{year}', 'displayOrdinance')->name('displayOrdinance');
+    Route::get('/ordinance/view/{id}', 'incrementViewCount');
+    Route::get('/ordinance/download/{id}', 'incrementDownloadCount');
     Route::get('search-ordinances', 'searchOrdinance')->name('searchOrdinance');
 
     Route::get('sangguniang-panlungsod', 'sangguniangPanlungsod')->name('sangguniangPanlungsod');
@@ -135,9 +137,9 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('loginAction', 'loginAction')->name('loginAction');
     Route::get('logout', 'logout')->middleware('auth')->name('logout');
 
-    // Route::middleware('throttle:5,1')->group(function () {
-    //     Route::post('loginAction', 'loginAction')->name('loginAction');
-    // })
+    Route::post('forgot-password', 'forgotPassword')->name('forgotPassword'); 
+    Route::get('reset-password/{token}/{username}', 'resetPasswordForm')->name('resetPasswordForm');
+    Route::post('reset-password', 'resetPassword')->name('resetPassword');
 });
 
 Route::middleware('auth')->group(function () {
@@ -155,6 +157,8 @@ Route::middleware('auth')->group(function () {
         Route::get('', 'index')->name('dashboard');
         Route::get('getAppointmentFeedbackData', 'getAppointmentFeedbackData')->name('dashboard.getAppointmentFeedbackData');
         Route::get('getDocumentRequestFeedbackData', 'getDocumentRequestFeedbackData')->name('dashboard.getDocumentRequestFeedbackData');
+        Route::get('getServicesCountData', 'getServicesCountData')->name('dashboard.getServicesCountData');
+        Route::get('getDocumentTypeCountData', 'getDocumentTypeCountData')->name('dashboard.getDocumentTypeCountData');
     });
 
     Route::controller(ProfileUpdateController::class)->prefix('profile')->group(function () {
@@ -173,7 +177,6 @@ Route::middleware('auth')->group(function () {
         Route::post('validateEditStaffForm/{id}', 'validateEditStaffForm')->name('staff.validateEditStaffForm');
         Route::post('editStaff/{id}', 'updateStaff')->name('staff.updateStaff');
 
-        Route::get('deleteStaff/{id}', 'deleteStaff')->name('staff.deleteStaff');
         Route::delete('destroyStaff/{id}', 'destroyStaff')->name('staff.destroyStaff');
     });
 
@@ -187,7 +190,6 @@ Route::middleware('auth')->group(function () {
         Route::post('validateEditAdminForm/{id}', 'validateEditAdminForm')->name('admin.validateEditAdminForm');
         Route::post('editAdmin/{id}', 'updateAdmin')->name('admin.updateAdmin');
 
-        Route::get('deleteAdmin/{id}', 'deleteAdmin')->name('admin.deleteAdmin');
         Route::delete('destroyAdmin/{id}', 'destroyAdmin')->name('admin.destroyAdmin');
     });
 
@@ -200,8 +202,7 @@ Route::middleware('auth')->group(function () {
         Route::get('editSuperAdmin/{id}', 'editSuperAdmin')->name('super-admin.editSuperAdmin');
         Route::post('validateEditSuperAdminForm/{id}', 'validateEditSuperAdminForm')->name('super-admin.validateEditSuperAdminForm');
         Route::post('editSuperAdmin/{id}', 'updateSuperAdmin')->name('super-admin.updateSuperAdmin');
-
-        Route::get('deleteSuperAdmin/{id}', 'deleteSuperAdmin')->name('super-admin.deleteSuperAdmin');
+        
         Route::delete('destroySuperAdmin/{id}', 'destroySuperAdmin')->name('super-admin.destroySuperAdmin');
     });
 
@@ -219,7 +220,6 @@ Route::middleware('auth')->group(function () {
         Route::post('validateEditOrdinanceForm/{id}', 'validateEditOrdinanceForm')->name('ordinance.validateEditOrdinanceForm');
         Route::post('editOrdinance/{id}', 'updateOrdinance')->name('ordinance.updateOrdinance');
 
-        Route::get('deleteOrdinance/{id}', 'deleteOrdinance')->name('ordinance.deleteOrdinance');
         Route::delete('destroyOrdinance/{id}', 'destroyOrdinance')->name('ordinance.destroyOrdinance');
     });
 
@@ -236,7 +236,6 @@ Route::middleware('auth')->group(function () {
         Route::get('deleteMember2/{id}', 'deleteMember2')->name('committee.deleteMember2');
         Route::get('deleteMember3/{id}', 'deleteMember3')->name('committee.deleteMember3');
 
-        Route::get('deleteCommittee/{id}', 'deleteCommittee')->name('committee.deleteCommittee');
         Route::delete('destroyCommittee/{id}', 'destroyCommittee')->name('committee.destroyCommittee');
     });
 
@@ -255,7 +254,6 @@ Route::middleware('auth')->group(function () {
         Route::post('validateEditForm/{id}', 'validateEditForm')->name('appointment.validateEditForm');
         Route::post('editAppointment/{id}', 'updateAppointment')->name('appointment.updateAppointment');
         
-        Route::get('deleteAppointment/{id}', 'deleteAppointment')->name('appointment.deleteAppointment');
         Route::delete('destroyAppointment/{id}', 'destroyAppointment')->name('appointment.destroyAppointment');
 
         Route::get('pending-appointment', 'pendingAppointment')->name('appointment.pendingAppointment');
@@ -280,8 +278,9 @@ Route::middleware('auth')->group(function () {
         Route::post('feedback-edit-form/validate/{id}/{type}', 'validateEditFeedbackForm')->name('appointment.validateEditFeedbackForm');
         Route::post('feedback-edit-form/{id}/{type}', 'saveEditFeedback')->name('appointment.saveEditFeedback');
         
-        Route::get('deleteFeedback/{id}', 'deleteFeedback')->name('appointment.deleteFeedback');
         Route::delete('destroyFeedback/{id}', 'destroyFeedback')->name('appointment.destroyFeedback');
+
+        Route::post('add-note/{id}', 'addNote')->name('appointment.addNote');
     });
 
     Route::controller(InquiryController::class)->prefix('inquiry')->group(function () {
@@ -316,7 +315,6 @@ Route::middleware('auth')->group(function () {
         Route::post('validate-edit-new-document-request-form/{id}', 'validateEditNewDocumentRequestForm')->name('document-request.validateEditNewDocumentRequestForm');
         Route::post('edit-document-request/{id}', 'updateDocumentRequest')->name('document-request.updateDocumentRequest');
 
-        Route::get('delete-document-request/{id}', 'deleteDocumentRequest')->name('document-request.deleteDocumentRequest');
         Route::delete('destroy-document-request/{id}', 'destroyDocumentRequest')->name('document-request.destroyDocumentRequest');
 
         Route::get('document-request-feedback', 'documentRequestFeedback')->name('document-request.documentRequestFeedback');
@@ -329,7 +327,6 @@ Route::middleware('auth')->group(function () {
         Route::post('feedback-edit-form/validate/{id}/{type}', 'validateEditFeedbackForm')->name('document-request.validateEditFeedbackForm');
         Route::post('feedback-edit-form/{id}/{type}', 'saveEditFeedback')->name('document-request.saveEditFeedback');
 
-        Route::get('delete-document-request-feedback/{id}', 'deleteFeedback')->name('document-request.deleteFeedback');
         Route::delete('destroy-document-request-feedback/{id}', 'destroyFeedback')->name('document-request.destroyFeedback');
     });
     
@@ -347,7 +344,6 @@ Route::middleware('auth')->group(function () {
         Route::post('validate-edit-inquiry-form/{id}', 'validateEditInquiryForm')->name('inquiry.validateEditInquiryForm');
         Route::post('edit-inquiry/{id}', 'updateInquiry')->name('inquiry.updateInquiry');
 
-        Route::get('delete-inquiry/{id}', 'deleteInquiry')->name('inquiry.deleteInquiry');
         Route::delete('destroy-inquiry/{id}', 'destroyInquiry')->name('inquiry.destroyInquiry');
     }); 
 

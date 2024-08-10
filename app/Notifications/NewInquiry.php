@@ -40,6 +40,7 @@ class NewInquiry extends Notification
             'inquiry_id' => $this->inquiry['inquiry_id'],
             'name' => $this->inquiry['name'],
             'transaction_type' => 'Inquiry',
+            'is_active' => true,
         ];
     }
 }

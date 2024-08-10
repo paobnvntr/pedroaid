@@ -43,7 +43,7 @@ class TrackerController extends Controller
             'email' => 'required|email|regex:/^.+@.+\..+$/i'
         ])->validate();
 
-        $appointment = Appointment::where('appointment_id', $request->appointment_id)->first();
+        $appointment = Appointment::where('appointment_id', $request->appointment_id)->where("is_active", 1)->first();
         if(!$appointment) {
             return redirect()->back()->with('failed','Appointment Not Found!')->withInput();
         }else {
@@ -507,7 +507,7 @@ class TrackerController extends Controller
             'email' => 'required|email|regex:/^.+@.+\..+$/i'
         ])->validate();
 
-        $inquiry = Inquiry::where('inquiry_id', $request->inquiry_id)->first();
+        $inquiry = Inquiry::where('inquiry_id', $request->inquiry_id)->where("is_active", 1)->first();
         if(!$inquiry) {
             return redirect()->back()->with('failed','Inquiry Not Found!')->withInput();
         }else {
@@ -615,7 +615,7 @@ class TrackerController extends Controller
             'email' => 'required|email|regex:/^.+@.+\..+$/i'
         ])->validate();
 
-        $documentRequest = DocumentRequest::where('documentRequest_id', $request->documentRequest_id)->first();
+        $documentRequest = DocumentRequest::where('documentRequest_id', $request->documentRequest_id)->where("is_active", 1)->first();
         if(!$documentRequest) {
             return redirect()->back()->with('failed','Document Request Not Found!')->withInput();
         }else {

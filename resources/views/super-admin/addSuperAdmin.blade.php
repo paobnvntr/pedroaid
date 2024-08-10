@@ -30,16 +30,24 @@
 					</div>
 				</div>
 
-				<div class="form-group">
-					<input name="email" id="email" type="email"
-						class="form-control form-control-user @error('email')is-invalid @enderror"
-						id="exampleInputEmail" placeholder="Email Address" value="{{ old('email') }}">
-					@error('email')
-					<span class="invalid-feedback">{{ $message }}</span>
-					@enderror
+				<div class="form-group row">
+					<div class="col-sm-6">
+						<input name="email" id="email" type="email"
+							class="form-control form-control-user @error('email')is-invalid @enderror"
+							id="exampleInputEmail" placeholder="Email Address" value="{{ old('email') }}">
+						@error('email')
+						<span class="invalid-feedback">{{ $message }}</span>
+						@enderror
+					</div>
+
+					<div class="col-sm-6 d-flex align-items-center justify-content-center">
+						<small class="text-muted">Note: Password is auto-generated. The combination is "<strong>24AID_</strong> + <strong>username</strong>".</small>
+					</div>
 				</div>
 
-				<div class="form-group row">
+				
+
+				<!-- <div class="form-group row">
 					<div class="col-sm-6 mb-3 mb-sm-0">
 						<div class="password-toggle-container">
 							<input name="password" id="password" type="password"
@@ -62,7 +70,7 @@
 							@enderror
 						</div>
 					</div>
-				</div>
+				</div> -->
 
 				<div class="form-group">
 					<label for="profile_picture">Profile Picture:</label>
@@ -82,18 +90,18 @@
 	</div>
 
 <script>
-	function togglePasswordVisibility(fieldId) {
-        var passwordInput = document.getElementById(fieldId);
-        var passwordToggleBtn = passwordInput.parentNode.querySelector(".password-toggle-btn");
+	// function togglePasswordVisibility(fieldId) {
+    //     var passwordInput = document.getElementById(fieldId);
+    //     var passwordToggleBtn = passwordInput.parentNode.querySelector(".password-toggle-btn");
 
-        if (passwordInput.type === "password") {
-            passwordInput.type = "text";
-            passwordToggleBtn.textContent = "Hide";
-        } else {
-            passwordInput.type = "password";
-            passwordToggleBtn.textContent = "Show";
-        }
-    }
+    //     if (passwordInput.type === "password") {
+    //         passwordInput.type = "text";
+    //         passwordToggleBtn.textContent = "Hide";
+    //     } else {
+    //         passwordInput.type = "password";
+    //         passwordToggleBtn.textContent = "Show";
+    //     }
+    // }
 
 	const createSuperAdminBtn = document.getElementById("createSuperAdminBtn");
 

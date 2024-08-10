@@ -6523,6 +6523,11 @@
   .bg-transparent {
     background-color: transparent !important;
   }
+
+  .bg-notes {
+    background-color: #fef1e1 !important;
+    border-radius: .5rem;
+  }
   
   .border {
     border: 1px solid #e3e6f0 !important;
@@ -11261,8 +11266,28 @@
   }
 
   #dataTableOrdinance .description {
+    height: 200px !important;
+    overflow: auto !important;
+  }
+
+  #dataTableUnansweredInquiry .inquiry {
     height: 100px !important;
     overflow: auto !important;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  #dataTableAnsweredInquiry .inquiry {
+    height: 100px !important;
+    overflow: auto !important;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
   }
 
   .text-orange {
@@ -11484,4 +11509,8 @@
   .forgot-password:hover {
     text-decoration: none;
     color: var(--danger);
+  }
+
+  .bg-notes h5, .bg-notes p {
+    color: var(--gray);
   }

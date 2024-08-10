@@ -20,7 +20,9 @@ return new class extends Migration
             $table->string('appointment_date');
             $table->string('appointment_time');
             $table->string('appointment_status')->default('Pending');
+            $table->text('notes')->nullable();
             $table->timestamp('date_finished')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

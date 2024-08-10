@@ -1181,13 +1181,8 @@ class WebhookController extends Controller
                                 'text' => [
                                     "Here is the status of your appointment.\n
                                     Appointment ID: " . $appointment->appointment_id . 
-                                    "\nAppointment Date: " . $appointment->appointment_date . 
-                                    "\nAppointment Time: " . $appointment->appointment_time .
                                     "\nAppointment Status: " . $appointment->appointment_status .
-                                    "\nDate Finished: " . $appointment->date_finished .
                                     "\n\nName: " . $appointment->name .
-                                    "\nAddress: " . $appointment->address .
-                                    "\nCellphone Number: " . $appointment->cellphone_number .
                                     "\nEmail: " . $appointment->email
                                 ]
                             ]
@@ -1217,8 +1212,7 @@ class WebhookController extends Controller
                                     Inquiry ID: " . $inquiry->inquiry_id . 
                                     "\nName: " . $inquiry->name . 
                                     "\nEmail: " . $inquiry->email .
-                                    "\nStatus: " . $inquiry->status .
-                                    "\n\nInquiry: " . $inquiry->inquiry
+                                    "\nStatus: " . $inquiry->status
                                 ]
                             ]
                         ]
@@ -1246,11 +1240,8 @@ class WebhookController extends Controller
                                 'text' => [
                                     "Here is the status of your document request.\n
                                     Document Request ID: " . $documentRequest->documentRequest_id . 
-                                    "\nDocument Type: " . $documentRequest->document_type .
                                     "\nStatus: " . $documentRequest->status .
                                     "\n\nName: " . $documentRequest->name . 
-                                    "\nAddress: " . $documentRequest->address .
-                                    "\nCellphone Number: " . $documentRequest->cellphone_number .
                                     "\nEmail: " . $documentRequest->email
                                 ]
                             ]

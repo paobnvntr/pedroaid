@@ -1,26 +1,22 @@
-@extends('layouts.app')
-
-@section('contents')
-  <div class="d-flex align-items-center justify-content-start addStaff mb-4">
-    @if($documentRequest->documentRequest_status == 'Pending' || $documentRequest->documentRequest_status == 'Declined')
-        <a href="{{ route('document-request.pendingDocumentRequest') }}" class="fas fa-angle-left fs-4"></a>
-    @elseif($documentRequest->documentRequest_status == 'To Claim' || $documentRequest->documentRequest_status == 'Claimed' || $documentRequest->documentRequest_status == 'Unclaimed')
-        <a href="{{ route('document-request.finishedDocumentRequest') }}" class="fas fa-angle-left fs-4"></a>
-    @else
-        <a href="{{ route('document-request') }}" class="fas fa-angle-left fs-4"></a>
-    @endif
-    <h1 class="mb-0 ml-4">Delete Document Request</h1>
-  </div>
-
-  <div class="p-5">
-    <form action="{{ route('document-request.destroyDocumentRequest', $documentRequest->documentRequest_id) }}" method="POST" class="user">
-      @csrf
-      @method('DELETE')
-      <div class="form-group">
-        <p>Are you sure you want to delete Document Request ID: <strong>{{ $documentRequest->documentRequest_id }}</strong> permanently?</p>
-      </div>
-      
-      <button type="submit" class="btn btn-danger btn-user btn-block">Permanently Delete Document Request</button>
-    </form>
-    <hr>
-@endsection
+<div class="modal fade" id="deleteModal{{$docreq->documentRequest_id}}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{$docreq->documentRequest_id}}" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger font-weight-bold" id="deleteModalLabel{{$docreq->documentRequest_id}}">Delete Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete Document Request ID: <strong>{{ $docreq->documentRequest_id }}</strong>?
+            </div>
+            <div class="modal-footer">
+              <form action="{{ route('document-request.destroyDocumentRequest', $docreq->documentRequest_id) }}" method="POST" class="user">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger btn-user">Confirm Delete</button>
+              </form>
+            </div>
+        </div>
+    </div>
+</div>

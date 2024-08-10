@@ -17,8 +17,8 @@ class InquiryController extends Controller
 {
     public function index()
     {
-        $unanswered_inquiry = Inquiry::where('status', 'unanswered')->get();
-        $answered_inquiry = Inquiry::where('status', 'answered')->get();
+        $unanswered_inquiry = Inquiry::where('status', 'unanswered')->where('is_active', true)->get();
+        $answered_inquiry = Inquiry::where('status', 'answered')->where('is_active', true)->get();
         return view('inquiry.index', compact('unanswered_inquiry', 'answered_inquiry')); 
     }
 
@@ -263,12 +263,6 @@ class InquiryController extends Controller
         ]);
     }
 
-    public function deleteInquiry(string $id)
-    {
-        $inquiry = Inquiry::where('inquiry_id', $id)->get()->first();
-        return view('inquiry.deleteInquiry', compact('inquiry'));
-    }
-
     public function destroyInquiry(string $id)
     {
         try {
@@ -281,17 +275,24 @@ class InquiryController extends Controller
     
             $inquiryStatus = $inquiry->inquiry_status;
     
-            Inquiry::where('inquiry_id', $id)->delete();
+            Inquiry::where('inquiry_id', $id)->update([
+                'is_active' => false,
+                'updated_at' => now('Asia/Manila'),
+            ]);
 
-            DB::table('notifications')
-            ->where('data->inquiry_id', $id)
-            ->where('type', 'App\Notifications\NewInquiry')
-            ->delete();
+            if(DB::table('notifications')->where('data->inquiry_id', $id)->where('type', 'App\Notifications\NewInquiry')->get()->count() > 0) {
+                DB::table('notifications')
+                ->where('data->inquiry_id', $id)
+                ->where('type', 'App\Notifications\NewInquiry')
+                ->update(['data->is_active' => false]);
+            }
 
-            DB::table('notifications')
-            ->where('data->inquiry_id', $id)
-            ->where('type', 'App\Notifications\NewInquiryMessage')
-            ->delete();
+            if(DB::table('notifications')->where('data->inquiry_id', $id)->where('type', 'App\Notifications\NewInquiryMessage')->get()->count() > 0) {
+                DB::table('notifications')
+                ->where('data->inquiry_id', $id)
+                ->where('type', 'App\Notifications\NewInquiryMessage')
+                ->update(['data->is_active' => false]);
+            }
     
             DB::commit();
     

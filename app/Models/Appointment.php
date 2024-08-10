@@ -28,6 +28,9 @@ class Appointment extends Model
         'appointment_date',
         'appointment_time',
         'appointment_status',
+        'date_finished',
+        'notes',
+        'is_active',
         'created_at',
         'updated_at',
     ];

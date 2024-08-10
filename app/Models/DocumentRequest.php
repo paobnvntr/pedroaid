@@ -27,5 +27,7 @@ class DocumentRequest extends Model
         'email',
         'cellphone_number',
         'documentRequest_status',
+        'date_claimed',
+        'is_active',
     ];
 }
