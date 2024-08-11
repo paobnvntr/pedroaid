@@ -16,13 +16,13 @@
                 <hr>
                 <div>
                     @if(Session::has('success'))
-                        <div class="alert alert-success" role="alert">
+                        <div class="alert alert-success" id="alert-success" role="alert">
                             {{ Session::get('success') }}
                         </div>
                     @endif
 
                     @if(Session::has('failed'))
-                        <div class="alert alert-danger" role="alert">
+                        <div class="alert alert-danger" id="alert-failed" role="alert">
                             {{ Session::get('failed') }}
                         </div>
                     @endif
@@ -134,6 +134,26 @@
 
         } catch (error) {
             console.error('An error occurred:', error);
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        let successAlert = document.getElementById('alert-success');
+        if (successAlert) {
+            setTimeout(() => {
+                successAlert.style.transition = "opacity 0.5s ease";
+                successAlert.style.opacity = 0;
+                setTimeout(() => { successAlert.remove(); }, 500);
+            }, 2000);
+        }
+
+        let failedAlert = document.getElementById('alert-failed');
+        if (failedAlert) {
+            setTimeout(() => {
+                failedAlert.style.transition = "opacity 0.5s ease";
+                failedAlert.style.opacity = 0;
+                setTimeout(() => { failedAlert.remove(); }, 500);
+            }, 2000);
         }
     });
 </script>

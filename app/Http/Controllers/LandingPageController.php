@@ -36,6 +36,7 @@ class LandingPageController extends Controller
     public function home()
     {
         $feedback = Feedback::all();
+        // $feedback = Feedback::whereIn('rating', ['Good', 'Very Good', 'Excellent'])->get();
         return view('landing-page.home', compact('feedback'));
     }
 
