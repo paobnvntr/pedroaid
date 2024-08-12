@@ -140,6 +140,10 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('forgot-password', 'forgotPassword')->name('forgotPassword'); 
     Route::get('reset-password/{token}/{username}', 'resetPasswordForm')->name('resetPasswordForm');
     Route::post('reset-password', 'resetPassword')->name('resetPassword');
+
+
+    Route::get('change-password/{token}/{username}', 'changeDefaultPasswordForm')->name('changeDefaultPasswordForm');
+    Route::post('changeDefaultPassword', 'changeDefaultPassword')->name('changeDefaultPassword');
 });
 
 Route::middleware('auth')->group(function () {

@@ -34,9 +34,16 @@ class AdminController extends Controller
         $validator = Validator::make($request->all(), [
             '_token' => 'required',
             'name' => 'required',
-            'username' => 'required|unique:users,username',
+            'username' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $user = User::where('username', $value)->where('is_active', true)->first();
+                    if ($user) {
+                        $fail('The ' . $attribute . ' has already been taken by an active user.');
+                    }
+                },
+            ],
             'email' => 'required|email|regex:/^.+@.+\..+$/i',
-            'password' => 'required|confirmed|min:8',
             'profile_picture' => 'nullable|image|mimes:jpeg,jpg,png',
         ]);
 
@@ -51,12 +58,14 @@ class AdminController extends Controller
     public function saveAdmin(Request $request)
     {
         $filePath = $this->uploadProfilePicture($request);
+
+        $password = "24AID_" . trim($request->username);
     
         $adminData = [
             'name' => trim($request->name),
             'username' => trim($request->username),
             'email' => trim($request->email),
-            'password' => trim(Hash::make($request->password)),
+            'password' => trim(Hash::make($password)),
             'level' => 'Admin',
             'profile_picture' => $filePath,
             'created_at' => now('Asia/Manila'),
@@ -69,7 +78,8 @@ class AdminController extends Controller
     
         if ($createAdmin) {
             $this->logAddAdminSuccess($user, $request->username);
-            return redirect()->route('admin')->with('success', 'Admin Added Successfully!');
+            session()->flash('password', $password);
+            return redirect()->route('admin')->with('success', 'Admin Added Successfully!<br><br>Password: <strong>' . $password . '</strong>');
         } else {
             $this->logAddAdminFailed($user, $request->username);
             return redirect()->route('admin')->with('failed', 'Failed to Add Admin!');

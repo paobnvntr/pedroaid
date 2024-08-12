@@ -21,14 +21,20 @@ class AuthController extends Controller
     }
     public function loginAction(Request $request)
     {
+        // Validate the request
         Validator::make($request->all(), [
             '_token' => 'required',
             'username' => 'required',
             'password' => 'required'
         ])->validate();
-        
 
-        if (!Auth::attempt($request->only('username', 'password'), $request->boolean('remember'))) {
+        // Retrieve the user based on the username and check if they are active
+        $user = User::where('username', $request->username)
+            ->where('is_active', true)
+            ->first();
+
+        // Check if user exists and the password is correct
+        if (!$user || !Hash::check($request->password, $user->password)) {
             Logs::create([
                 'type' => 'Login',
                 'user' => $request->username,
@@ -37,19 +43,33 @@ class AuthController extends Controller
                 'created_at' => now('Asia/Manila'),
                 'updated_at'=> now('Asia/Manila'),
             ]);
-
+        
             throw ValidationException::withMessages([
                 'username' => trans('auth.failed')
             ]);
         }
 
+        // Authenticate the user
+        Auth::login($user, $request->boolean('remember'));
+
+        // Log the successful login
         Logs::create([
             'type' => 'Login',
             'user' => $request->username,
             'subject' => 'Login Success',
-            'message' => $request->username . ' has successfully logged in.'
+            'message' => $request->username . ' has successfully logged in.',
+            'created_at' => now('Asia/Manila'),
+            'updated_at'=> now('Asia/Manila'),
         ]);
 
+        // Check if the password is still the default password
+        $defaultPassword = '24AID_' . $user->username;
+        if (Hash::check($defaultPassword, $user->password)) {
+            // If the password is the default one, redirect to the change password form
+            return redirect()->route('changeDefaultPasswordForm', ['token' => csrf_token(), 'username' => $user->username]);
+        }
+
+        // Regenerate session and redirect to dashboard if password is not default
         $request->session()->regenerate();
 
         return redirect()->route('dashboard');
@@ -75,10 +95,42 @@ class AuthController extends Controller
         return redirect('/login')->with('success', 'Logged Out Successfully!');
     }
 
+    public function changeDefaultPasswordForm($token, $username) { 
+        return view('auth.changeDefaultPassword', ['token' => $token, 'username' => $username]);
+    }
+
+    public function changeDefaultPassword(Request $request)
+    {
+        $request->validate([
+           'username' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $user = User::where('username', $value)->where('is_active', true)->first();
+                    if (!$user) {
+                        $fail('No account found with the ' . $attribute . ' provided.');
+                    }
+                },
+            ],
+            'password' => 'required|string|min:8|confirmed'
+        ]);
+
+        User::where('username', $request->username)->update(['password' => Hash::make($request->password)]);
+
+        return redirect('/login')->with('success', 'Your password has been changed!');
+    }
+
     public function forgotPassword(Request $request)
     {
         $request->validate([
-            'username' => 'required|exists:users',
+            'username' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $user = User::where('username', $value)->where('is_active', true)->first();
+                    if (!$user) {
+                        $fail('No account found with the ' . $attribute . ' provided.');
+                    }
+                },
+            ],
         ]);
 
         $token = Str::random(64);
@@ -106,7 +158,15 @@ class AuthController extends Controller
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'username' => 'required|exists:users',
+            'username' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $user = User::where('username', $value)->where('is_active', true)->first();
+                    if (!$user) {
+                        $fail('No account found with the ' . $attribute . ' provided.');
+                    }
+                },
+            ],
             'password' => 'required|string|min:8|confirmed'
         ]);
 

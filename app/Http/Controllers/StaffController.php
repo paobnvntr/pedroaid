@@ -34,10 +34,17 @@ class StaffController extends Controller
         $validator = Validator::make($request->all(), [
             '_token' => 'required',
             'name' => 'required',
-            'username' => 'required|unique:users,username',
+            'username' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $user = User::where('username', $value)->where('is_active', true)->first();
+                    if ($user) {
+                        $fail('The ' . $attribute . ' has already been taken by an active user.');
+                    }
+                },
+            ],
             'email' => 'required|email|regex:/^.+@.+\..+$/i',
             'transaction_level' => 'required',
-            'password' => 'required|confirmed|min:8',
             'profile_picture' => 'nullable|image|mimes:jpeg,jpg,png',
         ]);
 
@@ -53,11 +60,13 @@ class StaffController extends Controller
     {
         $filePath = $this->uploadProfilePicture($request);
 
+        $password = "24AID_" . trim($request->username);
+
         $staffData = [
             'name' => trim($request->name),
             'username' => trim($request->username),
             'email' => trim($request->email),
-            'password' => Hash::make($request->password),
+            'password' => Hash::make($password),
             'transaction_level' => $request->transaction_level,
             'level' => 'Staff',
             'profile_picture' => $filePath,
@@ -71,7 +80,8 @@ class StaffController extends Controller
 
         if ($createStaff) {
             $this->logAddStaffSuccess($user, $request->username);
-            return redirect()->route('staff')->with('success', 'Staff Added Successfully!');
+            session()->flash('password', $password);
+            return redirect()->route('staff')->with('success', 'Staff Added Successfully!<br><br>Password: <strong>' . $password . '</strong>');
         } else {
             $this->logAddStaffFailed($user, $request->username);
             return redirect()->route('staff')->with('failed', 'Failed to Add Staff!');
