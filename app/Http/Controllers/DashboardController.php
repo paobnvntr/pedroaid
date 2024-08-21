@@ -20,11 +20,14 @@ class DashboardController extends Controller
         $ordinances = Ordinances::count();
 
         $pending_appointments = Appointment::where('appointment_status', 'Pending')->count();
-        $booked_appointments = Appointment::where('appointment_status', 'Booked')->count();
+        $booked_appointments = Appointment::whereIn('appointment_status', ['Booked', 'Rescheduled'])->count();
         $cancelled_appointments = Appointment::where('appointment_status', 'Cancelled')->count();
         $finished_appointments = Appointment::where('appointment_status', 'Finished')->count();
 
-        $todays_appointments = Appointment::where('appointment_date', now('Asia/Manila')->format('Y-m-d'))->where('appointment_status', 'Booked')->orderBy('appointment_time', 'ASC')->get();
+        $todays_appointments = Appointment::where('appointment_date', now('Asia/Manila')->format('Y-m-d'))
+                                            ->whereIn('appointment_status', ['Booked', 'Rescheduled'])
+                                            ->orderBy('appointment_time', 'ASC')
+                                            ->get();
 
         $unanswered_inquiries = Inquiry::where('status', 'Unanswered')->take(4)->orderBy('created_at', 'ASC')->get();
         $answered_inquiries = Inquiry::where('status', 'Answered')->take(4)->orderBy('created_at', 'ASC')->get();
