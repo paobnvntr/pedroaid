@@ -92,7 +92,7 @@
 			const response = await fetch('{{ route('ordinance.validateAddOrdinanceForm') }}', {
 				method: 'POST',
 				headers: {
-					'X-CSRF-TOKEN': '{{ csrf_token() }}', // Add CSRF token
+					'X-CSRF-TOKEN': '{{ csrf_token() }}',
 				},
 				body: formData,
 			});

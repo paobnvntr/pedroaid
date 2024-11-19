@@ -57,31 +57,6 @@
 					@enderror
 				</div>
 
-				<!-- <div class="form-group row">
-					<div class="col-sm-6 mb-3 mb-sm-0">
-						<div class="password-toggle-container">
-							<input name="password" id="password" type="password"
-								class="form-control form-control-user @error('password')is-invalid @enderror"
-								placeholder="Password" required>
-							<span class="password-toggle-btn" onclick="togglePasswordVisibility('password')">Show</span>
-							@error('password')
-							<span class="invalid-feedback">{{ $message }}</span>
-							@enderror
-						</div>
-					</div>
-					<div class="col-sm-6">
-						<div class="password-toggle-container">
-							<input name="password_confirmation" id="password_confirmation" type="password"
-								class="form-control form-control-user @error('password_confirmation')is-invalid @enderror"
-								placeholder="Confirm Password">
-							<span class="password-toggle-btn" onclick="togglePasswordVisibility('password_confirmation')">Show</span>
-							@error('password_confirmation')
-							<span class="invalid-feedback">{{ $message }}</span>
-							@enderror
-						</div>
-					</div>
-				</div> -->
-
 				<div class="form-group">
 					<label for="profile_picture">Profile Picture:</label>
 					<input type="file" name="profile_picture" id="profile_picture"
@@ -99,19 +74,6 @@
 	</div>
 
 <script>
-	// function togglePasswordVisibility(fieldId) {
-    //     var passwordInput = document.getElementById(fieldId);
-    //     var passwordToggleBtn = passwordInput.parentNode.querySelector(".password-toggle-btn");
-
-    //     if (passwordInput.type === "password") {
-    //         passwordInput.type = "text";
-    //         passwordToggleBtn.textContent = "Hide";
-    //     } else {
-    //         passwordInput.type = "password";
-    //         passwordToggleBtn.textContent = "Show";
-    //     }
-    // }
-
 	const createStaffBtn = document.getElementById("createStaffBtn");
 
 	createStaffBtn.addEventListener("click", async () => {
@@ -132,7 +94,7 @@
 			const response = await fetch('{{ route('staff.validateAddStaffForm') }}', {
 				method: 'POST',
 				headers: {
-					'X-CSRF-TOKEN': '{{ csrf_token() }}', // Add CSRF token
+					'X-CSRF-TOKEN': '{{ csrf_token() }}',
 				},
 				body: formData,
 			});

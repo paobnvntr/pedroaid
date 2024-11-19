@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\DB;
 
 class SuperAdminController extends Controller
 {
-    // display super admin list
     public function index()
     {
         $user = Auth::user()->username;
@@ -23,13 +22,11 @@ class SuperAdminController extends Controller
         return view('super-admin.index', compact('super_admin'));
     }
 
-    // redirect to add super admin form
     public function addSuperAdmin() 
     {
         return view('super-admin.addSuperAdmin');
     }
 
-    // validate super admin form
     public function validateAddSuperAdminForm(Request $request) {
         $validator = Validator::make($request->all(), [
             '_token' => 'required',
@@ -54,7 +51,6 @@ class SuperAdminController extends Controller
         }
     }
 
-    // store super admin form
     public function saveSuperAdmin(Request $request)
     {
         $filePath = $this->uploadProfilePicture($request);
@@ -86,7 +82,6 @@ class SuperAdminController extends Controller
         }
     }
 
-    // upload profile picture
     private function uploadProfilePicture(Request $request)
     {
         if ($request->hasFile('profile_picture')) {
@@ -102,7 +97,6 @@ class SuperAdminController extends Controller
         return $filePath;
     }
 
-    // log the success add super admin
     private function logAddSuperAdminSuccess($user, $username)
     {
         Logs::create([
@@ -115,7 +109,6 @@ class SuperAdminController extends Controller
         ]);
     }
 
-    // log the failed add super admin
     private function logAddSuperAdminFailed($user, $username)
     {
         Logs::create([
@@ -128,14 +121,12 @@ class SuperAdminController extends Controller
         ]);
     }
 
-    // redirect to edit super admin page
     public function editSuperAdmin(string $id)
     {
         $super_admin = User::where('level', 'super admin')->findorFail($id);
         return view('super-admin.editSuperAdmin', compact('super_admin'));
     }
 
-    // validate super admin form
     public function validateEditSuperAdminForm(Request $request, string $id) {
         $validator = Validator::make($request->all(), [
             '_token' => 'required',
@@ -154,16 +145,13 @@ class SuperAdminController extends Controller
         }
     }
 
-    // update super admin details
     public function updateSuperAdmin(Request $request, string $id)
     {
         $superAdmin = User::findOrFail($id);
 
-        // Update user details
         if ($this->shouldUpdateUserDetails($superAdmin, $request)) {
             $this->updateUserDetails($superAdmin, $request);
 
-            // Log the update
             $this->logUpdate($superAdmin);
 
             return redirect()
@@ -176,7 +164,6 @@ class SuperAdminController extends Controller
         }
     }
 
-    // check if user details should be updated
     private function shouldUpdateUserDetails(User $user, Request $request)
     {
         return (
@@ -188,7 +175,6 @@ class SuperAdminController extends Controller
         );
     }
 
-    // update user details
     private function updateUserDetails(User $user, Request $request)
     {
         $user->name = $request->filled('name') ? $request->name : $user->name;
@@ -207,7 +193,6 @@ class SuperAdminController extends Controller
         $user->update();
     }
 
-    // update profile picture
     private function updateProfilePicture(User $user, UploadedFile $file)
     {
         $originalFileName = $file->getClientOriginalName();
@@ -222,7 +207,6 @@ class SuperAdminController extends Controller
         $user->profile_picture = $filePath;
     }
 
-    // log the update
     private function logUpdate(User $user)
     {
         $logType = 'Edit Super Admin';
@@ -246,7 +230,6 @@ class SuperAdminController extends Controller
         ]);
     }   
 
-    // delete super admin account
     public function destroySuperAdmin(string $id)
     {
         try {
@@ -273,8 +256,7 @@ class SuperAdminController extends Controller
             return redirect()->route('super-admin')->with('failed', 'Failed to delete Super Admin!');
         }
     }
-    
-    // Function to create super admin delete log
+
     private function createSuperAdminDeleteLog($user, $superAdmin, $subject = 'Delete Super Admin Success', $errorMessage = null)
     {
         $logData = [

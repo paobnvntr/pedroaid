@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Logs;
 use Auth;
-use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -16,20 +15,17 @@ use Illuminate\Support\Facades\DB;
 
 class StaffController extends Controller
 {
-    // display staff list
     public function index()
     {
         $staff = User::where('level', 'staff')->where('is_active', true)->orderBy('created_at', 'ASC')->get();
         return view('staff.index', compact('staff'));
     }
 
-    // redirect to add staff page
     public function addStaff() 
     {
         return view('staff.addStaff');
     }
 
-    // validate add staff form
     public function validateAddStaffForm(Request $request) {
         $validator = Validator::make($request->all(), [
             '_token' => 'required',
@@ -55,7 +51,6 @@ class StaffController extends Controller
         }
     }
 
-    // store/save new staff
     public function saveStaff(Request $request)
     {
         $filePath = $this->uploadProfilePicture($request);
@@ -88,7 +83,6 @@ class StaffController extends Controller
         }
     }
 
-    // upload profile picture
     private function uploadProfilePicture(Request $request)
     {
         if ($request->hasFile('profile_picture')) {
@@ -104,7 +98,6 @@ class StaffController extends Controller
         return $filePath;
     }
 
-    // log the success add staff
     private function logAddStaffSuccess($user, $username)
     {
         Logs::create([
@@ -117,7 +110,6 @@ class StaffController extends Controller
         ]);
     }
 
-    // log the failed add staff
     private function logAddStaffFailed($user, $username)
     {
         Logs::create([
@@ -130,7 +122,6 @@ class StaffController extends Controller
         ]);
     }
 
-    // redirect to staff edit page
     public function editStaff(string $id)
     {
         $staff = User::where('level', 'staff')->findorFail($id);
@@ -155,16 +146,13 @@ class StaffController extends Controller
         }
     }
 
-    // update staff details
     public function updateStaff(Request $request, string $id)
     {
         $staff = User::findOrFail($id);
 
-        // Update user details
         if ($this->shouldUpdateUserDetails($staff, $request)) {
             $this->updateUserDetails($staff, $request);
 
-            // Log the update
             $this->logUpdate($staff);
 
             return redirect()
@@ -177,7 +165,6 @@ class StaffController extends Controller
         }
     }
 
-    // check if user details should be updated
     private function shouldUpdateUserDetails(User $user, Request $request)
     {
         return (
@@ -190,7 +177,6 @@ class StaffController extends Controller
         );
     }
 
-    // update user details
     private function updateUserDetails(User $user, Request $request)
     {
         $user->name = $request->filled('name') ? $request->name : $user->name;
@@ -209,8 +195,6 @@ class StaffController extends Controller
         $user->updated_at = now('Asia/Manila');
         $user->update();
     }
-
-    // update profile picture
     private function updateProfilePicture(User $user, UploadedFile $file)
     {
         $originalFileName = $file->getClientOriginalName();
@@ -225,7 +209,6 @@ class StaffController extends Controller
         $user->profile_picture = $filePath;
     }
 
-    // log the update
     private function logUpdate(User $user)
     {
         $logType = 'Edit Staff';
@@ -249,7 +232,6 @@ class StaffController extends Controller
         ]);
     }
 
-    // delete staff account
     public function destroyStaff(string $id)
     {
         try {
@@ -277,7 +259,6 @@ class StaffController extends Controller
         }
     }
 
-    // Function to create staff delete log
     private function createStaffDeleteLog($user, $staff, $subject = 'Delete Staff Success', $errorMessage = null)
     {
         $logData = [

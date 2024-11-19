@@ -45,11 +45,9 @@
                     </div>
 
                     <div id="buttons-container">
-                        <!-- Conditionally render Edit icon if notes exist -->
                         @if ($appointment->notes)
                             <button onclick="showEditNoteInput()" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>
                         @else
-                            <!-- Render Add Note icon if notes are null -->
                             <button onclick="showAddNoteInput()" class="btn btn-sm btn-warning"><i class="fas fa-plus"></i></button>
                         @endif
                     </div>
@@ -57,7 +55,6 @@
 
                 <div>
                     <div class="message-wrapper">
-                        <!-- Message History Here -->
                         <div class="message-container" >
                             @foreach($messages as $appointmentMessage)
                                                             
@@ -167,26 +164,22 @@
         var notesContainer = document.getElementById('appointment-notes');
         var buttonsContainer = document.getElementById('buttons-container');
 
-        // Create a text input element
         var input = document.createElement('input');
         input.setAttribute('type', 'text');
         input.setAttribute('id', 'note-input');
 
-        // Create a save button
         var saveButton = document.createElement('button');
         saveButton.innerHTML = '<i class="fas fa-save"></i>';
         saveButton.classList.add('btn', 'btn-sm', 'btn-primary', 'mx-1');
         saveButton.onclick = saveNote;
 
-        // Create a cancel button
         var cancelButton = document.createElement('button');
         cancelButton.innerHTML = '<i class="fas fa-times"></i>';
         cancelButton.classList.add('btn', 'btn-sm', 'btn-danger');
         cancelButton.onclick = cancelAddNote;
 
-        // Append the input and buttons to the appropriate containers
         notesContainer.appendChild(input);
-        buttonsContainer.innerHTML = ''; // Clear existing buttons
+        buttonsContainer.innerHTML = '';
         buttonsContainer.appendChild(saveButton);
         buttonsContainer.appendChild(cancelButton);
     }
@@ -195,31 +188,26 @@
         var notesContainer = document.getElementById('appointment-notes');
         var buttonsContainer = document.getElementById('buttons-container');
 
-        // Save the existing note text
         var currentNote = notesContainer.textContent.trim();
 
-        // Create a text input element
         var input = document.createElement('input');
         input.setAttribute('type', 'text');
         input.setAttribute('id', 'note-input');
         input.setAttribute('value', currentNote);
 
-        // Create a save button
         var saveButton = document.createElement('button');
         saveButton.innerHTML = '<i class="fas fa-save"></i>';
         saveButton.classList.add('btn', 'btn-sm', 'btn-success', 'mx-1');
         saveButton.onclick = saveNote;
 
-        // Create a cancel button
         var cancelButton = document.createElement('button');
         cancelButton.innerHTML = '<i class="fas fa-times"></i>';
         cancelButton.classList.add('btn', 'btn-sm', 'btn-danger');
         cancelButton.onclick = cancelEditNote;
 
-        // Append the input and buttons to the appropriate containers
-        notesContainer.innerHTML = ''; // Clear existing content
+        notesContainer.innerHTML = '';
         notesContainer.appendChild(input);
-        buttonsContainer.innerHTML = ''; // Clear existing buttons
+        buttonsContainer.innerHTML = '';
         buttonsContainer.appendChild(saveButton);
         buttonsContainer.appendChild(cancelButton);
     }
@@ -228,8 +216,7 @@
         var notesContainer = document.getElementById('appointment-notes');
         var input = document.getElementById('note-input').value;
         
-        // Send AJAX request to save the note
-        var id = '{{ $appointment->appointment_id }}'; // Assuming you have access to the appointment ID in your Blade template
+        var id = '{{ $appointment->appointment_id }}';
         var formData = new FormData();
         formData.append('notes', input);
         
@@ -269,11 +256,9 @@
         var notesContainer = document.getElementById('appointment-notes');
         var buttonsContainer = document.getElementById('buttons-container');
 
-        // Restore the original note text
         var originalNote = '{{ $appointment->notes }}';
         notesContainer.textContent = originalNote;
 
-        // Restore the original buttons
         buttonsContainer.innerHTML = '';
         var editButton = document.createElement('button');
         editButton.innerHTML = '<i class="fas fa-edit"></i>';

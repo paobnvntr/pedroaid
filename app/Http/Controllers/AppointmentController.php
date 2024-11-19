@@ -6,7 +6,6 @@ use App\Models\Appointment;
 use App\Models\AppointmentMessage;
 use App\Models\Feedback;
 use App\Models\Logs;
-use App\Notifications\NewAppointmentMessage;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -95,7 +94,6 @@ class AppointmentController extends Controller
         $appointment = Appointment::where('appointment_id', $id)->first();
     
         if (!$appointment) {
-            // Handle the case where the appointment is not found
             return redirect()->route('appointment.appointmentDetails', $id)->with('failed', 'Appointment not found!');
         }
     
@@ -156,8 +154,7 @@ class AppointmentController extends Controller
     public function checkDateAvailability(Request $request) {
         $timeslots = ['14:00', '14:10', '14:20', '14:30', '14:40', '14:50', '15:00', '15:10', '15:20', '15:30', '15:40', '15:50'];
         $fullyBookedDates = [];
-    
-        // Get all unique dates from the appointments table
+
         $dates = Appointment::select('appointment_date')
                             ->whereIn('appointment_status', ['Pending', 'Booked', 'Rescheduled'])
                             ->where('appointment_date', '>=', now('Asia/Manila'))
@@ -470,7 +467,6 @@ class AppointmentController extends Controller
         Mail::to($appointment_email)->send(new AppointmentMail($mailData, $mailSubject));
     }    
 
-    // redirect to appointment edit page
     public function editAppointment(string $id)
     {
         $appointment = Appointment::where('appointment_id', $id)->get()->first();
@@ -628,7 +624,6 @@ class AppointmentController extends Controller
         ]);
     }   
 
-    // delete appointment account
     public function destroyAppointment(string $id)
     {
         try {
@@ -678,8 +673,7 @@ class AppointmentController extends Controller
             return redirect()->route('appointment')->with('failed', 'Failed to delete Appointment!');
         }
     }
-    
-    // Function to create delete appointment log
+
     private function createDeleteAppointmentLog($user, $appointment)
     {
         $logData = [
@@ -693,15 +687,14 @@ class AppointmentController extends Controller
     
         Logs::create($logData);
     }
-    
-    // Function to get route based on appointment status
+
     private function getRouteByAppointmentStatus($status)
     {
         $routeMap = [
             'Finished' => 'appointment.finishedAppointment',
-            'No-Show' => 'appointment.finishedAppointment', // Assuming no-show appointments go to the same route as finished
+            'No-Show' => 'appointment.finishedAppointment',
             'Pending' => 'appointment.pendingAppointment',
-            'Declined' => 'appointment.pendingAppointment', // Assuming declined appointments go to the same route as pending
+            'Declined' => 'appointment.pendingAppointment',
             'Booked' => 'appointment',
             'Rescheduled' => 'appointment',
             'Cancelled' => 'appointment',

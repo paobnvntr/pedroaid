@@ -1,4 +1,3 @@
-<!-- Modal -->
 <div class="modal fade" id="termsModal" tabindex="-1" role="dialog" aria-labelledby="termsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
@@ -6,7 +5,6 @@
                 <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
             </div>
             <div class="modal-body">
-                <!-- Your terms and conditions content goes here -->
                 <p><strong>Consent to Disclosure, Collection, and Use of Personal Information:</strong> By proceeding with the use of this online portal for appointment scheduling, document requests, and inquiries, you acknowledge and agree that you are providing unequivocal consent to the disclosure, collection, and use of your personal information and any data required under the Data Privacy Act of 2012 as amended and its Implementing Rules and Regulations.</p>
                 <p><strong>Waiver of Privacy Rights:</strong> Your consent effectively constitutes a waiver of any and all privacy rights pertaining to the disclosure, collection, and use of your personal information and data under the specific terms and conditions outlined in the PedroAID Portal's Privacy Policy, the Data Privacy Act of 2012 and its Implementing Rules and Regulations, and other pertinent  rules, regulations, policies on the matter.</p>
                 <p><strong>Responsibility for Accurate Information:</strong> You are responsible for providing accurate and up-to-date information during the use of this online portal. Any inaccurate or outdated information provided may result in delays or errors in processing your appointment, document requests, or inquiries.</p>

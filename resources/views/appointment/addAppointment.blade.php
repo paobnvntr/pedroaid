@@ -11,7 +11,6 @@
             fullyBookedDates = data.fullyBookedDates;
             availableDates = data.availableDates;
 
-            // Initialize the datepicker after the data has been fetched
             $("#datepicker").datepicker({
                 minDate: 0,
                 changeMonth: true,
@@ -66,14 +65,13 @@
 
     function timeslotChecker(dateText, inst) {
         var selectedDate = new Date(dateText);
-        var timeslots = $('.timeslot-option'); // Assuming you have an element with the ID 'timeslot'
+        var timeslots = $('.timeslot-option');
         var formattedDate = selectedDate.toLocaleDateString("en-US", {
             month: "2-digit",
             day: "2-digit",
             year: "numeric"
         }).replace(/(\d+)\/(\d+)\/(\d+)/, "$3-$1-$2");
 
-        // Make an AJAX request to check availability
         timeslots.each(async function (index, timeslotButton) {
             const timeslot = $(timeslotButton).val();
 
@@ -82,7 +80,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}', // Add CSRF token
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     },
                     body: JSON.stringify({ selectedDate: formattedDate, timeslot }),
                 });
@@ -90,19 +88,16 @@
                 const data = await response.json();
 
                 if (data.message === 'Timeslot is available') {
-                    // Timeslot is available
                     timeslotButton.disabled = false;
                     timeslotButton.classList.remove("timeslot-booked");
                     $(".timeslot").css("display", "block");
                     $(".descriptionTimeslot").css("display", "none");
                 } else if (data.message === 'Timeslot is not available') {
-                    // Timeslot is not available
                     timeslotButton.disabled = true;
                     timeslotButton.classList.add("timeslot-booked");
                     $(".timeslot").css("display", "block");
                     $(".descriptionTimeslot").css("display", "none");
                 } else {
-                    // Something went wrong
                     console.error(data.message);
                 }
             } catch (error) {
@@ -182,9 +177,7 @@
             
 <script>
     $("#timeslot").change(function() {
-        // Check if a timeslot is selected
         if ($(this).val() !== '') {
-            // Show the clientDetailsForm
             $(".clientDetailsForm").css("display", "block");
             
             $('html, body').animate({
@@ -192,23 +185,18 @@
             }, 100);
 
             var selectedOption = $(this).find("option:selected");
-            // Extract the display text (2:00 PM - 2:10 PM)
             var displayText = selectedOption.text();
-            // Extract the value (14:00)
             var selectedValue = $(this).val();
 
             console.log(selectedValue);
             console.log(displayText);
 
-            // Set the display text in clientDetailsForm
             $("#selected_timeslot_display").val(displayText).prop("readonly", true);;
 
-            // Set the selected time to the hidden input
             $("#appointment_time").val($(this).val());
             $("#appointment_date").prop("readonly", true);
             
         } else {
-            // Hide the clientDetailsForm if no timeslot is selected
             $(".clientDetailsForm").css("display", "none");
         }
     });
@@ -223,7 +211,7 @@
             const response = await fetch('{{ route('appointment.validateForm') }}', {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}', // Add CSRF token
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 },
                 body: formData,
             });

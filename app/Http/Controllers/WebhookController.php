@@ -74,7 +74,6 @@ class WebhookController extends Controller
 
     }
        
-
     public function webhookCheckDateAvailability(Request $request) {
         $tag = $request->input('fulfillmentInfo.tag');
         $message = $tag ?: $request->input('message', 'Hello World!');
@@ -91,7 +90,6 @@ class WebhookController extends Controller
                 ] 
             ];
 
-            // Return the response as JSON
             return response()->json($response);
         }
 
@@ -106,7 +104,6 @@ class WebhookController extends Controller
                 ] 
             ];
 
-            // Return the response as JSON
             return response()->json($response);
         }
 
@@ -145,14 +142,11 @@ class WebhookController extends Controller
                     $timeslots = ['14:00', '14:10', '14:20', '14:30', '14:40', '14:50', '15:00', '15:10', '15:20', '15:30', '15:40', '15:50'];            
                     $availableTimeslots = [];
 
-                    // Check each timeslot to see if it's available
                     foreach ($timeslots as $timeslot) {
-                        // Check if there's no appointment for the provided date and timeslot
                         if (!Appointment::where('appointment_date', $dateFormatted)
                                         ->where('appointment_time', $timeslot)
                                         ->whereIn('appointment_status', ['Pending', 'Booked', 'Rescheduled'])
                                         ->exists()) {
-                            // Add the available timeslot to the list
                             $availableTimeslots[] = militaryToAMPM($timeslot);
                         }
                     }
@@ -209,7 +203,6 @@ class WebhookController extends Controller
                     }
 
                 } else {
-
                     $message = "Appointments are only available on Tuesdays and Thursdays.";
 
                     $response = [
@@ -231,7 +224,6 @@ class WebhookController extends Controller
                         ] 
                     ];
         
-                    // Return the response as JSON
                     return response()->json($response);
                 }
 
@@ -257,7 +249,6 @@ class WebhookController extends Controller
                     ] 
                 ];
     
-                // Return the response as JSON
                 return response()->json($response);
             }
         
@@ -282,10 +273,8 @@ class WebhookController extends Controller
                 ]
             ];
 
-            // Return the response as JSON
             return response()->json($response);
         }
-
     }
 
     public function webhookCheckTimeAvailability(Request $request) {
@@ -305,7 +294,6 @@ class WebhookController extends Controller
         if ($dateArray && $timeArray) {
             $dateTime = new DateTime("$year-$monthNumberPadded-$day");
 
-            // Convert hours and minutes to a string representation of the time slot
             $timeslot = $hour . ':' . str_pad($minute, 2, '0', STR_PAD_RIGHT);
 
             $timeslots = ['14:00', '14:10', '14:20', '14:30', '14:40', '14:50', '15:00', '15:10', '15:20', '15:30', '15:40', '15:50'];
@@ -318,7 +306,6 @@ class WebhookController extends Controller
                 $dateFormatted = "$year-$monthNumberPadded-$day";
                 $availableTimeslots = [];
 
-                // Check if the provided time is in the predefined timeslots
                 if (!in_array($timeslot, $timeslots)) {
                     $message = $timeslot . " is an invalid timeslot. Please select a valid timeslot.";
         
@@ -355,14 +342,11 @@ class WebhookController extends Controller
                                 ->whereIn('appointment_status', ['Pending', 'Booked', 'Rescheduled'])
                                 ->exists()) {
 
-                        // Check each timeslot to see if it's available
                         foreach ($timeslots as $timeslot) {
-                            // Check if there's no appointment for the provided date and timeslot
                             if (!Appointment::where('appointment_date', $dateFormatted)
                                             ->where('appointment_time', $timeslot)
                                             ->whereIn('appointment_status', ['Pending', 'Booked', 'Rescheduled'])
                                             ->exists()) {
-                                // Add the available timeslot to the list
                                 $availableTimeslots[] = militaryToAMPM($timeslot);
                             }
                         }
@@ -519,7 +503,6 @@ class WebhookController extends Controller
         $tag = $request->input('fulfillmentInfo.tag');
         $city = strtolower($request->input('sessionInfo.parameters.city'));
     
-        // Define variants of San Pedro
         $sanPedroVariants = [
             'san pedro',
             'san pedro laguna',
@@ -529,7 +512,6 @@ class WebhookController extends Controller
         ];
     
         if ($city && in_array($city, $sanPedroVariants)) {
-            // City is San Pedro or its variants
             $response = [
                 'sessionInfo' => [
                     'parameters' => [
@@ -539,9 +521,7 @@ class WebhookController extends Controller
                 ] 
             ];
         } else {
-            // City is not San Pedro or its variants
             if ($city) {
-                // Check if "City" already exists, if not, append it
                 $formattedCity = ucwords($city);
                 if (strpos(strtolower($city), 'city') === false) {
                     $formattedCity .= ' City';
@@ -567,7 +547,6 @@ class WebhookController extends Controller
         $cellphoneNumber = $request->input('sessionInfo.parameters.cellphone_number');
     
         if ($cellphoneNumber && (preg_match('/^09\d{9}$/', $cellphoneNumber) || preg_match('/^\+639\d{9}$/', $cellphoneNumber))) {
-            // Cellphone number is provided and in correct Philippine format
             $response = [
                 'sessionInfo' => [
                     'parameters' => [
@@ -578,7 +557,6 @@ class WebhookController extends Controller
                 ] 
             ];
         } else {
-            // Cellphone number is not provided or not in correct format
             $message = "The cellphone number you provided is not valid. Please provide a valid mobile number.";
 
             $response = [
@@ -988,7 +966,6 @@ class WebhookController extends Controller
                 'sessionInfo' => [
                     'parameters' => [
                         'topic' => null,
-                        // 'ord-availability' => 'not-valid'
                     ],
                     'tag' => $tag
                 ] 
@@ -1117,11 +1094,8 @@ class WebhookController extends Controller
     public function webhookTrackingIdChecker(Request $request) {
         $tag = $request->input('fulfillmentInfo.tag');
         $trackingID = $request->input('sessionInfo.parameters.tracking_id');
-        
-        // Check if the tracking ID is valid
         $isValidTrackingID = $this->isTrackingIdValid($trackingID);
         
-        // Define the response message based on the validity of the tracking ID
         if ($isValidTrackingID) {
             $response = [
                 'sessionInfo' => [
@@ -1133,7 +1107,6 @@ class WebhookController extends Controller
                 ] 
             ];
         
-            // Return the response
             return response()->json($response);
 
         } else {
@@ -1147,17 +1120,13 @@ class WebhookController extends Controller
                 ] 
             ];
 
-            // Return the response
             return response()->json($response);
         }
 
     }
     
     private function isTrackingIdValid($trackingID) {
-        // Define the regular expression pattern for tracking IDs
-        $pattern = '/^[A-Z0-9]{3}-[A-Z0-9]{3}-[A-Z0-9]{3}$/'; // Assuming tracking ID consists of 10 characters, uppercase letters, digits, and hyphens only
-        
-        // Use preg_match to check if the trackingID matches the pattern
+        $pattern = '/^[A-Z0-9]{3}-[A-Z0-9]{3}-[A-Z0-9]{3}$/';
         return preg_match($pattern, $trackingID);
     }    
 

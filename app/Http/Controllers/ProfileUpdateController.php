@@ -65,8 +65,7 @@ class ProfileUpdateController extends Controller
                 ->with('failed', 'Fill Up a Field!');
         }
     }
-    
-    // check if user profile should be updated
+
     private function shouldUpdateUserProfile(User $user, Request $request)
     {
         return (
@@ -77,8 +76,7 @@ class ProfileUpdateController extends Controller
             $request->hasFile('profile_picture')
         );
     }
-    
-    // update user profile
+
     private function updateUserProfile(User $user, Request $request)
     {
         $user->name = $request->filled('name') ? $request->name : $user->name;
@@ -98,8 +96,7 @@ class ProfileUpdateController extends Controller
     
         $this->logUpdateProfile($user);
     }
-    
-    // update profile picture
+
     private function updateProfilePicture(User $user, UploadedFile $file)
     {
         $originalFileName = $file->getClientOriginalName();
@@ -114,8 +111,7 @@ class ProfileUpdateController extends Controller
     
         $user->profile_picture = $filePath;
     }
-    
-    // log the update profile
+
     private function logUpdateProfile(User $user)
     {
         $logType = 'Edit Profile';

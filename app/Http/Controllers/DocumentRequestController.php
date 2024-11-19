@@ -151,7 +151,6 @@ class DocumentRequestController extends Controller
                 'image',
                 'mimes:jpg,jpeg,png',
                 Rule::requiredIf(function () use ($request) {
-                    // Check if the checkbox is checked
                     return $request->input('document_type') === 'Extra Judicial' &&
                             !$request->input('deceased_spouse');
                 }),
@@ -160,7 +159,6 @@ class DocumentRequestController extends Controller
                 'image',
                 'mimes:jpg,jpeg,png',
                 Rule::requiredIf(function () use ($request) {
-                    // Check if the checkbox is checked
                     return $request->input('document_type') === 'Extra Judicial' &&
                             !$request->input('deceased_spouse');
                 }),
@@ -1106,7 +1104,6 @@ class DocumentRequestController extends Controller
         $documentRequest = DocumentRequest::where('documentRequest_id', $id)->first();
     
         if (!$documentRequest) {
-            // Handle the case where the appointment is not found
             return redirect()->route('document-request.documentRequestDetails', $id)->with('failed', 'Request not found!');
         }
     
@@ -4764,60 +4761,46 @@ class DocumentRequestController extends Controller
         return ExtraJudicial::where('documentRequest_id', $documentRequestID)->update($data);
     }
 
-
     private function updateHeirs(Request $request, $documentRequestID) {
         $survivingHeirs = $request->input('surviving_heir');
         $spousesOfHeirs = $request->input('spouse_of_heir');
-        
-        // Get all existing heirs for the document request ID
+
         $existingHeirs = Heir::where('documentRequest_id', $documentRequestID)->get();
-    
-        // Iterate through existing heirs
+
         foreach ($existingHeirs as $existingHeir) {
-            $key = $existingHeir->id; // Assuming each heir has a unique ID
-    
-            // Check if this heir exists in the submitted data
+            $key = $existingHeir->id;
+
             if (isset($survivingHeirs[$key])) {
                 $heirName = $survivingHeirs[$key];
-    
-                // Check if the heir name is different from the original value in the database
+
                 if ($heirName !== $existingHeir->surviving_heir) {
-                    // Update the heir's name
                     $existingHeir->surviving_heir = $heirName;
                     $existingHeir->save();
                 }
-    
-                // Check if there's a spouse for this heir in the submitted data
+
                 if (isset($spousesOfHeirs[$key])) {
                     $spouseName = $spousesOfHeirs[$key];
-    
-                    // Check if the spouse name is different from the original value in the database
+
                     if ($spouseName !== $existingHeir->spouse_of_heir) {
-                        // Update the spouse's name
                         $existingHeir->spouse_of_heir = $spouseName;
                         $existingHeir->save();
                     }
                 } else {
-                    // No spouse is provided, so clear the spouse_of_heir field
                     $existingHeir->spouse_of_heir = null;
                     $existingHeir->save();
                 }
-    
-                // Remove this heir from the submitted data to track which heirs have been processed
+
                 unset($survivingHeirs[$key]);
             } else {
-                // Heir is not present in the submitted data, so delete it
                 $existingHeir->delete();
             }
         }
-    
-        // Handle any new heirs that are not in the existing database records
+
         foreach ($survivingHeirs as $key => $heirName) {
             $heir = new Heir();
             $heir->surviving_heir = $heirName;
             $heir->documentRequest_id = $documentRequestID;
-    
-            // Check if there's a spouse for this heir
+
             if (isset($spousesOfHeirs[$key])) {
                 $heir->spouse_of_heir = $spousesOfHeirs[$key];
             }
@@ -5077,7 +5060,6 @@ class DocumentRequestController extends Controller
         }
     }
     
-    // Function to create delete document request log
     private function createDeleteDocumentRequestLog($user, $documentRequest)
     {
         $logData = [
@@ -5091,8 +5073,7 @@ class DocumentRequestController extends Controller
     
         Logs::create($logData);
     }
-    
-    // Function to get route based on document request status
+
     private function getRouteByDocumentRequestStatus($status)
     {
         $routeMap = [
@@ -5221,7 +5202,6 @@ class DocumentRequestController extends Controller
     }
 
     public function destroyFeedback(string $id) {
-        
         Feedback::where('transaction_id', $id)->where('transaction_type', 'Document Request')->update([
             'is_active' => false,
             'updated_at' => now('Asia/Manila'),

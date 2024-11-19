@@ -27,6 +27,7 @@ use App\Models\Inquiry;
 use App\Models\DocumentRequest;
 use App\Models\DocumentRequestMessage;
 use App\Mail\DocumentRequestMail;
+
 class TrackerController extends Controller
 {
     public function tracker() {
@@ -62,7 +63,6 @@ class TrackerController extends Controller
         $appointment_id = session('appointment_id');
 
         if (!$appointment_id) {
-            // Handle the case where appointment_id is not found in the session
             return redirect()->route('appointmentTracker')->with('failed', 'Appointment Session Destroyed!');
         }
 
@@ -276,7 +276,6 @@ class TrackerController extends Controller
         $appointment = Appointment::where('appointment_id', $appointment_id)->first();
 
         if (!$appointment_id) {
-            // Handle the case where appointment_id is not found in the session
             return redirect()->route('appointmentTracker')->with('failed', 'Appointment Session Destroyed!');
         }
         
@@ -397,7 +396,6 @@ class TrackerController extends Controller
         $appointment = Appointment::where('appointment_id', $appointment_id)->first();
 
         if (!$appointment_id) {
-            // Handle the case where appointment_id is not found in the session
             return redirect()->route('appointmentTracker')->with('failed', 'Appointment Session Destroyed!');
         }
 
@@ -526,7 +524,6 @@ class TrackerController extends Controller
         $inquiry_id = session('inquiry_id');
 
         if (!$inquiry_id) {
-            // Handle the case where appointment_id is not found in the session
             return redirect()->route('inquiryTracker')->with('failed', 'Inquiry Session Destroyed!');
         }
 
@@ -805,7 +802,6 @@ class TrackerController extends Controller
         $documentRequest = DocumentRequest::where('documentRequest_id', $documentRequest_id)->first();
 
         if (!$documentRequest_id) {
-            // Handle the case where appointment_id is not found in the session
             return redirect()->route('documentRequestTracker')->with('failed', 'Appointment Session Destroyed!');
         }
 

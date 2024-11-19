@@ -237,7 +237,7 @@
             firstMember3.classList.remove("col-sm-6");
             firstMember3.classList.add("col-sm-5");
 
-			submitBtn.style.display = "block"; // show the submit button
+			submitBtn.style.display = "block";
 		} else {
 			editCommitteeBtn.textContent = "Edit Committee";
 			editCommitteeBtn.classList.remove("btn-danger");
@@ -266,9 +266,8 @@
             firstMember3.classList.remove("col-sm-5");
             firstMember3.classList.add("col-sm-6");
 
-			submitBtn.style.display = "none"; // hide the submit button
+			submitBtn.style.display = "none";
 
-			// reset the form
 			nameInput.value = originalName;
             chairmanFirstNameInput.value = originalChairmanFirstName;
             chairmanLastNameInput.value = originalChairmanLastName;
@@ -303,7 +302,7 @@
 			const response = await fetch('{{ route('committee.validateEditCommitteeForm', $committee->id) }}', {
 				method: 'POST',
 				headers: {
-					'X-CSRF-TOKEN': '{{ csrf_token() }}', // Add CSRF token
+					'X-CSRF-TOKEN': '{{ csrf_token() }}',
 				},
 				body: formData,
 			});

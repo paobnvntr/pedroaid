@@ -94,7 +94,7 @@
             const response = await fetch('{{ route('appointment.validateFeedbackForm', ['id' => $appointment->appointment_id, 'type' => 'Appointment']) }}', {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}', // Add CSRF token
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 },
                 body: formData,
             });

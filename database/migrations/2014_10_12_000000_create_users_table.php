@@ -21,12 +21,11 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Create a default super admin account
         $defaultSuperAdmin = [
             'name' => 'Super Admin',
             'username' => 'SuperAdmin',
             'email' => 'sanpedroaid@gmail.com',
-            'password' => Hash::make('admin123'), // Hash the password
+            'password' => Hash::make('admin123'),
             'level' => 'Super Admin',
             'transaction_level' => null,
             'profile_picture' => 'uploads/profile/superadmin/default_superadmin.jpg',

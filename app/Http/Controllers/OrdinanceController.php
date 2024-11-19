@@ -14,14 +14,12 @@ use Illuminate\Support\Facades\DB;
 
 class OrdinanceController extends Controller
 {
-    //display ordinance list
     public function index()
     {
         $ordinance = Ordinances::where('is_active', true)->orderBy('ordinance_number', 'ASC')->get();
         return view('ordinance.index', compact('ordinance'));
     }
 
-    //redirect to add ordinance page
     public function addOrdinance() 
     {
         $committee = Committee::orderBy('name', 'ASC')->get();
@@ -45,7 +43,6 @@ class OrdinanceController extends Controller
         }
     }
 
-    //store/save new ordinance
     public function saveOrdinance(Request $request)
     {
         $filePath = $this->uploadOrdinanceFile($request);
@@ -73,26 +70,23 @@ class OrdinanceController extends Controller
         }
     }
     
-    // upload ordinance file
     private function uploadOrdinanceFile(Request $request)
     {
         if ($request->hasFile('ordinance_file')) {
             $file = $request->file('ordinance_file');
             $originalFileName = $file->getClientOriginalName();
             
-            // Replace spaces with underscores in the file name
             $fileName = time() . '_' . Str::slug(str_replace(' ', '_', pathinfo($originalFileName, PATHINFO_FILENAME))) . '.' . $file->getClientOriginalExtension();
             
             $filePath = 'uploads/ordinances/' . $fileName;
             $file->move('uploads/ordinances/', $fileName);
         } else {
-            $filePath = ''; // Adjust this based on your default file path or behavior
+            $filePath = '';
         }
     
         return $filePath;
     }    
-    
-    // log the success add ordinance
+
     private function logAddOrdinanceSuccess($user, $ordinanceNumber)
     {
         Logs::create([
@@ -105,7 +99,6 @@ class OrdinanceController extends Controller
         ]);
     }
     
-    // log the failed add ordinance
     private function logAddOrdinanceFailed($user, $ordinanceNumber)
     {
         Logs::create([
@@ -118,7 +111,6 @@ class OrdinanceController extends Controller
         ]);
     }    
 
-    //redirect to edit ordinance page
     public function editOrdinance(string $id)
     {
         $ordinance = Ordinances::findorFail($id);
@@ -143,7 +135,6 @@ class OrdinanceController extends Controller
         }
     }
 
-    //update ordinance details
     public function updateOrdinance(Request $request, string $id)
     {
         $ordinance = Ordinances::findOrFail($id);
@@ -202,7 +193,6 @@ class OrdinanceController extends Controller
         if ($request->hasFile('ordinance_file')) {
             $file = $request->file('ordinance_file');
             
-            // Replace spaces with underscores in the file name
             $originalFileName = str_replace(' ', '_', $file->getClientOriginalName());
             $fileName = time() . '_' . $originalFileName;
             $filePath = 'uploads/ordinances/' . $fileName;
@@ -242,7 +232,6 @@ class OrdinanceController extends Controller
         Logs::create($logData);
     }
 
-    //delete ordinance
     public function destroyOrdinance(string $id)
     {
         try {
@@ -270,7 +259,6 @@ class OrdinanceController extends Controller
         }
     }
     
-    // Function to create ordinance delete log
     private function createOrdinanceDeleteLog($user, $ordinance, $subject = 'Delete Ordinance Success', $errorMessage = null)
     {
         $logData = [

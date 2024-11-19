@@ -142,7 +142,7 @@
 			passwordInput.disabled = false;
 			passwordConfirmationInput.disabled = false;
 			profilePictureInput.disabled = false;
-			submitBtn.style.display = "block"; // show the submit button
+			submitBtn.style.display = "block";
 			showPasswordToggleBtns.forEach(btn => {
 				btn.style.display = "block";
 			});
@@ -156,7 +156,7 @@
 			passwordInput.disabled = true;
 			passwordConfirmationInput.disabled = true;
 			profilePictureInput.disabled = true;
-			submitBtn.style.display = "none"; // hide the submit button
+			submitBtn.style.display = "none";
 			showPasswordToggleBtns.forEach(btn => {
 				btn.style.display = "none";
 			});
@@ -191,7 +191,7 @@
 			const response = await fetch('{{ route('super-admin.validateEditSuperAdminForm', $super_admin->id) }}', {
 				method: 'POST',
 				headers: {
-					'X-CSRF-TOKEN': '{{ csrf_token() }}', // Add CSRF token
+					'X-CSRF-TOKEN': '{{ csrf_token() }}',
 				},
 				body: formData,
 			});

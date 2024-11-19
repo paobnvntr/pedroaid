@@ -68,7 +68,6 @@
     </div>
     
 <script>
-    // Store original values when page loads
     const originalName = "{{ $inquiry->name }}";
     const originalEmail = "{{ $inquiry->email }}";
     const originalInquiry = "{{ $inquiry->inquiry }}";

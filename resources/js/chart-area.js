@@ -1,42 +1,41 @@
-// Set new default font family and font color to mimic Bootstrap's default styling
 Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
 Chart.defaults.global.defaultFontColor = '#858796';
 
-// Pie Chart Example
-    var ctx = document.getElementById("myPieChart");
+var ctx = document.getElementById("myPieChart");
 
-    fetch(feedbackAppointmentRoute)
+fetch(feedbackAppointmentRoute)
     .then(response => response.json())
     .then(data => {
-      var categories = ['Poor', 'Fair', 'Good', 'Excellent'];
+        var categories = ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
 
-      var backgroundColors = categories.map(category => {
-          var colorMap = {
-              'Poor': '#e74a3b',
-              'Fair': '#f6c23e',
-              'Good': '#35784f',
-              'Excellent': '#1cc88a',
-          };
+        var backgroundColors = categories.map(category => {
+            var colorMap = {
+                'Poor': '#e74a3b',
+                'Fair': '#f6c23e',
+                'Good': '#35784f',
+                'Very Good': '#36b9cc',
+                'Excellent': '#1cc88a',
+            };
 
-          return colorMap[category];
-      });
+            return colorMap[category];
+        });
 
-      var hoverBackgroundColors = backgroundColors.map(color => lightenDarkenColor(color, 20));
+        var hoverBackgroundColors = backgroundColors.map(color => lightenDarkenColor(color, 20));
 
-      var myPieChart = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-              labels: categories,
-              datasets: [{
-                  data: categories.map(category => {
-                      var categoryData = data.find(item => item.rating === category);
-                      return categoryData ? categoryData.count : 0;
-                  }),
-                  backgroundColor: backgroundColors,
-                  hoverBackgroundColor: hoverBackgroundColors,
-                  hoverBorderColor: "rgba(234, 236, 244, 1)",
-              }],
-          },
+        var myPieChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: categories,
+                datasets: [{
+                    data: categories.map(category => {
+                        var categoryData = data.find(item => item.rating === category);
+                        return categoryData ? categoryData.count : 0;
+                    }),
+                    backgroundColor: backgroundColors,
+                    hoverBackgroundColor: hoverBackgroundColors,
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }],
+            },
             options: {
                 maintainAspectRatio: false,
                 tooltips: {
@@ -58,52 +57,48 @@ Chart.defaults.global.defaultFontColor = '#858796';
     })
     .catch(error => console.error('Error fetching data:', error));
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
 
     fetch(feedbackDocumentRequestRoute)
-    .then(response => response.json())
-    .then(data => {
-      var categories = ['Poor', 'Fair', 'Good', 'Excellent'];
+        .then(response => response.json())
+        .then(data => {
+            var categories = ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
 
-        categories.forEach((category, index) => {
-            var categoryData = data.find(item => item.rating === category);
-            var percentage = categoryData ? (categoryData.count / data.reduce((acc, item) => acc + item.count, 0)) * 100 : 0;
-            
-            // Update the HTML elements
-            document.getElementById(`${category.toLowerCase()}Progress`).style.width = `${percentage}%`;
-            document.getElementById(`${category.toLowerCase()}Percentage`).textContent = `${percentage.toFixed(2)}%`;
-        });
-        
-    }).catch(error => console.error('Error fetching data:', error));
+            categories.forEach((category, index) => {
+                var categoryData = data.find(item => item.rating === category);
+                var percentage = categoryData ? (categoryData.count / data.reduce((acc, item) => acc + item.count, 0)) * 100 : 0;
+
+                document.getElementById(`${category.toLowerCase()}Progress`).style.width = `${percentage}%`;
+                document.getElementById(`${category.toLowerCase()}Percentage`).textContent = `${percentage.toFixed(2)}%`;
+            });
+
+        }).catch(error => console.error('Error fetching data:', error));
 });
 
-
-  
-// Function to lighten or darken a color
 function lightenDarkenColor(col, amt) {
-  var usePound = false;
+    var usePound = false;
 
-  if (col[0] === "#") {
-      col = col.slice(1);
-      usePound = true;
-  }
+    if (col[0] === "#") {
+        col = col.slice(1);
+        usePound = true;
+    }
 
-  var num = parseInt(col, 16);
+    var num = parseInt(col, 16);
 
-  var r = (num >> 16) + amt;
+    var r = (num >> 16) + amt;
 
-  if (r > 255) r = 255;
-  else if (r < 0) r = 0;
+    if (r > 255) r = 255;
+    else if (r < 0) r = 0;
 
-  var b = ((num >> 8) & 0x00FF) + amt;
+    var b = ((num >> 8) & 0x00FF) + amt;
 
-  if (b > 255) b = 255;
-  else if (b < 0) b = 0;
+    if (b > 255) b = 255;
+    else if (b < 0) b = 0;
 
-  var g = (num & 0x0000FF) + amt;
+    var g = (num & 0x0000FF) + amt;
 
-  if (g > 255) g = 255;
-  else if (g < 0) g = 0;
+    if (g > 255) g = 255;
+    else if (g < 0) g = 0;
 
-  return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
+    return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
 }

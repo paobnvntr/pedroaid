@@ -145,7 +145,6 @@
     </div>
 </div>
 
-<!-- Information for the Minor -->
 <hr>
 
 <div class="form-group text-center">

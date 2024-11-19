@@ -113,7 +113,7 @@
             const response = await fetch('{{ route('validateEditDocumentRequestFeedbackForm', $documentRequest->documentRequest_id) }}', {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}', // Add CSRF token
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 },
                 body: formData,
             });

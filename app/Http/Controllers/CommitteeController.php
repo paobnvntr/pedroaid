@@ -12,14 +12,12 @@ use Illuminate\Support\Facades\DB;
 
 class CommitteeController extends Controller
 {
-    //display committee list
     public function index()
     {
         $committees = Committee::where('is_active', true)->orderBy('created_at', 'ASC')->get();
         return view('committee.index', compact('committees'));
     }
 
-    //redirect to add committee page
     public function addCommittee() 
     {
         return view('committee.addCommittee');
@@ -50,8 +48,7 @@ class CommitteeController extends Controller
             return response()->json(['message' => 'Validation passed']);
         }
     }
-    
-    //save new committee
+
     public function saveCommittee(Request $request)
     {
         $chairman = $request->chairman_firstName . ' ' . $request->chairman_lastName;
@@ -120,7 +117,6 @@ class CommitteeController extends Controller
         ]);
     }
 
-    //redirect to edit ordinance page
     public function editCommittee(string $id)
     {
         $committee = Committee::findOrFail($id);
@@ -145,8 +141,7 @@ class CommitteeController extends Controller
         $lastNames = array_map(function ($member) {
             return $this->extractLastName($member);
         }, $members);
-    
-        // Ensure that the array has three elements
+
         $lastNames += array_fill(0, 3 - count($lastNames), '');
     
         return $lastNames;
@@ -202,17 +197,6 @@ class CommitteeController extends Controller
             'member3_lastName' => 'required_with:member3_firstName',
         ];
     
-        // if ($committee->member_1 == null) {
-        //     unset($rules['member1_firstName'], $rules['member1_lastName']);
-        //     unset($rules['member2_firstName'], $rules['member2_lastName']);
-        //     unset($rules['member3_firstName'], $rules['member3_lastName']);
-        // } elseif ($committee->member_2 == null) {
-        //     unset($rules['member2_firstName'], $rules['member2_lastName']);
-        //     unset($rules['member3_firstName'], $rules['member3_lastName']);
-        // } elseif ($committee->member_3 == null) {
-        //     unset($rules['member3_firstName'], $rules['member3_lastName']);
-        // }
-    
         $validator = Validator::make($request->all(), $rules);
     
         if ($validator->fails()) {
@@ -267,7 +251,6 @@ class CommitteeController extends Controller
         return $currentFirstName . ' ' . $currentLastName;
     }
 
-    // Function to update vice chairman name
     private function updateViceChairman($request, $currentFirstName, $currentLastName) {
         if($request->viceChairman_firstName != $currentFirstName && $request->viceChairman_lastName == $currentLastName) 
         {
@@ -306,7 +289,6 @@ class CommitteeController extends Controller
         return $currentFirstName . ' ' . $currentLastName;
     }
 
-    //update ordinance details
     public function updateCommittee(Request $request, string $id)
     {
         $committee = Committee::findOrFail($id);
@@ -336,7 +318,6 @@ class CommitteeController extends Controller
                 $committee->chairman = $committeeChairman;
                 $committee->vice_chairman = $committeeViceChairman;
 
-                //committee name
                 if($request->name != $committee->name) 
                 {
                     $committee->name = $request->name;
@@ -397,7 +378,6 @@ class CommitteeController extends Controller
                 $committee->vice_chairman = $committeeViceChairman;
                 $committee->member_1 = $committeeMember1;
 
-                //committee name
                 if($request->name != $committee->name) 
                 {
                     $committee->name = $request->name;
@@ -460,7 +440,6 @@ class CommitteeController extends Controller
                 $committee->member_1 = $committeeMember1;
                 $committee->member_2 = $committeeMember2;
 
-                //committee name
                 if($request->name != $committee->name) 
                 {
                     $committee->name = $request->name;
@@ -525,7 +504,6 @@ class CommitteeController extends Controller
                 $committee->member_2 = $committeeMember2;
                 $committee->member_3 = $committeeMember3;
 
-                //committee name
                 if($request->name != $committee->name) 
                 {
                     $committee->name = $request->name;
@@ -564,7 +542,6 @@ class CommitteeController extends Controller
         }
     }
 
-    //delete ordinance
     public function destroyCommittee(string $id)
     {
         try {
@@ -591,8 +568,7 @@ class CommitteeController extends Controller
             return redirect()->route('committee')->with('failed', 'Failed to delete Committee!');
         }
     }
-    
-    // Function to create committee delete log
+
     private function createCommitteeDeleteLog($user, $committee, $subject = 'Delete Committee Success', $errorMessage = null)
     {
         $logData = [
@@ -610,5 +586,4 @@ class CommitteeController extends Controller
     
         Logs::create($logData);
     }
-    
 }

@@ -3,11 +3,9 @@
 @section('title', 'Messages')
   
 @section('contents')
-
     <div class="pt-4 pb-4">
         <div class="container">
             <div class="row">
-                <!-- Unread Messages Card -->
                 <div class="col-md-6 mb-4">
                     <div class="card shadow p-4">
                         <div class="trackerAppointmentContact">
@@ -67,7 +65,6 @@
                     </div>
                 </div>
 
-                <!-- Read Messages Card -->
                 <div class="col-md-6 mb-4">
                     <div class="card shadow p-4">
                         <div class="trackerAppointmentContact">
@@ -91,9 +88,7 @@
                                         }
                                     @endphp
 
-                                    {{-- Check if the notification type matches --}}
                                     @if ($notification->data['is_active'] === true && ($notification->type === 'App\Notifications\NewAppointmentMessage' || $notification->type === 'App\Notifications\NewDocumentRequestMessage' || $notification->type === 'App\Notifications\NewInquiryMessage'))
-                                        {{-- Check if the notification is within the last 7 days --}}
                                         @if ($notificationDate->greaterThanOrEqualTo($sevenDaysAgo))
                                             <a id="notification_{{ $notification->id }}" class="dropdown-item d-flex align-items-center mb-2 notification-item shadow-sm rounded" href="{{ 
                                                 $transactionType === 'Appointment' ? route('appointment.appointmentDetails', $id) :
@@ -120,5 +115,4 @@
             </div>
         </div>
     </div>
-
 @endsection

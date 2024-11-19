@@ -149,7 +149,6 @@
                     <hr>
                     <div>
                         <div class="message-wrapper">
-                            <!-- Message History Here -->
                             <div class="message-container" >
                                 @foreach($messages as $documentRequestMessage)
                                                              

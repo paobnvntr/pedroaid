@@ -1,4 +1,3 @@
-<!-- Modal -->
 <div class="modal fade" id="privacyModal" tabindex="-1" role="dialog" aria-labelledby="privacyModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
@@ -6,7 +5,6 @@
                 <h5 class="modal-title" id="privacyModalLabel">Privacy Policies</h5>
             </div>
             <div class="modal-body">
-                <!-- Your terms and conditions content goes here -->
                 <p>Welcome to PedroAID. We are committed to protecting your privacy and ensuring that your personal information is handled in a safe and responsible manner. This Privacy Policy outlines how we collect, use, and protect your information when you visit our website.</p>
                 <p><strong>Information We Collect:</strong> We may collect Personal Information that includes your name, email address, phone number, and any other information you provide when you contact us or tried any of our services.</p>
                 <p><strong>How We Use Your Information:</strong> We use your information for several purposes. Primarily, we utilize it to provide our services, which includes scheduling appointments, responding to inquiries, and offering legal services. Additionally, we analyze how our Website is used to improve its functionality and enhance the user experience. Furthermore, if you have opted in to receive communications from us, we may use your information to send you updates, newsletters, and other information that may be of interest to you.</p>

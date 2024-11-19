@@ -16,20 +16,17 @@ use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
-    // display admin list
     public function index()
     {
         $admin = User::where('level', 'admin')->where('is_active', true)->orderBy('created_at', 'ASC')->get();
         return view('admin.index', compact('admin'));
     }
 
-    // redirect to add admin page
     public function addAdmin() 
     {
         return view('admin.addAdmin');
     }
 
-    // validate add admin form
     public function validateAddAdminForm(Request $request) {
         $validator = Validator::make($request->all(), [
             '_token' => 'required',
@@ -49,18 +46,15 @@ class AdminController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()]);
-        }else {
+        } else {
             return response()->json(['message' => 'Validation passed']);
         }
     }
 
-    // save admin
     public function saveAdmin(Request $request)
     {
         $filePath = $this->uploadProfilePicture($request);
-
         $password = "24AID_" . trim($request->username);
-    
         $adminData = [
             'name' => trim($request->name),
             'username' => trim($request->username),
@@ -71,11 +65,9 @@ class AdminController extends Controller
             'created_at' => now('Asia/Manila'),
             'updated_at' => now('Asia/Manila'),
         ];
-    
         $createAdmin = User::create($adminData);
-    
         $user = Auth::user()->username;
-    
+
         if ($createAdmin) {
             $this->logAddAdminSuccess($user, $request->username);
             session()->flash('password', $password);
@@ -86,7 +78,6 @@ class AdminController extends Controller
         }
     }
 
-    // upload profile picture
     private function uploadProfilePicture(Request $request)
     {
         if ($request->hasFile('profile_picture')) {
@@ -98,11 +89,9 @@ class AdminController extends Controller
         } else {
             $filePath = 'uploads/profile/admin/default_admin.jpg';
         }
-
         return $filePath;
     }
-    
-    // log the success add admin
+
     private function logAddAdminSuccess($user, $username)
     {
         Logs::create([
@@ -114,8 +103,7 @@ class AdminController extends Controller
             'updated_at' => now('Asia/Manila'),
         ]);
     }
-    
-    // log the failed add admin
+
     private function logAddAdminFailed($user, $username)
     {
         Logs::create([
@@ -126,9 +114,8 @@ class AdminController extends Controller
             'created_at' => now('Asia/Manila'),
             'updated_at' => now('Asia/Manila'),
         ]);
-    }    
+    }
 
-    // redirect to admin edit page
     public function editAdmin(string $id)
     {
         $admin = User::where('level', 'admin')->findorFail($id);
@@ -148,24 +135,18 @@ class AdminController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()]);
-        }else {
+        } else {
             return response()->json(['message' => 'Validation passed']);
         }
     }
 
-
-    // update admin details
     public function updateAdmin(Request $request, string $id)
     {
         $admin = User::findOrFail($id);
 
-        // Update user details
         if ($this->shouldUpdateUserDetails($admin, $request)) {
             $this->updateUserDetails($admin, $request);
-
-            // Log the update
             $this->logUpdate($admin);
-
             return redirect()
                 ->route('admin.editAdmin', $admin->id)
                 ->with('success', 'Admin Details Updated Successfully!');
@@ -176,7 +157,6 @@ class AdminController extends Controller
         }
     }
 
-    // check if user details should be updated
     private function shouldUpdateUserDetails(User $user, Request $request)
     {
         return (
@@ -188,7 +168,6 @@ class AdminController extends Controller
         );
     }
 
-    // update user details
     private function updateUserDetails(User $user, Request $request)
     {
         $user->name = $request->filled('name') ? $request->name : $user->name;
@@ -207,7 +186,6 @@ class AdminController extends Controller
         $user->update();
     }
 
-    // update profile picture
     private function updateProfilePicture(User $user, UploadedFile $file)
     {
         $originalFileName = $file->getClientOriginalName();
@@ -222,7 +200,6 @@ class AdminController extends Controller
         $user->profile_picture = $filePath;
     }
 
-    // log the update
     private function logUpdate(User $user)
     {
         $logType = 'Edit Admin';
@@ -246,35 +223,25 @@ class AdminController extends Controller
         ]);
     }
 
-    // delete admin account
     public function destroyAdmin(string $id)
     {
         try {
             DB::beginTransaction();
-    
             $admin = User::findOrFail($id);
             $user = Auth::user()->username;
-    
             $this->createAdminDeleteLog($user, $admin);
-
             $admin->is_active = false;
             $admin->updated_at = now('Asia/Manila');
-    
             $admin->update();
-    
             DB::commit();
-    
             return redirect()->route('admin')->with('success', 'Admin Deleted Successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
-    
             $this->createAdminDeleteLog($user, $admin, 'Failed to delete Admin', $e->getMessage());
-    
             return redirect()->route('admin')->with('failed', 'Failed to delete Admin!');
         }
     }
-    
-    // Function to create admin delete log
+
     private function createAdminDeleteLog($user, $admin, $subject = 'Delete Admin Success', $errorMessage = null)
     {
         $logData = [
@@ -285,12 +252,11 @@ class AdminController extends Controller
             'created_at' => now('Asia/Manila'),
             'updated_at' => now('Asia/Manila'),
         ];
-    
+
         if ($errorMessage) {
             $logData['message'] .= ' Error: ' . $errorMessage;
         }
-    
-        Logs::create($logData);
-    }    
-}
 
+        Logs::create($logData);
+    }
+}

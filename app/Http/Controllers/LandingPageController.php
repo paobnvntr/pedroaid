@@ -94,17 +94,14 @@ class LandingPageController extends Controller
     }
 
     public function searchOrdinance(Request $request) {
-        // Get the search query from the request
         $query = $request->input('query');
 
-        // Perform the search in the ordinances table
         $ordinances = Ordinances::where('ordinance_number', 'like', "%{$query}%")
                                 ->orWhere('committee', 'like', "%{$query}%")
                                 ->orWhere('date_approved', 'like', "%{$query}%")
                                 ->orWhere('description', 'like', "%{$query}%")
                                 ->get();
 
-        // Return the matching ordinances as JSON response
         return response()->json($ordinances);
     }
 
@@ -116,8 +113,7 @@ class LandingPageController extends Controller
     public function checkDateAvailability(Request $request) {
         $timeslots = ['14:00', '14:10', '14:20', '14:30', '14:40', '14:50', '15:00', '15:10', '15:20', '15:30', '15:40', '15:50'];
         $fullyBookedDates = [];
-    
-        // Get all unique dates from the appointments table
+
         $dates = Appointment::select('appointment_date')
                             ->whereIn('appointment_status', ['Pending', 'Booked', 'Rescheduled'])
                             ->where('appointment_date', '>=', Carbon::now('Asia/Manila'))
@@ -409,7 +405,6 @@ class LandingPageController extends Controller
                 'image',
                 'mimes:jpg,jpeg,png',
                 Rule::requiredIf(function () use ($request) {
-                    // Check if the checkbox is checked
                     return $request->input('document_type') === 'Extra Judicial' &&
                             !$request->input('deceased_spouse');
                 }),
@@ -418,7 +413,6 @@ class LandingPageController extends Controller
                 'image',
                 'mimes:jpg,jpeg,png',
                 Rule::requiredIf(function () use ($request) {
-                    // Check if the checkbox is checked
                     return $request->input('document_type') === 'Extra Judicial' &&
                             !$request->input('deceased_spouse');
                 }),

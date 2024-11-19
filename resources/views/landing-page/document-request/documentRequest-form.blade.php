@@ -433,59 +433,45 @@
             }
         });
 
-        // Declare cloneCount outside of the event handler function
         var cloneCount = 0;
 
         document.getElementById('addHeirBtn').addEventListener('click', function() {
             var heirFields = document.getElementById('heirFields');
             var deceasedFields = document.getElementById('deceasedFields');
-            var clone = deceasedFields.cloneNode(true); // Clone the entire deceasedFields section
+            var clone = deceasedFields.cloneNode(true);
 
-            // Increment cloneCount each time the button is clicked
             cloneCount++;
 
-            // Modify the id attribute of the cloned fields and adjust the names to use array-like structure
             var clonedFields = clone.querySelectorAll('input, select, textarea');
             clonedFields.forEach(function(field) {
                 var originalId = field.id;
                 var originalName = field.name;
                 
-                field.id = originalName.replace(/\[\d+\]/, '[' + cloneCount + ']'); // Adjust id for array-like structure
-                field.name = originalName.replace(/\[\d+\]/, '[' + cloneCount + ']'); // Adjust name for array-like structure
+                field.id = originalName.replace(/\[\d+\]/, '[' + cloneCount + ']');
+                field.name = originalName.replace(/\[\d+\]/, '[' + cloneCount + ']');
 
                 var errorElement = document.querySelector('[data-error="' + originalName + '"]');
                 if (errorElement) {
                     errorElement.setAttribute('data-error', field.name);
                 }
 
-                // Update value using old() function for Laravel
                 field.value = '{{ old(' + JSON.stringify(originalName) + ') }}';
             });
 
-            // Modify the id attribute of the cloned deceasedField
             clone.id = 'deceasedFields_' + cloneCount;
-
-            // Insert the cloned fields before the addHeirBtn
             heirFields.insertBefore(clone, document.getElementById('buttons'));
-
-            // Enable the delete button
             document.getElementById('deleteHeirBtn').disabled = false;
         });
 
         document.getElementById('deleteHeirBtn').addEventListener('click', function() {
-            // Find the most recent cloned field
             var mostRecentClone = document.getElementById('deceasedFields_' + cloneCount);
             if (mostRecentClone) {
-                // Remove the most recent cloned field when the delete button is clicked
                 mostRecentClone.remove();
-                // Decrement the cloneCount variable
                 cloneCount--;
 
-                // If there are no remaining cloned fields, disable the delete button
                 var deleteButton = document.getElementById('deleteHeirBtn');
                 deleteButton.disabled = cloneCount === 0;
 
-                // Adjust the index of the remaining fields
                 var heirFields = document.getElementById('heirFields');
                 var clonedFields = heirFields.querySelectorAll('[id^="deceasedFields_"]');
                 clonedFields.forEach(function(field, index) {
@@ -499,7 +485,6 @@
                 });
             }
         });
-
     }
 
     documentType.addEventListener('change', () => {
@@ -627,7 +612,7 @@
             const response = await fetch('{{ route('validateDocumentRequestForm') }}', {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}', // Add CSRF token
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 },
                 body: formData,
             });
@@ -651,10 +636,9 @@
                 for (const [key, value] of Object.entries(data.errors)) {
                     let modifiedKey = key;
                     if (key.includes('.')) {
-                        modifiedKey = key.replace(/\./, '[') + ']'; // Replace dot with '[' and add ']'
+                        modifiedKey = key.replace(/\./, '[') + ']';
                     }
 
-                    // console.log(`${modifiedKey}: ${value}`);
                     const input = document.querySelector(`[name="${modifiedKey}"]`);
                     const error = document.createElement('div');
                     error.classList.add('invalid-feedback');

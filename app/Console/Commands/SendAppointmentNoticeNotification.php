@@ -17,13 +17,11 @@ class SendAppointmentNoticeNotification extends Command
     {
         $reminderDate = Carbon::tomorrow();
 
-        // Query database for appointments scheduled for the next day
         $appointments = Appointment::whereDate('appointment_date', $reminderDate->toDateString())
                         ->whereIn('appointment_status', ['Booked', 'Rescheduled'])
                         ->get();
 
         foreach ($appointments as $appointment) {
-            // Send email reminder
             Mail::to($appointment->email)->send(new AppointmentReminder($appointment));
         }
 

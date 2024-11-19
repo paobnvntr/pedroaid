@@ -109,7 +109,7 @@
             dateApprovedInput.disabled = false;
             descriptionInput.disabled = false;
             ordinanceFileInput.disabled = false;
-			submitBtn.style.display = "block"; // show the submit button
+			submitBtn.style.display = "block";
 		} else {
 			editOrdinanceBtn.textContent = "Edit Ordinance";
 			editOrdinanceBtn.classList.remove("btn-danger");
@@ -119,9 +119,8 @@
             dateApprovedInput.disabled = true;
             descriptionInput.disabled = true;
             ordinanceFileInput.disabled = true;
-			submitBtn.style.display = "none"; // hide the submit button
+			submitBtn.style.display = "none";
 
-			// reset the form
             committeeInput.value = originalCommittee;
             ordinanceNumberInput.value = originalOrdinanceNumber;
             dateApprovedInput.value = originalDateApproved;
@@ -150,7 +149,7 @@
 			const response = await fetch('{{ route('ordinance.validateEditOrdinanceForm', $ordinance->id) }}', {
 				method: 'POST',
 				headers: {
-					'X-CSRF-TOKEN': '{{ csrf_token() }}', // Add CSRF token
+					'X-CSRF-TOKEN': '{{ csrf_token() }}',
 				},
 				body: formData,
 			});
